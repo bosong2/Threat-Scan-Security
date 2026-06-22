@@ -191,8 +191,9 @@ done
 echo "🔗 Sub-skill 파일 내 경로 치환 중..."
 for md_file in "${SUB_SKILLS_DIR}"/*.md; do
     if [ -f "$md_file" ]; then
-        sed -i '' 's|../../docs/|../docs/|g' "$md_file"
-        sed -i '' 's|../../dictionary/|../dictionary/|g' "$md_file"
+        # macOS(BSD sed)·Linux(GNU sed) 양쪽 호환을 위해 -i 대신 임시파일 방식 사용
+        sed -e 's|../../docs/|../docs/|g' -e 's|../../dictionary/|../dictionary/|g' \
+            "$md_file" > "${md_file}.tmp" && mv "${md_file}.tmp" "$md_file"
     fi
 done
 echo "   ✓ 경로 치환 완료"
