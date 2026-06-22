@@ -1,0 +1,10 @@
+{
+  "name": "threat-scan-security",
+  "version": "2.3.1",
+  "description": "Scan skills/agents/plugins/repos for security threats, model validity, and dependencies (17 ecosystems, lock-aware); emit bilingual JSON + static HTML report. Dual-mode: Claude Code plugin and Claude Desktop skill.",
+  "author": { "name": "Bosung Hong (bosong2)", "url": "https://github.com/bosong2" },
+  "homepage": "https://github.com/bosong2/Threat-Scan-Security",
+  "repository": "https://github.com/bosong2/Threat-Scan-Security",
+  "license": "Apache-2.0",
+  "keywords": ["security", "skill", "agent", "plugin", "audit", "threat-scan", "html-report"]
+}

@@ -1,0 +1,43 @@
+name: Release Claude Desktop Skill
+
+# 태그(v*) push 시 build_claude_desktop.sh 로 zip 을 만들어 릴리스에 첨부한다.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify tag matches VERSION
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          FILE_VER="$(cat VERSION | tr -d '[:space:]')"
+          echo "tag=$TAG file=$FILE_VER"
+          if [ "$TAG" != "$FILE_VER" ]; then
+            echo "::warning::Tag ($TAG) 와 VERSION 파일 ($FILE_VER) 이 일치하지 않습니다."
+          fi
+
+      - name: Build Claude Desktop skill zip
+        run: bash build_claude_desktop.sh
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Threat-scan-security ${{ github.ref_name }}
+          files: threat-scan-security.zip
+          generate_release_notes: true
+          body: |
+            Claude Desktop Skill 패키지 — `threat-scan-security.zip`
+
+            **설치**: Claude Desktop ▸ Settings ▸ Capabilities ▸ Skills ▸ Upload
+            **Claude Code**: `/plugin marketplace add` 후 `/plugin install`
+
+            Author: Bosung Hong (bosong2) · License: Apache-2.0

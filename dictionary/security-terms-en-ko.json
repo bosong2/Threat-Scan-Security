@@ -1,0 +1,1179 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-02-05",
+    "sources": [
+      "NIST SP 800-53",
+      "NIST CSF 2.0",
+      "NIST Glossary",
+      "CIS Controls v8.1",
+      "ISO 27001:2022",
+      "OWASP",
+      "KISA 정보보호 용어"
+    ],
+    "supported_languages": ["en", "ko"],
+    "total_terms": 250
+  },
+  "categories": {
+    "severity": {
+      "en": "Severity",
+      "ko": "심각도"
+    },
+    "finding_type": {
+      "en": "Finding Type",
+      "ko": "발견 유형"
+    },
+    "security_control": {
+      "en": "Security Control",
+      "ko": "보안 통제"
+    },
+    "compliance": {
+      "en": "Compliance",
+      "ko": "컴플라이언스"
+    },
+    "vulnerability": {
+      "en": "Vulnerability",
+      "ko": "취약점"
+    },
+    "threat": {
+      "en": "Threat",
+      "ko": "위협"
+    },
+    "risk": {
+      "en": "Risk",
+      "ko": "위험"
+    },
+    "sbom": {
+      "en": "SBOM",
+      "ko": "소프트웨어 구성표"
+    },
+    "license": {
+      "en": "License",
+      "ko": "라이선스"
+    },
+    "action": {
+      "en": "Action",
+      "ko": "조치"
+    }
+  },
+  "terms": [
+    {
+      "id": "SEV-001",
+      "category": "severity",
+      "en": {
+        "term": "Critical",
+        "definition": "Highest severity level requiring immediate action. Exploitation could result in complete system compromise.",
+        "context": "severity_level"
+      },
+      "ko": {
+        "term": "심각",
+        "definition": "즉각적인 조치가 필요한 최고 심각도 수준. 악용 시 시스템 전체가 손상될 수 있음.",
+        "context": "심각도_수준"
+      },
+      "source": "NIST CSF"
+    },
+    {
+      "id": "SEV-002",
+      "category": "severity",
+      "en": {
+        "term": "High",
+        "definition": "High severity level requiring priority remediation. Significant impact on confidentiality, integrity, or availability.",
+        "context": "severity_level"
+      },
+      "ko": {
+        "term": "높음",
+        "definition": "우선 조치가 필요한 높은 심각도 수준. 기밀성, 무결성 또는 가용성에 중대한 영향.",
+        "context": "심각도_수준"
+      },
+      "source": "NIST CSF"
+    },
+    {
+      "id": "SEV-003",
+      "category": "severity",
+      "en": {
+        "term": "Medium",
+        "definition": "Medium severity level requiring planned remediation. Moderate impact on system security.",
+        "context": "severity_level"
+      },
+      "ko": {
+        "term": "중간",
+        "definition": "계획된 조치가 필요한 중간 심각도 수준. 시스템 보안에 중간 정도의 영향.",
+        "context": "심각도_수준"
+      },
+      "source": "NIST CSF"
+    },
+    {
+      "id": "SEV-004",
+      "category": "severity",
+      "en": {
+        "term": "Low",
+        "definition": "Low severity level. Minor security impact, remediation recommended but not urgent.",
+        "context": "severity_level"
+      },
+      "ko": {
+        "term": "낮음",
+        "definition": "낮은 심각도 수준. 경미한 보안 영향, 조치 권장되나 긴급하지 않음.",
+        "context": "심각도_수준"
+      },
+      "source": "NIST CSF"
+    },
+    {
+      "id": "SEV-005",
+      "category": "severity",
+      "en": {
+        "term": "Info",
+        "definition": "Informational finding. No direct security impact but may be useful for awareness.",
+        "context": "severity_level"
+      },
+      "ko": {
+        "term": "정보",
+        "definition": "정보성 발견 항목. 직접적인 보안 영향 없으나 인지에 유용할 수 있음.",
+        "context": "심각도_수준"
+      },
+      "source": "NIST CSF"
+    },
+    {
+      "id": "STAT-001",
+      "category": "finding_type",
+      "en": {
+        "term": "Confirmed",
+        "definition": "Finding has been verified and confirmed as a genuine security issue.",
+        "context": "finding_status"
+      },
+      "ko": {
+        "term": "확인됨",
+        "definition": "발견 항목이 실제 보안 이슈로 검증 및 확인됨.",
+        "context": "발견_상태"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "STAT-002",
+      "category": "finding_type",
+      "en": {
+        "term": "Mitigated",
+        "definition": "Security issue has been addressed through compensating controls or fixes.",
+        "context": "finding_status"
+      },
+      "ko": {
+        "term": "완화됨",
+        "definition": "보안 이슈가 보완 통제 또는 수정을 통해 해결됨.",
+        "context": "발견_상태"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "STAT-003",
+      "category": "finding_type",
+      "en": {
+        "term": "False Positive",
+        "definition": "Initially flagged item that was determined not to be a genuine security issue.",
+        "context": "finding_status"
+      },
+      "ko": {
+        "term": "오탐",
+        "definition": "처음 표시되었으나 실제 보안 이슈가 아닌 것으로 판정된 항목.",
+        "context": "발견_상태"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "VULN-T-001",
+      "category": "vulnerability",
+      "en": {
+        "term": "Command Injection",
+        "definition": "Attack technique where malicious commands are inserted into application input to be executed by the system.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "명령 주입",
+        "definition": "악성 명령이 애플리케이션 입력에 삽입되어 시스템에서 실행되는 공격 기법.",
+        "context": "취약점_유형"
+      },
+      "source": "OWASP, CWE-78"
+    },
+    {
+      "id": "VULN-T-002",
+      "category": "vulnerability",
+      "en": {
+        "term": "SQL Injection",
+        "definition": "Code injection technique used to attack data-driven applications by inserting malicious SQL statements.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "SQL 주입",
+        "definition": "악성 SQL 문을 삽입하여 데이터 기반 애플리케이션을 공격하는 코드 주입 기법.",
+        "context": "취약점_유형"
+      },
+      "source": "OWASP, CWE-89"
+    },
+    {
+      "id": "VULN-T-003",
+      "category": "vulnerability",
+      "en": {
+        "term": "Cross-Site Scripting",
+        "definition": "Attack where malicious scripts are injected into otherwise benign websites.",
+        "abbreviation": "XSS",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "크로스 사이트 스크립팅",
+        "definition": "악성 스크립트가 정상적인 웹사이트에 삽입되는 공격.",
+        "abbreviation": "XSS",
+        "context": "취약점_유형"
+      },
+      "source": "OWASP, CWE-79"
+    },
+    {
+      "id": "VULN-T-004",
+      "category": "vulnerability",
+      "en": {
+        "term": "Hardcoded Credential",
+        "definition": "Authentication credentials embedded directly in source code rather than being externally configured.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "하드코딩된 자격 증명",
+        "definition": "외부 설정이 아닌 소스 코드에 직접 포함된 인증 자격 증명.",
+        "context": "취약점_유형"
+      },
+      "source": "CWE-798"
+    },
+    {
+      "id": "VULN-T-005",
+      "category": "vulnerability",
+      "en": {
+        "term": "Prototype Pollution",
+        "definition": "JavaScript vulnerability that allows attackers to modify Object prototype properties.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "프로토타입 오염",
+        "definition": "공격자가 JavaScript Object 프로토타입 속성을 수정할 수 있는 취약점.",
+        "context": "취약점_유형"
+      },
+      "source": "CWE-1321"
+    },
+    {
+      "id": "VULN-T-006",
+      "category": "vulnerability",
+      "en": {
+        "term": "Remote Code Execution",
+        "definition": "Vulnerability that allows an attacker to execute arbitrary code on a remote system.",
+        "abbreviation": "RCE",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "원격 코드 실행",
+        "definition": "공격자가 원격 시스템에서 임의의 코드를 실행할 수 있는 취약점.",
+        "abbreviation": "RCE",
+        "context": "취약점_유형"
+      },
+      "source": "CWE-94"
+    },
+    {
+      "id": "VULN-T-007",
+      "category": "vulnerability",
+      "en": {
+        "term": "Insecure Deserialization",
+        "definition": "Vulnerability where untrusted data is used to abuse application logic or execute arbitrary code.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "안전하지 않은 역직렬화",
+        "definition": "신뢰할 수 없는 데이터가 애플리케이션 로직을 악용하거나 임의 코드를 실행하는 데 사용되는 취약점.",
+        "context": "취약점_유형"
+      },
+      "source": "OWASP, CWE-502"
+    },
+    {
+      "id": "VULN-T-008",
+      "category": "vulnerability",
+      "en": {
+        "term": "Path Traversal",
+        "definition": "Attack technique allowing access to files outside the intended directory.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "경로 탐색",
+        "definition": "의도된 디렉토리 외부의 파일에 접근할 수 있게 하는 공격 기법.",
+        "context": "취약점_유형"
+      },
+      "source": "CWE-22"
+    },
+    {
+      "id": "VULN-T-009",
+      "category": "vulnerability",
+      "en": {
+        "term": "Prompt Injection",
+        "definition": "Attack technique where malicious input manipulates AI/LLM system prompts to bypass intended behavior.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "프롬프트 인젝션",
+        "definition": "악의적인 입력이 AI/LLM 시스템 프롬프트를 조작하여 의도된 동작을 우회하는 공격 기법.",
+        "context": "취약점_유형"
+      },
+      "source": "OWASP LLM Top 10"
+    },
+    {
+      "id": "VULN-T-010",
+      "category": "vulnerability",
+      "en": {
+        "term": "Privilege Escalation",
+        "definition": "Attack where a user gains elevated access to resources normally protected from them.",
+        "context": "vulnerability_type"
+      },
+      "ko": {
+        "term": "권한 상승",
+        "definition": "사용자가 일반적으로 보호된 리소스에 대한 상승된 접근 권한을 획득하는 공격.",
+        "context": "취약점_유형"
+      },
+      "source": "CWE-269"
+    },
+    {
+      "id": "SENS-001",
+      "category": "finding_type",
+      "en": {
+        "term": "Sensitive Pattern",
+        "definition": "Text pattern that may indicate presence of sensitive information such as credentials or PII.",
+        "context": "finding_type"
+      },
+      "ko": {
+        "term": "민감 패턴",
+        "definition": "자격 증명이나 개인정보 등 민감 정보의 존재를 나타낼 수 있는 텍스트 패턴.",
+        "context": "발견_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SENS-002",
+      "category": "finding_type",
+      "en": {
+        "term": "API Key",
+        "definition": "Authentication token used to identify and authorize API access.",
+        "context": "sensitive_data"
+      },
+      "ko": {
+        "term": "API 키",
+        "definition": "API 접근을 식별하고 인증하는 데 사용되는 인증 토큰.",
+        "context": "민감_데이터"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SENS-003",
+      "category": "finding_type",
+      "en": {
+        "term": "Private Key",
+        "definition": "Cryptographic key that must be kept confidential and is used for decryption or signing.",
+        "context": "sensitive_data"
+      },
+      "ko": {
+        "term": "개인키",
+        "definition": "기밀로 유지해야 하며 복호화 또는 서명에 사용되는 암호화 키.",
+        "context": "민감_데이터"
+      },
+      "source": "NIST SP 800-57"
+    },
+    {
+      "id": "SENS-004",
+      "category": "finding_type",
+      "en": {
+        "term": "Access Token",
+        "definition": "Credential that grants access to protected resources on behalf of a user or system.",
+        "context": "sensitive_data"
+      },
+      "ko": {
+        "term": "액세스 토큰",
+        "definition": "사용자 또는 시스템을 대신하여 보호된 리소스에 대한 접근을 부여하는 자격 증명.",
+        "context": "민감_데이터"
+      },
+      "source": "OAuth 2.0"
+    },
+    {
+      "id": "SENS-005",
+      "category": "finding_type",
+      "en": {
+        "term": "Personally Identifiable Information",
+        "abbreviation": "PII",
+        "definition": "Information that can be used to identify a specific individual.",
+        "context": "sensitive_data"
+      },
+      "ko": {
+        "term": "개인식별정보",
+        "abbreviation": "PII",
+        "definition": "특정 개인을 식별하는 데 사용될 수 있는 정보.",
+        "context": "민감_데이터"
+      },
+      "source": "NIST SP 800-122"
+    },
+    {
+      "id": "LIC-T-001",
+      "category": "license",
+      "en": {
+        "term": "Copyleft",
+        "definition": "License type requiring derivative works to be distributed under the same license terms.",
+        "context": "license_type"
+      },
+      "ko": {
+        "term": "카피레프트",
+        "definition": "파생 저작물이 동일한 라이선스 조건으로 배포되어야 하는 라이선스 유형.",
+        "context": "라이선스_유형"
+      },
+      "source": "OSI"
+    },
+    {
+      "id": "LIC-T-002",
+      "category": "license",
+      "en": {
+        "term": "Permissive License",
+        "definition": "License with minimal restrictions on how software can be used, modified, and redistributed.",
+        "context": "license_type"
+      },
+      "ko": {
+        "term": "허용적 라이선스",
+        "definition": "소프트웨어의 사용, 수정 및 재배포에 대한 제한이 최소화된 라이선스.",
+        "context": "라이선스_유형"
+      },
+      "source": "OSI"
+    },
+    {
+      "id": "LIC-T-003",
+      "category": "license",
+      "en": {
+        "term": "License Incompatibility",
+        "definition": "Situation where license terms of dependencies conflict with the project license.",
+        "context": "license_issue"
+      },
+      "ko": {
+        "term": "라이선스 비호환성",
+        "definition": "의존성의 라이선스 조건이 프로젝트 라이선스와 충돌하는 상황.",
+        "context": "라이선스_이슈"
+      },
+      "source": "OSI"
+    },
+    {
+      "id": "SBOM-001",
+      "category": "sbom",
+      "en": {
+        "term": "Software Bill of Materials",
+        "abbreviation": "SBOM",
+        "definition": "Formal record containing details and supply chain relationships of components used in building software.",
+        "context": "sbom"
+      },
+      "ko": {
+        "term": "소프트웨어 구성표",
+        "abbreviation": "SBOM",
+        "definition": "소프트웨어 구축에 사용된 구성 요소의 세부 정보와 공급망 관계를 포함하는 공식 기록.",
+        "context": "SBOM"
+      },
+      "source": "NTIA, Executive Order 14028"
+    },
+    {
+      "id": "SBOM-002",
+      "category": "sbom",
+      "en": {
+        "term": "Direct Dependency",
+        "definition": "Package or library explicitly required by a project in its manifest file.",
+        "context": "dependency_type"
+      },
+      "ko": {
+        "term": "직접 의존성",
+        "definition": "프로젝트의 매니페스트 파일에서 명시적으로 요구하는 패키지 또는 라이브러리.",
+        "context": "의존성_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SBOM-003",
+      "category": "sbom",
+      "en": {
+        "term": "Transitive Dependency",
+        "definition": "Package required by a project's direct dependencies but not explicitly declared.",
+        "context": "dependency_type"
+      },
+      "ko": {
+        "term": "전이 의존성",
+        "definition": "프로젝트의 직접 의존성에서 요구하지만 명시적으로 선언되지 않은 패키지.",
+        "context": "의존성_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SBOM-004",
+      "category": "sbom",
+      "en": {
+        "term": "Unpinned Version",
+        "definition": "Dependency version specification using ranges instead of exact versions.",
+        "context": "version_risk"
+      },
+      "ko": {
+        "term": "고정되지 않은 버전",
+        "definition": "정확한 버전 대신 범위를 사용하는 의존성 버전 지정.",
+        "context": "버전_위험"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SBOM-005",
+      "category": "sbom",
+      "en": {
+        "term": "Deprecated Package",
+        "definition": "Package that is no longer maintained or has been superseded by a newer alternative.",
+        "context": "version_risk"
+      },
+      "ko": {
+        "term": "지원 중단 패키지",
+        "definition": "더 이상 유지 관리되지 않거나 새로운 대안으로 대체된 패키지.",
+        "context": "버전_위험"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SUPPLY-001",
+      "category": "sbom",
+      "en": {
+        "term": "Typosquatting",
+        "definition": "Attack where malicious packages use names similar to popular packages to trick developers.",
+        "context": "supply_chain_risk"
+      },
+      "ko": {
+        "term": "타이포스쿼팅",
+        "definition": "악성 패키지가 유명 패키지와 유사한 이름을 사용하여 개발자를 속이는 공격.",
+        "context": "공급망_위험"
+      },
+      "source": "NIST"
+    },
+    {
+      "id": "SUPPLY-002",
+      "category": "sbom",
+      "en": {
+        "term": "Supply Chain Attack",
+        "definition": "Attack targeting vulnerabilities in software supply chain to compromise downstream users.",
+        "context": "supply_chain_risk"
+      },
+      "ko": {
+        "term": "공급망 공격",
+        "definition": "소프트웨어 공급망의 취약점을 대상으로 하여 다운스트림 사용자를 손상시키는 공격.",
+        "context": "공급망_위험"
+      },
+      "source": "NIST SP 800-161"
+    },
+    {
+      "id": "CTRL-001",
+      "category": "security_control",
+      "en": {
+        "term": "Access Control",
+        "definition": "Security technique regulating who or what can view or use resources.",
+        "context": "control_type"
+      },
+      "ko": {
+        "term": "접근 제어",
+        "definition": "누가 또는 무엇이 리소스를 보거나 사용할 수 있는지 규제하는 보안 기법.",
+        "context": "통제_유형"
+      },
+      "source": "NIST SP 800-53"
+    },
+    {
+      "id": "CTRL-002",
+      "category": "security_control",
+      "en": {
+        "term": "Input Validation",
+        "definition": "Process of ensuring input data is correct and safe before processing.",
+        "context": "control_type"
+      },
+      "ko": {
+        "term": "입력 검증",
+        "definition": "처리 전 입력 데이터가 올바르고 안전한지 확인하는 프로세스.",
+        "context": "통제_유형"
+      },
+      "source": "OWASP"
+    },
+    {
+      "id": "CTRL-003",
+      "category": "security_control",
+      "en": {
+        "term": "Encryption",
+        "definition": "Process of converting information into a form that unauthorized parties cannot read.",
+        "context": "control_type"
+      },
+      "ko": {
+        "term": "암호화",
+        "definition": "정보를 권한이 없는 당사자가 읽을 수 없는 형태로 변환하는 프로세스.",
+        "context": "통제_유형"
+      },
+      "source": "NIST SP 800-175B"
+    },
+    {
+      "id": "CTRL-004",
+      "category": "security_control",
+      "en": {
+        "term": "Least Privilege",
+        "definition": "Security principle of granting only minimum permissions necessary to perform a function.",
+        "context": "security_principle"
+      },
+      "ko": {
+        "term": "최소 권한",
+        "definition": "기능 수행에 필요한 최소한의 권한만 부여하는 보안 원칙.",
+        "context": "보안_원칙"
+      },
+      "source": "NIST SP 800-53"
+    },
+    {
+      "id": "CTRL-005",
+      "category": "security_control",
+      "en": {
+        "term": "Defense in Depth",
+        "definition": "Security strategy using multiple layers of controls to protect resources.",
+        "context": "security_principle"
+      },
+      "ko": {
+        "term": "심층 방어",
+        "definition": "리소스를 보호하기 위해 여러 계층의 통제를 사용하는 보안 전략.",
+        "context": "보안_원칙"
+      },
+      "source": "NIST"
+    },
+    {
+      "id": "ACT-001",
+      "category": "action",
+      "en": {
+        "term": "Recommendation",
+        "definition": "Suggested action to address a security finding or improve security posture.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "권장 조치",
+        "definition": "보안 발견 항목을 해결하거나 보안 상태를 개선하기 위한 제안된 조치.",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "ACT-001A",
+      "category": "action",
+      "en": {
+        "term": "Rank",
+        "definition": "Processing order of a recommendation, starting at 1 (highest priority first).",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "순위",
+        "definition": "권장 조치의 처리 순서. 1부터 시작하며 1이 최우선.",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "ACT-001B",
+      "category": "action",
+      "en": {
+        "term": "Related Findings",
+        "definition": "The finding IDs (e.g. STATIC-001) that a recommendation is derived from.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "관련 발견",
+        "definition": "권장 조치가 파생된 근거 발견 항목의 ID 목록(예: STATIC-001).",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "ACT-002",
+      "category": "action",
+      "en": {
+        "term": "Remediation",
+        "definition": "Process of fixing or addressing a security vulnerability or issue.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "교정",
+        "definition": "보안 취약점이나 이슈를 수정하거나 해결하는 프로세스.",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "ACT-003",
+      "category": "action",
+      "en": {
+        "term": "Patch",
+        "definition": "Update designed to fix security vulnerabilities or bugs in software.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "패치",
+        "definition": "소프트웨어의 보안 취약점이나 버그를 수정하기 위해 설계된 업데이트.",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "ACT-004",
+      "category": "action",
+      "en": {
+        "term": "Upgrade",
+        "definition": "Action of updating software to a newer version with improved features or security.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "업그레이드",
+        "definition": "개선된 기능이나 보안을 갖춘 최신 버전으로 소프트웨어를 업데이트하는 조치.",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "ACT-005",
+      "category": "action",
+      "en": {
+        "term": "Key Rotation",
+        "definition": "Security practice of periodically replacing cryptographic keys to limit exposure.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "키 로테이션",
+        "definition": "노출을 제한하기 위해 주기적으로 암호화 키를 교체하는 보안 관행.",
+        "context": "조치_유형"
+      },
+      "source": "NIST SP 800-57"
+    },
+    {
+      "id": "COMP-001",
+      "category": "compliance",
+      "en": {
+        "term": "Compliance",
+        "definition": "State of conforming to established guidelines, specifications, or laws.",
+        "context": "compliance"
+      },
+      "ko": {
+        "term": "컴플라이언스",
+        "definition": "확립된 지침, 규격 또는 법률을 준수하는 상태.",
+        "context": "컴플라이언스"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "COMP-002",
+      "category": "compliance",
+      "en": {
+        "term": "Audit",
+        "definition": "Systematic examination of security controls to assess compliance and effectiveness.",
+        "context": "compliance"
+      },
+      "ko": {
+        "term": "감사",
+        "definition": "준수 및 효과성을 평가하기 위한 보안 통제의 체계적인 검사.",
+        "context": "컴플라이언스"
+      },
+      "source": "ISO 27001"
+    },
+    {
+      "id": "COMP-003",
+      "category": "compliance",
+      "en": {
+        "term": "Risk Assessment",
+        "definition": "Process of identifying, analyzing, and evaluating security risks.",
+        "context": "compliance"
+      },
+      "ko": {
+        "term": "위험 평가",
+        "definition": "보안 위험을 식별, 분석 및 평가하는 프로세스.",
+        "context": "컴플라이언스"
+      },
+      "source": "NIST SP 800-30"
+    },
+    {
+      "id": "REPORT-001",
+      "category": "finding_type",
+      "en": {
+        "term": "Repository Summary",
+        "definition": "Overview of repository structure, file statistics, and detected sensitive files.",
+        "context": "report_section"
+      },
+      "ko": {
+        "term": "리포지토리 요약",
+        "definition": "리포지토리 구조, 파일 통계 및 탐지된 민감 파일 개요.",
+        "context": "보고서_섹션"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "REPORT-002",
+      "category": "finding_type",
+      "en": {
+        "term": "Static Code Finding",
+        "definition": "Security issue identified through static analysis of source code.",
+        "context": "finding_type"
+      },
+      "ko": {
+        "term": "정적 코드 발견",
+        "definition": "소스 코드의 정적 분석을 통해 식별된 보안 이슈.",
+        "context": "발견_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "REPORT-003",
+      "category": "finding_type",
+      "en": {
+        "term": "Binary Analysis Finding",
+        "definition": "Security issue identified through analysis of compiled or binary files.",
+        "context": "finding_type"
+      },
+      "ko": {
+        "term": "바이너리 분석 발견",
+        "definition": "컴파일된 파일 또는 바이너리 파일의 분석을 통해 식별된 보안 이슈.",
+        "context": "발견_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "REPORT-004",
+      "category": "finding_type",
+      "en": {
+        "term": "Skill Risk Finding",
+        "definition": "Security risk identified in AI skill/tool definitions or prompt templates.",
+        "context": "finding_type"
+      },
+      "ko": {
+        "term": "스킬 위험 발견",
+        "definition": "AI 스킬/도구 정의 또는 프롬프트 템플릿에서 식별된 보안 위험.",
+        "context": "발견_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "REPORT-005",
+      "category": "finding_type",
+      "en": {
+        "term": "Agent Policy Finding",
+        "definition": "Issue related to AI agent security policy configuration or enforcement.",
+        "context": "finding_type"
+      },
+      "ko": {
+        "term": "에이전트 정책 발견",
+        "definition": "AI 에이전트 보안 정책 구성 또는 적용과 관련된 이슈.",
+        "context": "발견_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "REPORT-006",
+      "category": "finding_type",
+      "en": {
+        "term": "Prompt Optimization",
+        "definition": "Recommendation to improve prompt efficiency and reduce token usage.",
+        "context": "finding_type"
+      },
+      "ko": {
+        "term": "프롬프트 최적화",
+        "definition": "프롬프트 효율성을 개선하고 토큰 사용량을 줄이기 위한 권장 사항.",
+        "context": "발견_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "GIT-001",
+      "category": "security_control",
+      "en": {
+        "term": "gitignore",
+        "definition": "File specifying patterns for files that Git should ignore and not track.",
+        "context": "version_control"
+      },
+      "ko": {
+        "term": "gitignore",
+        "definition": "Git이 무시하고 추적하지 않아야 하는 파일의 패턴을 지정하는 파일.",
+        "context": "버전_관리"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "GIT-002",
+      "category": "action",
+      "en": {
+        "term": "Add to gitignore",
+        "definition": "Action of adding file patterns to .gitignore to prevent version control tracking.",
+        "context": "action_type"
+      },
+      "ko": {
+        "term": "gitignore에 추가",
+        "definition": "버전 관리 추적을 방지하기 위해 파일 패턴을 .gitignore에 추가하는 조치.",
+        "context": "조치_유형"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "RISK-001",
+      "category": "risk",
+      "en": {
+        "term": "Risk Matrix",
+        "definition": "Grid showing the relationship between risk severity and likelihood for categorization.",
+        "context": "risk_assessment"
+      },
+      "ko": {
+        "term": "위험 매트릭스",
+        "definition": "분류를 위한 위험 심각도와 가능성 간의 관계를 보여주는 그리드.",
+        "context": "위험_평가"
+      },
+      "source": "ISO 31000"
+    },
+    {
+      "id": "RISK-002",
+      "category": "risk",
+      "en": {
+        "term": "Deep Dive",
+        "definition": "Thorough recursive analysis to investigate and confirm a potential security issue.",
+        "context": "analysis_method"
+      },
+      "ko": {
+        "term": "심층 분석",
+        "definition": "잠재적 보안 이슈를 조사하고 확인하기 위한 철저한 재귀적 분석.",
+        "context": "분석_방법"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SCAN-001",
+      "category": "action",
+      "en": {
+        "term": "Scan",
+        "definition": "Automated process of analyzing code or systems for security issues.",
+        "context": "analysis_method"
+      },
+      "ko": {
+        "term": "스캔",
+        "definition": "보안 이슈에 대해 코드 또는 시스템을 분석하는 자동화된 프로세스.",
+        "context": "분석_방법"
+      },
+      "source": "Common"
+    },
+    {
+      "id": "SCAN-002",
+      "category": "action",
+      "en": {
+        "term": "Static Analysis",
+        "definition": "Examination of source code without executing it to find potential vulnerabilities.",
+        "context": "analysis_method"
+      },
+      "ko": {
+        "term": "정적 분석",
+        "definition": "잠재적 취약점을 찾기 위해 소스 코드를 실행하지 않고 검사하는 것.",
+        "context": "분석_방법"
+      },
+      "source": "NIST"
+    },
+    {
+      "id": "SCAN-003",
+      "category": "action",
+      "en": {
+        "term": "Dynamic Analysis",
+        "definition": "Testing and evaluation of software during runtime execution.",
+        "context": "analysis_method"
+      },
+      "ko": {
+        "term": "동적 분석",
+        "definition": "런타임 실행 중 소프트웨어를 테스트하고 평가하는 것.",
+        "context": "분석_방법"
+      },
+      "source": "NIST"
+    },
+    {
+      "id": "VERDICT-001",
+      "category": "verdict",
+      "en": {
+        "term": "INSTALL_OK",
+        "definition": "Security verdict indicating no significant risk; component may be installed and used normally.",
+        "context": "verdict_system"
+      },
+      "ko": {
+        "term": "설치_허용",
+        "definition": "중요한 위험이 없음을 나타내는 보안 판정; 컴포넌트를 정상적으로 설치하고 사용할 수 있음.",
+        "context": "판정_체계"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "VERDICT-002",
+      "category": "verdict",
+      "en": {
+        "term": "REVIEW",
+        "definition": "Security verdict indicating the component requires manual review before use; risk level is Medium or elevated by model obsolescence.",
+        "context": "verdict_system"
+      },
+      "ko": {
+        "term": "검토_필요",
+        "definition": "사용 전 수동 검토가 필요함을 나타내는 보안 판정; 위험 수준이 Medium이거나 모델 진부화로 상향됨.",
+        "context": "판정_체계"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "VERDICT-003",
+      "category": "verdict",
+      "en": {
+        "term": "DISABLE",
+        "definition": "Security verdict indicating the component should be immediately disabled until remediation is complete; maps to High severity.",
+        "context": "verdict_system"
+      },
+      "ko": {
+        "term": "비활성화",
+        "definition": "조치 완료 전까지 즉시 비활성화해야 함을 나타내는 보안 판정; High 심각도에 매핑됨.",
+        "context": "판정_체계"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "VERDICT-004",
+      "category": "verdict",
+      "en": {
+        "term": "REMOVE",
+        "definition": "Security verdict indicating the component must be removed immediately; maps to Critical severity.",
+        "context": "verdict_system"
+      },
+      "ko": {
+        "term": "제거",
+        "definition": "컴포넌트를 즉시 제거해야 함을 나타내는 보안 판정; Critical 심각도에 매핑됨.",
+        "context": "판정_체계"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "MODEL-EFF-001",
+      "category": "model_effectiveness",
+      "en": {
+        "term": "VALID",
+        "definition": "Model effectiveness verdict indicating the skill/agent operates as intended on the current model.",
+        "context": "model_effectiveness"
+      },
+      "ko": {
+        "term": "유효",
+        "definition": "스킬/에이전트가 현행 모델에서 의도한 대로 동작함을 나타내는 모델 유효성 판정.",
+        "context": "모델_효과성"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "MODEL-EFF-002",
+      "category": "model_effectiveness",
+      "en": {
+        "term": "DEGRADED",
+        "definition": "Model effectiveness verdict indicating the skill/agent partially works on the current model but with reduced effectiveness.",
+        "context": "model_effectiveness"
+      },
+      "ko": {
+        "term": "성능저하",
+        "definition": "스킬/에이전트가 현행 모델에서 부분적으로 동작하지만 효과가 감소했음을 나타내는 모델 유효성 판정.",
+        "context": "모델_효과성"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "MODEL-EFF-003",
+      "category": "model_effectiveness",
+      "en": {
+        "term": "OBSOLETE",
+        "definition": "Model effectiveness verdict indicating the current model natively performs the skill's function, making the skill redundant.",
+        "context": "model_effectiveness"
+      },
+      "ko": {
+        "term": "진부화",
+        "definition": "현행 모델이 스킬의 기능을 네이티브로 수행하여 스킬이 불필요해졌음을 나타내는 모델 유효성 판정.",
+        "context": "모델_효과성"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "MODEL-EFF-004",
+      "category": "model_effectiveness",
+      "en": {
+        "term": "MODEL_LOCKED",
+        "definition": "Model effectiveness verdict indicating the skill is hardcoded to a retired or specific model and cannot run on other models.",
+        "context": "model_effectiveness"
+      },
+      "ko": {
+        "term": "모델_고정",
+        "definition": "스킬이 은퇴하거나 특정 모델에 고정되어 다른 모델에서 동작하지 않음을 나타내는 모델 유효성 판정.",
+        "context": "모델_효과성"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "GRAPH-001",
+      "category": "graph_analysis",
+      "en": {
+        "term": "Relationship Graph",
+        "definition": "A directed graph of components (Plugin/Skill/Agent/Hook/MCP/Command) and their dependency/trust edges used for risk propagation analysis.",
+        "context": "graph_analysis"
+      },
+      "ko": {
+        "term": "연관관계 그래프",
+        "definition": "위험 전파 분석을 위해 사용되는 컴포넌트(플러그인/스킬/에이전트/훅/MCP/커맨드)와 의존성·신뢰 엣지로 구성된 방향성 그래프.",
+        "context": "그래프_분석"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "GRAPH-002",
+      "category": "graph_analysis",
+      "en": {
+        "term": "Risk Propagation",
+        "definition": "The process of propagating risk scores from child components to parent components through trust edges with attenuation factors.",
+        "context": "graph_analysis"
+      },
+      "ko": {
+        "term": "위험 전파",
+        "definition": "감쇠 계수를 적용하여 신뢰 엣지를 통해 자식 컴포넌트에서 부모 컴포넌트로 위험 점수를 전파하는 프로세스.",
+        "context": "그래프_분석"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "GRAPH-003",
+      "category": "graph_analysis",
+      "en": {
+        "term": "Graph Verdict",
+        "definition": "The overall security verdict of a component after risk propagation through the relationship graph; reflects the worst verdict among the component and all its downstream nodes.",
+        "context": "graph_analysis"
+      },
+      "ko": {
+        "term": "그래프 판정",
+        "definition": "연관관계 그래프를 통한 위험 전파 후 컴포넌트의 전체 보안 판정; 해당 컴포넌트와 모든 하위 노드 중 최악의 판정을 반영함.",
+        "context": "그래프_분석"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "GRAPH-004",
+      "category": "graph_analysis",
+      "en": {
+        "term": "Model Validity",
+        "definition": "Assessment of whether a skill or agent remains effective and functional with current AI models, checking for hardcoded model IDs, deprecated APIs, and obsolete patterns.",
+        "context": "model_analysis"
+      },
+      "ko": {
+        "term": "모델 유효성",
+        "definition": "스킬 또는 에이전트가 현재 AI 모델에서 여전히 효과적이고 기능적인지 평가하는 것; 하드코딩된 모델 ID, 폐기된 API, 진부화된 패턴을 확인함.",
+        "context": "모델_분석"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    },
+    {
+      "id": "GRAPH-005",
+      "category": "graph_analysis",
+      "en": {
+        "term": "Obsolescence",
+        "definition": "State where a skill's functionality has been superseded by native model capabilities, rendering the skill unnecessary or counterproductive.",
+        "context": "model_analysis"
+      },
+      "ko": {
+        "term": "진부화",
+        "definition": "스킬의 기능이 모델 네이티브 기능으로 대체되어 스킬이 불필요하거나 역효과를 낼 수 있는 상태.",
+        "context": "모델_분석"
+      },
+      "source": "Threat-scan-security v2.1.0"
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "source_language": "en",
+    "target_language": "ko",
+    "last_updated": "2026-02-05"
+  },
+  "sentence_patterns": [
+    {
+      "id": "REC-001",
+      "en": "Upgrade {package} to version {version} or later",
+      "ko": "{package}를 {version} 이상 버전으로 업그레이드하세요"
+    },
+    {
+      "id": "REC-002",
+      "en": "Add {file} to .gitignore",
+      "ko": "{file}을(를) .gitignore에 추가하세요"
+    },
+    {
+      "id": "REC-003",
+      "en": "Use environment variables instead of hardcoded values",
+      "ko": "하드코딩된 값 대신 환경 변수를 사용하세요"
+    },
+    {
+      "id": "REC-004",
+      "en": "Implement input validation before processing",
+      "ko": "처리 전 입력 검증을 구현하세요"
+    },
+    {
+      "id": "REC-005",
+      "en": "Replace with {alternative} for better security",
+      "ko": "더 나은 보안을 위해 {alternative}(으)로 교체하세요"
+    },
+    {
+      "id": "REC-006",
+      "en": "Remove {item} from version control",
+      "ko": "버전 관리에서 {item}을(를) 제거하세요"
+    },
+    {
+      "id": "REC-007",
+      "en": "Rotate {credential} immediately",
+      "ko": "즉시 {credential}을(를) 로테이션하세요"
+    },
+    {
+      "id": "REC-008",
+      "en": "Use parameterized queries to prevent SQL injection",
+      "ko": "SQL 주입을 방지하기 위해 매개변수화된 쿼리를 사용하세요"
+    },
+    {
+      "id": "REC-009",
+      "en": "Implement rate limiting to prevent abuse",
+      "ko": "남용을 방지하기 위해 속도 제한을 구현하세요"
+    },
+    {
+      "id": "REC-010",
+      "en": "Use {tool} for automated scanning",
+      "ko": "자동 스캔을 위해 {tool}을(를) 사용하세요"
+    },
+    {
+      "id": "REC-011",
+      "en": "Define explicit disallowed_tools list",
+      "ko": "명시적인 disallowed_tools 목록을 정의하세요"
+    },
+    {
+      "id": "REC-012",
+      "en": "Enable sandbox mode for {agent}",
+      "ko": "{agent}에 대해 샌드박스 모드를 활성화하세요"
+    },
+    {
+      "id": "REC-013",
+      "en": "Review and pin dependency versions",
+      "ko": "의존성 버전을 검토하고 고정하세요"
+    },
+    {
+      "id": "REC-014",
+      "en": "Generate SBOM using {format} format",
+      "ko": "{format} 형식을 사용하여 SBOM을 생성하세요"
+    },
+    {
+      "id": "REC-015",
+      "en": "Verify package authenticity before use",
+      "ko": "사용 전 패키지 진위를 확인하세요"
+    },
+    {
+      "id": "DESC-001",
+      "en": "Contains placeholder string that could be replaced with real credentials",
+      "ko": "실제 자격 증명으로 교체될 수 있는 플레이스홀더 문자열 포함"
+    },
+    {
+      "id": "DESC-002",
+      "en": "File is not in .gitignore. HIGH RISK if {data} is added",
+      "ko": "파일이 .gitignore에 없음. {data} 추가 시 높은 위험"
+    },
+    {
+      "id": "DESC-003",
+      "en": "Hardcoded credentials detected in source code",
+      "ko": "소스 코드에서 하드코딩된 자격 증명 발견"
+    },
+    {
+      "id": "DESC-004",
+      "en": "External command execution with user-controllable input",
+      "ko": "사용자 제어 가능한 입력으로 외부 명령 실행"
+    },
+    {
+      "id": "DESC-005",
+      "en": "Sensitive data exposed in {location}",
+      "ko": "{location}에서 민감한 데이터 노출됨"
+    },
+    {
+      "id": "DESC-006",
+      "en": "No security policy defined for agent",
+      "ko": "에이전트에 대한 보안 정책이 정의되지 않음"
+    },
+    {
+      "id": "DESC-007",
+      "en": "Dangerous tools implicitly allowed",
+      "ko": "위험한 도구가 암묵적으로 허용됨"
+    },
+    {
+      "id": "DESC-008",
+      "en": "Prototype pollution vulnerability in {package} before {version}",
+      "ko": "{version} 이전 {package}의 프로토타입 오염 취약점"
+    },
+    {
+      "id": "DESC-009",
+      "en": "{license} license is incompatible with {project_license}",
+      "ko": "{license} 라이선스가 {project_license}와 호환되지 않음"
+    },
+    {
+      "id": "DESC-010",
+      "en": "Package name is suspiciously similar to popular package {package}",
+      "ko": "패키지 이름이 인기 패키지 {package}와 의심스럽게 유사함"
+    }
+  ],
+  "phrase_mappings": [
+    {"en": "immediately", "ko": "즉시"},
+    {"en": "or later", "ko": "이상"},
+    {"en": "before", "ko": "이전"},
+    {"en": "after", "ko": "이후"},
+    {"en": "at least", "ko": "최소"},
+    {"en": "at most", "ko": "최대"},
+    {"en": "if possible", "ko": "가능하다면"},
+    {"en": "as soon as possible", "ko": "가능한 빨리"},
+    {"en": "not recommended", "ko": "권장되지 않음"},
+    {"en": "highly recommended", "ko": "강력히 권장됨"},
+    {"en": "required", "ko": "필수"},
+    {"en": "optional", "ko": "선택 사항"},
+    {"en": "deprecated", "ko": "지원 중단"},
+    {"en": "outdated", "ko": "오래됨"},
+    {"en": "missing", "ko": "누락됨"},
+    {"en": "incomplete", "ko": "불완전함"},
+    {"en": "detected", "ko": "발견됨"},
+    {"en": "identified", "ko": "식별됨"},
+    {"en": "confirmed", "ko": "확인됨"},
+    {"en": "potential", "ko": "잠재적"},
+    {"en": "suspected", "ko": "의심됨"},
+    {"en": "verified", "ko": "검증됨"},
+    {"en": "unverified", "ko": "미검증"},
+    {"en": "safe currently", "ko": "현재 안전함"},
+    {"en": "currently safe", "ko": "현재 안전함"},
+    {"en": "should be", "ko": "해야 함"},
+    {"en": "must be", "ko": "반드시 해야 함"},
+    {"en": "can be", "ko": "될 수 있음"},
+    {"en": "may be", "ko": "일 수 있음"},
+    {"en": "is recommended", "ko": "권장됨"},
+    {"en": "is required", "ko": "필수임"},
+    {"en": "for security", "ko": "보안을 위해"},
+    {"en": "for compliance", "ko": "컴플라이언스를 위해"},
+    {"en": "for audit", "ko": "감사를 위해"}
+  ],
+  "do_not_translate": [
+    "CVE-*",
+    "CWE-*",
+    "STATIC-*",
+    "BIN-*",
+    "SKILL-*",
+    "AGENT-*",
+    "SENS-*",
+    "OPT-*",
+    "VULN-*",
+    "LIC-*",
+    "VER-*",
+    "SUPPLY-*",
+    "REL-*",
+    "MODEL-*",
+    "REC-*",
+    "MIT",
+    "Apache-2.0",
+    "GPL-*",
+    "LGPL-*",
+    "BSD-*",
+    "ISC",
+    "MPL-*",
+    "SPDX",
+    "CycloneDX",
+    "OWASP",
+    "NIST",
+    "CIS",
+    "ISO",
+    "npm",
+    "pip",
+    "maven",
+    "gradle",
+    "cargo",
+    "gem",
+    "composer",
+    "nuget",
+    ".env",
+    ".pem",
+    ".key",
+    ".gitignore",
+    "package.json",
+    "requirements.txt",
+    "SKILL.md",
+    "os.system",
+    "subprocess",
+    "exec",
+    "eval",
+    "shell=True",
+    "shell=False",
+    "disallowed_tools",
+    "sandbox_mode"
+  ]
+}

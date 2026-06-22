@@ -1,0 +1,25 @@
+Threat-scan-security
+Copyright 2026 Bosung Hong (bosong2)
+https://github.com/bosong2/Threat-Scan-Security
+
+This product includes software developed by Bosung Hong (bosong2).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+----------------------------------------------------------------------
+Third-party components
+----------------------------------------------------------------------
+
+The generated HTML report (security-template.html) loads Chart.js from a
+public CDN at view time, for rendering the risk-distribution doughnut chart.
+
+  Chart.js — MIT License — https://www.chartjs.org/
+  Copyright (c) 2014-2024 Chart.js Contributors
+
+Chart.js is not bundled in this distribution; it is referenced via CDN with
+an SRI integrity hash and degrades gracefully to an inline SVG chart when
+offline. No other third-party code is included.

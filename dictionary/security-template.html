@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Threat Scan Report Viewer v2.1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" integrity="sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF" crossorigin="anonymous"></script>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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">
+<style>
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F8F8;
+  --bg-tertiary: #F0F0F0;
+  --bg-card: #FFFFFF;
+  --text-primary: #191414;
+  --text-secondary: #535353;
+  --text-muted: #767676;
+  --accent: #1DB954;
+  --accent-hover: #1ed760;
+  --accent-light: rgba(29,185,84,0.10);
+  --border: #E0E0E0;
+  --border-light: #F0F0F0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.10);
+  --sev-c-bg:#FFF0F1; --sev-c-text:#C41230; --sev-c-border:#FFCDD2;
+  --sev-h-bg:#FFF3EE; --sev-h-text:#C84B2A; --sev-h-border:#FFD0C0;
+  --sev-m-bg:#FFFBF0; --sev-m-text:#A85C00; --sev-m-border:#FFE0A0;
+  --sev-l-bg:#F0FBF4; --sev-l-text:#157A3A; --sev-l-border:#B5E8C7;
+  --sev-i-bg:#EEF5FF; --sev-i-text:#1E67C6; --sev-i-border:#C0D8FF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-secondary);color:var(--text-primary);line-height:1.6;min-height:100vh}
+
+/* HEADER */
+.header{background:var(--bg-primary);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+.header-content{max-width:1280px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#fff;letter-spacing:-1px}
+.logo-text{font-weight:700;font-size:15px;color:var(--text-primary)}
+.version-badge{background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;border:1px solid rgba(29,185,84,.3)}
+.header-controls{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.lang-toggle{display:flex;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.lang-btn{padding:5px 12px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .15s}
+.lang-btn.active{background:var(--accent);color:#fff}
+.nav-controls{display:flex;align-items:center;gap:6px}
+.nav-btn{padding:5px 10px;border:1px solid var(--border);background:var(--bg-primary);border-radius:6px;font-size:14px;cursor:pointer;color:var(--text-secondary);transition:all .15s}
+.nav-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed}
+#reportIndicator{font-size:12px;color:var(--text-muted);min-width:44px;text-align:center}
+.upload-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.upload-btn:hover{background:var(--accent-hover)}
+.action-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg-primary);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:var(--bg-primary);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;position:relative;flex-shrink:0}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn::after{content:attr(data-tip);position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);background:var(--text-primary);color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200}
+.icon-btn:hover::after{opacity:1}
+#fileInput{display:none}
+
+/* MAIN */
+.main-content{max-width:1280px;margin:0 auto;padding:24px}
+
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:48px 24px}
+.empty-icon{font-size:60px;margin-bottom:20px;opacity:.5}
+.empty-title{font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:10px}
+.empty-desc{font-size:14px;color:var(--text-secondary);max-width:440px;margin-bottom:28px;line-height:1.7}
+.drop-zone{border:2px dashed var(--border);border-radius:16px;padding:44px;width:100%;max-width:480px;cursor:pointer;transition:all .2s}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-light)}
+.drop-zone-text{font-size:14px;color:var(--text-muted);line-height:1.8}
+.drop-zone-highlight{color:var(--accent);font-weight:700}
+
+/* SCAN META BAR */
+.scan-meta-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.scan-meta-item{display:flex;flex-direction:column;gap:2px}
+.scan-meta-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.scan-meta-value{font-size:13px;font-weight:600;color:var(--text-primary)}
+
+/* SUMMARY GRID */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.summary-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center;box-shadow:var(--shadow-sm)}
+.summary-count{font-size:28px;font-weight:800;line-height:1.1;margin-bottom:4px}
+.summary-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.cnt-c{color:var(--sev-c-text)} .cnt-h{color:var(--sev-h-text)} .cnt-m{color:var(--sev-m-text)} .cnt-l{color:var(--sev-l-text)} .cnt-a{color:var(--accent)}
+
+/* GRAPH VERDICT CARD */
+.graph-verdict-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow-sm);display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.graph-verdict-label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.graph-verdict-sub{font-size:13px;color:var(--text-secondary);margin-top:5px}
+
+/* SECTIONS */
+.section{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:hidden}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;transition:background .15s}
+.section-header:hover{background:var(--bg-secondary)}
+.section-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text-primary)}
+.section-count{background:var(--bg-tertiary);color:var(--text-secondary);padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600}
+.section-toggle{font-size:13px;color:var(--text-muted);transition:transform .2s}
+.section.collapsed .section-toggle{transform:rotate(-90deg)}
+.section-content{padding:0 18px 18px}
+.section.collapsed .section-content{display:none}
+
+/* FINDING CARDS */
+.finding-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:box-shadow .15s}
+.finding-card:hover{box-shadow:var(--shadow-md)}
+.finding-header{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.finding-id{font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:11px;font-weight:700;background:var(--bg-tertiary);color:var(--text-secondary);padding:2px 6px;border-radius:4px;flex-shrink:0}
+.finding-title{font-weight:600;font-size:14px;color:var(--text-primary);flex:1;min-width:0}
+.finding-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.finding-meta-item{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)}
+.finding-meta-label{color:var(--text-muted);font-weight:500}
+.finding-meta-item code{background:var(--bg-tertiary);padding:1px 5px;border-radius:4px;font-family:'SF Mono',Consolas,monospace;font-size:11px;color:var(--text-primary)}
+.finding-description{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:8px}
+.finding-detail{background:var(--bg-secondary);border-radius:8px;padding:10px 12px;margin-top:8px}
+.finding-detail-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.finding-detail-content{font-size:13px;color:var(--text-secondary);line-height:1.6}
+.dd-pre{white-space:pre-wrap;word-break:break-word}
+.code-fix{background:var(--bg-secondary);border-radius:8px;padding:10px 12px;margin-top:8px}
+.code-fix-block{margin-top:6px}
+.code-fix-label{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.cf-before .code-fix-label{color:var(--sev-c-text)}
+.cf-after .code-fix-label{color:var(--sev-l-text)}
+.code-lang{font-family:'SF Mono',Consolas,monospace;font-size:9px;font-weight:600;text-transform:none;letter-spacing:0;background:var(--bg-tertiary);color:var(--text-muted);padding:1px 6px;border-radius:4px}
+.code-block{font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:12px;line-height:1.5;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:pre;color:var(--text-primary);margin:0}
+.cf-before .code-block{border-left:3px solid var(--sev-c-text)}
+.cf-after .code-block{border-left:3px solid var(--sev-l-text)}
+.code-fix-note{font-size:12px;color:var(--text-secondary);line-height:1.6;margin-top:6px}
+
+/* BADGES */
+.severity-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
+.sev-critical{background:var(--sev-c-bg);color:var(--sev-c-text);border:1px solid var(--sev-c-border)}
+.sev-high{background:var(--sev-h-bg);color:var(--sev-h-text);border:1px solid var(--sev-h-border)}
+.sev-medium{background:var(--sev-m-bg);color:var(--sev-m-text);border:1px solid var(--sev-m-border)}
+.sev-low{background:var(--sev-l-bg);color:var(--sev-l-text);border:1px solid var(--sev-l-border)}
+.sev-info{background:var(--sev-i-bg);color:var(--sev-i-text);border:1px solid var(--sev-i-border)}
+
+.verdict-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:800;letter-spacing:.5px;flex-shrink:0}
+.verd-install_ok{background:#F0FBF4;color:#157A3A;border:1px solid #B5E8C7}
+.verd-review{background:#FFFBF0;color:#A85C00;border:1px solid #FFE0A0}
+.verd-disable{background:#FFF3EE;color:#C84B2A;border:1px solid #FFD0C0}
+.verd-remove{background:#FFF0F1;color:#C41230;border:1px solid #FFCDD2}
+.verdict-badge-lg{font-size:14px!important;padding:5px 16px!important;border-radius:14px!important;letter-spacing:.8px!important}
+.sev-badge-lg{font-size:14px!important;padding:5px 16px!important;border-radius:14px!important;letter-spacing:.6px!important}
+.risk-overall{margin-top:12px;padding:10px 12px;background:var(--bg-primary);border-radius:8px;border:1px solid var(--border-light)}
+.risk-overall-hd{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px}
+.risk-overall-body{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.risk-overall-basis{font-size:11px;color:var(--text-secondary);background:var(--bg-secondary);padding:2px 8px;border-radius:10px;border:1px solid var(--border)}
+.risk-overall-rationale{font-size:12px;color:var(--text-secondary);line-height:1.55;margin-top:8px;padding-top:8px;border-top:1px solid var(--border-light)}
+
+.meff-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.3px;flex-shrink:0}
+.meff-valid{background:#F0FBF4;color:#157A3A;border:1px solid #B5E8C7}
+.meff-degraded{background:#FFFBF0;color:#A85C00;border:1px solid #FFE0A0}
+.meff-obsolete{background:#FFF3EE;color:#C84B2A;border:1px solid #FFD0C0}
+.meff-locked{background:#FFF0F1;color:#C41230;border:1px solid #FFCDD2}
+
+.pattern-badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;background:#EEF5FF;color:#1E67C6;border:1px solid #C0D8FF;font-family:'SF Mono',Consolas,monospace}
+.edge-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#F3F0FF;color:#5B3FBF;border:1px solid #D4C5FF;font-family:'SF Mono',Consolas,monospace}
+.cve-badge{background:var(--sev-c-bg);color:var(--sev-c-text);border:1px solid var(--sev-c-border);padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;font-family:'SF Mono',Consolas,monospace}
+a.cve-badge{text-decoration:none}
+a.cve-badge:hover{filter:brightness(.96)}
+.vuln-link{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;text-decoration:none;margin-right:4px;border:1px solid;white-space:nowrap;vertical-align:middle}
+.vuln-link.osv{background:#EEF5FF;color:#1E67C6;border-color:#C0D8FF}
+.vuln-link.osv-clean{background:#F0FBF4;color:#157A3A;border-color:#B5E8C7}
+.vuln-link.osv-hit{background:#FFF0F1;color:#C41230;border-color:#FFCDD2}
+.vuln-link:hover{filter:brightness(.95)}
+button.vuln-link{cursor:pointer;font-family:inherit;outline:none;line-height:1.4;transition:all .15s}
+button.vuln-link:disabled{opacity:.55;cursor:wait}
+.osv-result{display:inline-flex;flex-wrap:wrap;gap:3px;align-items:center;margin-left:5px;vertical-align:middle}
+.osv-none{font-size:10px;color:#157A3A;font-weight:600}
+.osv-more{font-size:10px;color:var(--text-muted)}
+.status-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border)}
+.cve-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+
+/* REPO SUMMARY */
+.repo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.repo-item{background:var(--bg-secondary);border-radius:8px;padding:10px 12px}
+.repo-item-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.comp-tag{display:inline-block;background:var(--accent-light);color:var(--accent);border:1px solid rgba(29,185,84,.3);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;margin:2px}
+.sensitive-tag{display:inline-block;background:var(--sev-h-bg);color:var(--sev-h-text);border:1px solid var(--sev-h-border);border-radius:6px;padding:2px 8px;font-size:12px;margin:2px}
+
+/* RELATIONSHIP GRAPH */
+.rel-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.edge-path{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.node-chip{background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600;color:var(--text-primary)}
+.edge-arrow{color:var(--text-muted);font-size:13px}
+.score-chip{font-size:12px;color:var(--text-secondary);background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;padding:3px 8px}
+
+/* SBOM */
+.sbom-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.sbom-stat{background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.sbom-stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.sbom-stat-val{font-size:22px;font-weight:800;color:var(--text-primary)}
+.risk-matrix{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.risk-matrix th{text-align:left;padding:8px 10px;background:var(--bg-secondary);color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+.risk-matrix td{padding:8px 10px;border-bottom:1px solid var(--border-light);color:var(--text-secondary)}
+.risk-matrix tr:last-child td{border-bottom:none}
+.priority-action{display:flex;gap:10px;padding:10px 12px;background:var(--bg-secondary);border-radius:8px;margin-bottom:8px}
+.priority-rank{width:26px;height:26px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;margin-top:2px}
+.priority-pkg{font-weight:700;font-size:13px;color:var(--text-primary);margin-bottom:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.priority-ver,.priority-rationale{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.priority-act{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px}
+.cat-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:var(--bg-tertiary);color:var(--text-secondary)}
+.sub-heading{font-size:13px;font-weight:700;color:var(--text-primary);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+
+/* RECOMMENDATIONS */
+.rec-card{background:var(--bg-secondary);border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--border)}
+.rec-card.p-critical{border-left-color:var(--sev-c-text)} .rec-card.p-high{border-left-color:var(--sev-h-text)}
+.rec-card.p-medium{border-left-color:var(--sev-m-text)} .rec-card.p-low{border-left-color:var(--sev-l-text)}
+.rec-priority{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.rec-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px}
+.rec-id{font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:11px;font-weight:700;background:var(--bg-tertiary);color:var(--text-secondary);padding:2px 6px;border-radius:4px}
+.rec-rank{font-size:11px;font-weight:800;color:var(--text-muted);background:var(--bg-primary);border:1px solid var(--border);border-radius:4px;padding:2px 6px}
+.rec-prio-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.rec-action{font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:5px}
+.rec-rationale{font-size:13px;color:var(--text-secondary);line-height:1.6}
+.rec-refs{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:8px}
+.rec-refs-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.finding-ref{font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:11px;font-weight:700;background:var(--accent-light);color:var(--accent);border:1px solid rgba(29,185,84,.3);border-radius:4px;padding:2px 7px;cursor:pointer;transition:all .15s}
+.finding-ref:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.rec-files{font-size:12px;color:var(--text-muted);margin-top:5px;font-family:'SF Mono',Consolas,monospace}
+.finding-flash{animation:findingFlash 1.6s ease-out}
+@keyframes findingFlash{0%{box-shadow:0 0 0 3px var(--accent)}60%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+
+.report-footer{padding:20px 40px 24px;background:var(--bg-primary);border-top:2px solid var(--border);margin-top:40px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-row{display:flex;flex-wrap:wrap;gap:0;align-items:stretch}
+.footer-block{display:flex;flex-direction:column;gap:3px;padding:0 20px}
+.footer-block:first-child{padding-left:0}
+.footer-sep{width:1px;background:var(--border);margin:4px 0}
+.footer-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);font-weight:600}
+.footer-value{font-size:12px;color:var(--text-secondary);font-family:'SF Mono','Fira Code',Consolas,monospace}
+.footer-credit{font-size:11px;color:var(--text-muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.footer-credit-logo{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.footer-repo-link{font-size:11px;color:var(--accent);text-decoration:none;font-family:'SF Mono','Fira Code',Consolas,monospace}
+.footer-repo-link:hover{text-decoration:underline}
+/* RISK FINDINGS BLOCK */
+.risk-block{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.risk-block-hd{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.risk-inner-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.risk-inner-one-col{display:grid;grid-template-columns:1fr;gap:12px}
+.risk-chart-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:8px}
+.risk-legend{display:flex;flex-direction:column;gap:7px;flex:1;min-width:130px}
+.risk-legend-item{display:flex;align-items:center;gap:8px;font-size:13px}
+.risk-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.risk-legend-label{color:var(--text-secondary);flex:1}
+.risk-legend-count{font-weight:800;font-size:16px;min-width:26px;text-align:right}
+.risk-legend-total{border-top:1px solid var(--border);margin-top:5px;padding-top:7px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--text-primary)}
+.risk-comp-name{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:8px;word-break:break-word;line-height:1.3}
+.risk-comp-rationale{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:9px}
+.risk-comp-empty{font-size:12px;color:var(--text-muted);font-style:italic}
+/* REPO 2-CARD LAYOUT */
+.repo-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.repo-card2{background:var(--bg-secondary);border-radius:10px;padding:14px}
+.repo-card2-hd{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.repo-card2-desc{font-size:13px;color:var(--text-secondary);line-height:1.65}
+.repo-meta-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.repo-meta-chip{background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;padding:4px 10px;display:flex;flex-direction:column;gap:1px}
+.repo-meta-chip-lbl{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px}
+.repo-meta-chip-val{font-size:12px;font-weight:600;color:var(--text-primary)}
+.repo-subcards-stack{display:flex;flex-direction:column;gap:8px}
+.repo-subcard2{background:var(--bg-primary);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.repo-subcard2-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;font-weight:600}
+.repo-subcard2-tags{display:flex;flex-wrap:wrap;gap:4px}
+
+@media print{.header-controls{display:none!important}.section.collapsed .section-content{display:block!important}#reportFooter{display:block!important}.upload-btn{display:none!important}.nav-controls{display:none!important}}
+@media(max-width:680px){.repo-two-col{grid-template-columns:1fr}}
+@media(max-width:640px){.header-content{padding:0 14px}.main-content{padding:14px}.repo-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-content">
+    <div class="logo">
+      <div class="logo-icon">CTS</div>
+      <span class="logo-text">Claude Threat Scan</span>
+      <span class="version-badge">V2.1</span>
+    </div>
+    <div class="header-controls">
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ko">KO</button>
+      </div>
+      <div class="nav-controls">
+        <button class="nav-btn" id="prevReport">&#8249;</button>
+        <span id="reportIndicator">0 / 0</span>
+        <button class="nav-btn" id="nextReport">&#8250;</button>
+      </div>
+      <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+        &#128196; <span data-en="Load JSON" data-ko="JSON 열기">Load JSON</span>
+      </button>
+      <button class="icon-btn" id="printBtn" style="display:none" onclick="window.print()" data-tip="Print">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      </button>
+      <button class="icon-btn" id="exportBtn" style="display:none" onclick="exportHTML()" data-tip="Export HTML">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <input type="file" id="fileInput" accept=".json" multiple>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div id="emptyState" class="empty-state">
+    <div class="empty-icon">&#128196;</div>
+    <div class="empty-title" data-en="No Report Loaded" data-ko="리포트 없음">No Report Loaded</div>
+    <div class="empty-desc" data-en="Load a Claude Threat Scan JSON file. Supports v1.2 and v1.3 schema." data-ko="Claude Threat Scan JSON 파일을 불러오세요. v1.2 및 v1.3 스키마를 지원합니다.">
+      Load a Claude Threat Scan JSON file. Supports v1.2 and v1.3 schema.
+    </div>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="drop-zone-text">
+        <span class="drop-zone-highlight" data-en="Click or drag &amp; drop" data-ko="클릭하거나 파일을 드래그">Click or drag &amp; drop</span><br>
+        <span data-en="JSON security report files" data-ko="JSON 보안 리포트 파일">JSON security report files</span>
+      </div>
+    </div>
+  </div>
+  <div id="reportContent" style="display:none"></div>
+</main>
+<footer id="reportFooter" style="display:none"></footer>
+
+<script>
+var reports = [];
+var currentReportIndex = 0;
+var currentLang = 'en';
+
+var S = {
+  en:{
+    scanDate:'Scan Date',version:'Version',repository:'Repository',totalFiles:'Total Files',
+    codeFiles:'Code Files',depth:'Depth',totalFindings:'Total Findings',critical:'Critical',
+    high:'High',medium:'Medium',low:'Low',info:'Info',
+    repoSummary:'Repository Summary',keyComponents:'Key Components',sensitiveFiles:'Sensitive Files',
+    staticFindings:'Static Code Findings',binaryFindings:'Binary Analysis',
+    skillFindings:'Skill Security',agentFindings:'Agent Policy',
+    sensitivePatterns:'Sensitive Patterns',promptOptimization:'Prompt Optimization',
+    sbomAnalysis:'SBOM Analysis',relationshipFindings:'Relationship Graph',
+    modelValidityFindings:'Model Validity',recommendations:'Recommendations',
+    file:'File',line:'Line',issue:'Issue',status:'Status',
+    recommendation:'Recommendation',deepDive:'Deep Dive',analysis:'Analysis',codeFix:'Code Fix',before:'Before',after:'After',
+    riskSummary:'Risk Summary',verdict:'Verdict',modelEff:'Model Effectiveness',
+    patternType:'Pattern',modelId:'Model ID',sourceComp:'Source',targetComp:'Target',
+    edgeType:'Edge Type',propagatedRisk:'Propagated Risk',graphVerdict:'Graph Verdict',
+    worstComp:'Worst Component',totalPkgs:'Total Packages',criticalPkgs:'Critical Packages',
+    vulns:'Vulnerabilities',licenseIssues:'License Issues',versionRisks:'Version Risks',
+    supplyChain:'Supply Chain Risks',priorityActions:'Priority Actions',
+    currentVer:'Current Version',fixedVer:'Fixed Version',
+    priority:'Priority',affectedFiles:'Affected Files',relatedFindings:'Related Findings',propagationPath:'Propagation Path',
+    primaryLang:'Primary Language',framework:'Framework',transport:'Transport',authModel:'Auth Model',
+    componentType:'Component Type',targetType:'Target Type',ownSeverity:'Own Severity',
+    evidence:'Evidence',registryField:'Registry Field',component:'Component',
+    packageManager:'Package Manager',lockfile:'Lockfile Version',prodPkgs:'Production',devPkgs:'Dev',
+    directDeps:'Direct Dependencies',transitiveDeps:'Notable Transitive Dependencies',
+    integrity:'Integrity Check',knownVulns:'Known Vulnerabilities',supplyChainRisk:'Supply Chain Risk',
+    licenseFindings:'License Findings',risk:'Risk',note:'Note',pkgName:'Package',pkgVersion:'Version',license:'License',
+    cveLookup:'CVE Lookup',
+    riskFindings:'Risk Findings',riskDistribution:'Risk Distribution',noData:'No data',repoDescription:'Repository Description',overallAssessment:'Overall Risk',highestConfirmed:'Highest active severity',
+    reportVer:'Report Version',schemaVer:'Schema Version',scannerModel:'Scanner Model',
+    footerAuthor:'Author',footerOrg:'Organization',footerGenerated:'Generated'
+  },
+  ko:{
+    scanDate:'스캔 날짜',version:'버전',repository:'리포지토리',totalFiles:'전체 파일',
+    codeFiles:'코드 파일',depth:'분석 깊이',totalFindings:'전체 발견',critical:'심각',
+    high:'높음',medium:'중간',low:'낮음',info:'정보',
+    repoSummary:'리포지토리 요약',keyComponents:'주요 컴포넌트',sensitiveFiles:'민감 파일',
+    staticFindings:'정적 코드 분석',binaryFindings:'바이너리 분석',
+    skillFindings:'스킬 보안',agentFindings:'에이전트 정책',
+    sensitivePatterns:'민감 패턴',promptOptimization:'프롬프트 최적화',
+    sbomAnalysis:'SBOM 분석',relationshipFindings:'연관관계 그래프',
+    modelValidityFindings:'모델 유효성',recommendations:'권장 조치',
+    file:'파일',line:'라인',issue:'이슈',status:'상태',
+    recommendation:'권장 조치',deepDive:'심층 분석',analysis:'분석',codeFix:'수정 코드',before:'수정 전',after:'수정 후',
+    riskSummary:'위험 요약',verdict:'판정',modelEff:'모델 효과성',
+    patternType:'패턴',modelId:'모델 ID',sourceComp:'소스',targetComp:'대상',
+    edgeType:'엣지 타입',propagatedRisk:'전파된 위험',graphVerdict:'그래프 판정',
+    worstComp:'최고 위험 컴포넌트',totalPkgs:'전체 패키지',criticalPkgs:'위험 패키지',
+    vulns:'취약점',licenseIssues:'라이선스 이슈',versionRisks:'버전 위험',
+    supplyChain:'공급망 위험',priorityActions:'우선 조치',
+    currentVer:'현재 버전',fixedVer:'수정 버전',
+    priority:'우선순위',affectedFiles:'영향 파일',relatedFindings:'관련 발견',propagationPath:'전파 경로',
+    primaryLang:'주 언어',framework:'프레임워크',transport:'전송 방식',authModel:'인증 모델',
+    componentType:'컴포넌트 타입',targetType:'대상 타입',ownSeverity:'자체 심각도',
+    evidence:'근거',registryField:'레지스트리 필드',component:'컴포넌트',
+    packageManager:'패키지 매니저',lockfile:'잠금파일 버전',prodPkgs:'프로덕션',devPkgs:'개발',
+    directDeps:'직접 의존성',transitiveDeps:'주요 전이 의존성',
+    integrity:'무결성 검사',knownVulns:'알려진 취약점',supplyChainRisk:'공급망 위험',
+    licenseFindings:'라이선스 발견',risk:'위험',note:'비고',pkgName:'패키지',pkgVersion:'버전',license:'라이선스',
+    cveLookup:'CVE 조회',
+    riskFindings:'위험 요소',riskDistribution:'위험 분포',noData:'데이터 없음',repoDescription:'리포지토리 설명',overallAssessment:'종합 위험도',highestConfirmed:'유효 발견 중 최고 심각도',
+    reportVer:'리포트 버전',schemaVer:'스키마 버전',scannerModel:'스캐너 모델',
+    footerAuthor:'작성자',footerOrg:'조직',footerGenerated:'생성일'
+  }
+};
+
+function t(k){ return S[currentLang][k] || k; }
+
+function getData(r){
+  if(currentLang==='ko' && r.korean_report) return r.korean_report;
+  return r.english_report || r;
+}
+
+function sevClass(s){
+  if(s===null||s===undefined||s==='') return 'info';
+  var v=String(s).toLowerCase();
+  if(v==='critical'||v==='심각') return 'critical';
+  if(v==='high'||v==='높음') return 'high';
+  if(v==='medium'||v==='중간') return 'medium';
+  if(v==='low'||v==='낮음') return 'low';
+  return 'info';
+}
+
+function sevColor(s){
+  var c=sevClass(s);
+  var m={critical:'#C41230',high:'#C84B2A',medium:'#A85C00',low:'#157A3A',info:'#1E67C6'};
+  return m[c]||'#767676';
+}
+
+function esc(str){
+  if(str===null||str===undefined) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Map a package-manager / ecosystem string to the OSV ecosystem code.
+function osvEcosystem(pm){
+  if(!pm) return '';
+  var m={npm:'npm',yarn:'npm',pnpm:'npm',
+    pip:'PyPI',pypi:'PyPI',python:'PyPI',poetry:'PyPI',pipenv:'PyPI',
+    maven:'Maven',gradle:'Maven',java:'Maven',
+    go:'Go',gomod:'Go',cargo:'crates.io',rust:'crates.io','crates.io':'crates.io',
+    gem:'RubyGems',bundler:'RubyGems',ruby:'RubyGems',rubygems:'RubyGems',
+    composer:'Packagist',php:'Packagist',packagist:'Packagist',
+    nuget:'NuGet',dotnet:'NuGet'};
+  return m[String(pm).toLowerCase()]||'';
+}
+
+// Render a CVE lookup button that calls OSV API live (browser has network; scanner sandbox does not).
+// On click: POST https://api.osv.dev/v1/query with {version, package:{name,ecosystem}}.
+// Results rendered inline: CVE badges or a "no known CVEs" label.
+// Falls back to opening the OSV search page on network error.
+function vulnLinks(name, version, links, ecosystem){
+  if(!name) return '';
+  var eco=osvEcosystem(ecosystem);
+  var fallback=(links&&links.osv)?links.osv:
+    'https://osv.dev/list?q='+encodeURIComponent(name)+(eco?'&ecosystem='+encodeURIComponent(eco):'');
+  return '<button class="vuln-link osv" '+
+    'data-pkg="'+esc(name)+'" '+
+    'data-ver="'+esc(version||'')+'" '+
+    'data-eco="'+esc(eco)+'" '+
+    'data-fb="'+esc(fallback)+'" '+
+    'onclick="checkOSV(this)" '+
+    'title="OSV API로 취약점 조회">OSV</button>';
+}
+
+// Live OSV API query — called when the user clicks a vuln button.
+function checkOSV(btn){
+  if(btn.dataset.checked) return;
+  btn.disabled=true;
+  btn.textContent='...';
+  var body={package:{name:btn.dataset.pkg}};
+  if(btn.dataset.ver) body.version=btn.dataset.ver;
+  if(btn.dataset.eco) body.package.ecosystem=btn.dataset.eco;
+  fetch('https://api.osv.dev/v1/query',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    btn.dataset.checked='1';
+    var vulns=data.vulns||[];
+    var cell=btn.parentElement;
+    var res=cell.querySelector('.osv-result');
+    if(!res){res=document.createElement('span');res.className='osv-result';cell.appendChild(res);}
+    if(vulns.length===0){
+      btn.textContent='✓';
+      btn.className='vuln-link osv osv-clean';
+      res.innerHTML='<span class="osv-none">No known CVEs</span>';
+    } else {
+      var ids=[];
+      vulns.forEach(function(v){
+        (v.aliases||[]).forEach(function(a){if(a.indexOf('CVE-')===0)ids.push(a);});
+        if(!ids.length&&v.id)ids.push(v.id);
+      });
+      // deduplicate
+      ids=ids.filter(function(v,i,a){return a.indexOf(v)===i;});
+      btn.textContent=vulns.length+(vulns.length===1?' CVE':' CVEs');
+      btn.className='vuln-link osv osv-hit';
+      var shown=ids.slice(0,4).map(function(c){return cveLink(c);}).join('');
+      var more=ids.length>4?'<span class="osv-more">+'+( ids.length-4)+'</span>':'';
+      res.innerHTML=shown+more;
+    }
+    btn.disabled=false;
+  })
+  .catch(function(){
+    btn.textContent='?';
+    btn.title='네트워크 오류 — 클릭하면 OSV 검색 페이지로 이동';
+    btn.disabled=false;
+    btn.dataset.checked='';
+    btn.onclick=function(){window.open(btn.dataset.fb,'_blank','noopener,noreferrer');};
+  });
+}
+
+// Render a CVE id as a clickable OSV detail link (OSV indexes CVE ids as aliases)
+function cveLink(cve){
+  if(!cve) return '';
+  return '<a class="cve-badge" href="https://osv.dev/vulnerability/'+encodeURIComponent(cve)+'" target="_blank" rel="noopener noreferrer">'+esc(cve)+'</a>';
+}
+
+function sevBadge(s){
+  if(!s) return '';
+  return '<span class="severity-badge sev-'+esc(sevClass(s))+'">'+esc(s)+'</span>';
+}
+
+function verdictBadge(v,extraCls){
+  if(v===null||v===undefined||v==='') return '';
+  var cls=String(v).toLowerCase();
+  return '<span class="verdict-badge verd-'+esc(cls)+(extraCls?' '+extraCls:'')+'">'+esc(v)+'</span>';
+}
+
+function meffBadge(e){
+  if(e===null||e===undefined||e==='') return '';
+  var map={'VALID':'valid','DEGRADED':'degraded','OBSOLETE':'obsolete','MODEL_LOCKED':'locked'};
+  var cls=map[String(e).toUpperCase()]||String(e).toLowerCase();
+  return '<span class="meff-badge meff-'+esc(cls)+'">'+esc(e)+'</span>';
+}
+
+function renderScanMeta(meta){
+  if(!meta) return '';
+  var date=meta.scan_date?new Date(meta.scan_date).toLocaleString():'-';
+  return '<div class="scan-meta-bar">'+
+    item(t('scanDate'),esc(date))+
+    item(t('version'),esc(meta.scanner_version||'-'))+
+    item(t('repository'),esc(meta.repository||meta.target_repository||'-'))+
+    item(t('totalFiles'),esc(String(meta.total_files_scanned||meta.total_files||0)))+
+    (meta.code_files?item(t('codeFiles'),esc(String(meta.code_files))):'')+
+    item(t('depth'),esc(String(meta.analysis_depth||meta.scan_depth||'-')))+
+    '</div>';
+  function item(label,val){ return '<div class="scan-meta-item"><span class="scan-meta-label">'+label+'</span><span class="scan-meta-value">'+val+'</span></div>'; }
+}
+
+function countSev(data,s){
+  var c=0;
+  var arrs=[data.static_code_findings,data.binary_analysis_findings,data.skill_risk_findings,
+    data.agent_policy_findings,data.sensitive_patterns,data.prompt_optimization,
+    data.relationship_findings,data.model_validity_findings];
+  arrs.forEach(function(a){
+    if(Array.isArray(a)) a.forEach(function(f){ if(f&&f.severity&&sevClass(f.severity)===s) c++; });
+  });
+  return c;
+}
+
+// True if a finding's status excludes it from active risk (False Positive / Mitigated).
+function isClearedStatus(st){
+  if(!st) return false;
+  var v=String(st).toLowerCase().trim();
+  return v==='false positive'||v==='오탐'||v==='mitigated'||v==='완화됨';
+}
+
+// Overall risk = highest severity among findings NOT marked False Positive/Mitigated.
+function overallRisk(data){
+  var arrs=[data.static_code_findings,data.binary_analysis_findings,data.skill_risk_findings,
+    data.agent_policy_findings,data.sensitive_patterns,data.prompt_optimization,
+    data.relationship_findings,data.model_validity_findings];
+  var rank={critical:4,high:3,medium:2,low:1,info:0};
+  var bestCls='', bestRank=-1, active=0;
+  arrs.forEach(function(a){
+    if(!Array.isArray(a)) return;
+    a.forEach(function(f){
+      if(!f||!f.severity) return;
+      if(isClearedStatus(f.status)) return;
+      active++;
+      var cls=sevClass(f.severity), r=rank[cls];
+      if(r>bestRank){ bestRank=r; bestCls=cls; }
+    });
+  });
+  return {cls:bestCls, active:active};
+}
+
+function renderDonutChartSVG(c,h,m,l){
+  var total=c+h+m+l;
+  var sz=132,r=48,cx=66,cy=66,circ=2*Math.PI*r,sw=18;
+  if(total===0) return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 '+sz+' '+sz+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--bg-tertiary)" stroke-width="'+sw+'"/><text x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle" font-size="12" fill="var(--text-muted)" font-family="sans-serif">0</text></svg>';
+  var segs=[{v:c,col:'#C41230'},{v:h,col:'#C84B2A'},{v:m,col:'#A85C00'},{v:l,col:'#157A3A'}];
+  var off=0;
+  var paths=segs.filter(function(s){return s.v>0;}).map(function(s){
+    var len=(s.v/total)*circ-2;
+    var p='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+s.col+'" stroke-width="'+sw+'" stroke-dasharray="'+Math.max(0,len)+' '+(circ)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    off+=(s.v/total)*circ; return p;
+  }).join('');
+  return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 '+sz+' '+sz+'">'+
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--bg-tertiary)" stroke-width="'+sw+'"/>'+
+    paths+
+    '<text x="'+cx+'" y="'+(cy-5)+'" text-anchor="middle" font-size="22" font-weight="800" fill="var(--text-primary)" font-family="sans-serif">'+total+'</text>'+
+    '<text x="'+cx+'" y="'+(cy+13)+'" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="sans-serif">findings</text>'+
+  '</svg>';
+}
+
+function initRiskChart(c,h,m,l){
+  var canvas=document.getElementById('risk-donut-canvas');
+  if(!canvas) return;
+  var total=c+h+m+l;
+  if(typeof Chart==='undefined'){
+    var fb=document.getElementById('risk-donut-fallback');
+    if(fb){fb.innerHTML=renderDonutChartSVG(c,h,m,l);fb.style.display='block';}
+    canvas.style.display='none'; return;
+  }
+  var existing=Chart.getChart(canvas);
+  if(existing) existing.destroy();
+  if(total===0){canvas.style.display='none';return;}
+  var cs=getComputedStyle(document.documentElement);
+  var textColor=cs.getPropertyValue('--text-primary').trim()||'#1A1A2E';
+  var mutedColor=cs.getPropertyValue('--text-muted').trim()||'#8B8FA8';
+  var centerPlugin={
+    id:'tss-center',
+    afterDraw:function(chart){
+      var ctx=chart.ctx,ca=chart.chartArea;
+      var cx=ca.left+(ca.right-ca.left)/2,cy=ca.top+(ca.bottom-ca.top)/2;
+      ctx.save();
+      ctx.font='bold 22px system-ui,sans-serif';
+      ctx.fillStyle=textColor;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(total,cx,cy-6);
+      ctx.font='10px system-ui,sans-serif';
+      ctx.fillStyle=mutedColor;
+      ctx.fillText('findings',cx,cy+10);
+      ctx.restore();
+    }
+  };
+  var segLabels={
+    id:'tss-seglabels',
+    afterDatasetsDraw:function(chart){
+      var ctx=chart.ctx;
+      chart.data.datasets.forEach(function(ds,i){
+        chart.getDatasetMeta(i).data.forEach(function(arc,j){
+          var v=ds.data[j];
+          if(!v) return;
+          var cp=arc.getCenterPoint();
+          ctx.save();
+          ctx.font='bold 13px system-ui,sans-serif';
+          ctx.fillStyle='#ffffff';
+          ctx.textAlign='center';
+          ctx.textBaseline='middle';
+          ctx.shadowColor='rgba(0,0,0,0.35)';
+          ctx.shadowBlur=3;
+          ctx.fillText(v,cp.x,cp.y);
+          ctx.restore();
+        });
+      });
+    }
+  };
+  new Chart(canvas,{
+    type:'doughnut',
+    data:{
+      labels:[t('critical'),t('high'),t('medium'),t('low')],
+      datasets:[{data:[c,h,m,l],backgroundColor:['#C41230','#C84B2A','#A85C00','#157A3A'],borderWidth:3,borderColor:'var(--bg-primary)',hoverBorderColor:'var(--bg-primary)'}]
+    },
+    options:{
+      responsive:false,cutout:'60%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+ctx.parsed;}}}}
+    },
+    plugins:[centerPlugin,segLabels]
+  });
+}
+
+function renderSummary(report){
+  var data=getData(report);
+  var c=countSev(data,'critical'),h=countSev(data,'high'),m=countSev(data,'medium'),l=countSev(data,'low');
+  var total=c+h+m+l;
+  var rs=data.repository_summary||{};
+  var gv=rs.graph_verdict||{};
+  var worstComp=gv.worst_component||'';
+  var worstVerdict=gv.security_verdict||gv.verdict||'';
+  var worstRationale=gv.rationale||gv.summary||gv.description||'';
+
+  var segs=[{n:c,col:'#C41230',cls:'cnt-c',lbl:t('critical')},{n:h,col:'#C84B2A',cls:'cnt-h',lbl:t('high')},{n:m,col:'#A85C00',cls:'cnt-m',lbl:t('medium')},{n:l,col:'#157A3A',cls:'cnt-l',lbl:t('low')}];
+  var legend=segs.map(function(s){
+    return '<div class="risk-legend-item">'+
+      '<span class="risk-legend-dot" style="background:'+s.col+'"></span>'+
+      '<span class="risk-legend-label">'+s.lbl+'</span>'+
+      '<span class="risk-legend-count '+s.cls+'">'+s.n+'</span>'+
+    '</div>';
+  }).join('')+
+  '<div class="risk-legend-total"><span>'+t('totalFindings')+'</span><span>'+total+'</span></div>';
+
+  // Overall Risk = highest severity among active (non-FP/Mitigated) findings.
+  var ov=overallRisk(data);
+  var sevLbl={critical:t('critical'),high:t('high'),medium:t('medium'),low:t('low'),info:t('low')};
+  var overallCard=(ov.active>0&&ov.cls)?
+    '<div class="risk-overall">'+
+      '<div class="risk-overall-hd">🛡 '+t('overallAssessment')+'</div>'+
+      '<div class="risk-overall-body">'+
+        '<span class="severity-badge sev-'+esc(ov.cls)+' sev-badge-lg">'+esc(sevLbl[ov.cls]||ov.cls)+'</span>'+
+        '<span class="risk-overall-basis">'+t('highestConfirmed')+'</span>'+
+      '</div>'+
+    '</div>':'';
+
+  var distCard='<div class="repo-card2">'+
+    '<div class="repo-card2-hd">'+
+      '<svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/><path d="M6 6 L6 2" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/><path d="M6 6 L9 8" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/></svg>'+
+      t('riskDistribution')+
+    '</div>'+
+    '<div class="risk-chart-row">'+
+      '<canvas id="risk-donut-canvas" width="132" height="132" style="flex-shrink:0"></canvas>'+
+      '<div id="risk-donut-fallback" style="display:none;flex-shrink:0"></div>'+
+      '<div class="risk-legend">'+legend+'</div>'+
+    '</div>'+
+    overallCard+
+  '</div>';
+
+  var compCard=worstComp?
+    '<div class="repo-card2">'+
+      '<div class="repo-card2-hd">'+
+        '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1L11 11H1L6 1z" fill="var(--sev-c-text)"/></svg>'+
+        t('worstComp')+
+      '</div>'+
+      '<div class="risk-comp-name">'+esc(worstComp)+'</div>'+
+      (worstVerdict?verdictBadge(worstVerdict):'')+
+      (worstRationale?'<div class="risk-comp-rationale">'+esc(worstRationale)+'</div>':'')+
+    '</div>':'';
+
+  return '<div class="risk-block">'+
+    '<div class="risk-block-hd">'+
+      '<svg width="11" height="11" viewBox="0 0 11 11"><path d="M5.5 1L10.5 10H.5L5.5 1z" fill="var(--sev-h-text)"/></svg>'+
+      t('riskFindings')+
+    '</div>'+
+    '<div class="'+(worstComp?'risk-inner-two-col':'risk-inner-one-col')+'">'+distCard+compCard+'</div>'+
+  '</div>';
+}
+
+function renderGraphVerdictCard(gv){
+  if(!gv) return '';
+  var v=gv.security_verdict||gv.verdict;
+  if(!v) return '';
+  var icons={install_ok:'✅',review:'⚠️',disable:'🔶',remove:'🔴'};
+  var icon=icons[String(v).toLowerCase()]||'📊';
+  var sub=gv.rationale||gv.summary||gv.description;
+  return '<div class="graph-verdict-card">'+
+    '<div style="font-size:36px">'+icon+'</div>'+
+    '<div>'+
+      '<div class="graph-verdict-label">🔗 '+t('graphVerdict')+'</div>'+
+      verdictBadge(v)+
+      (gv.worst_component?'<div class="graph-verdict-sub">'+t('worstComp')+': <strong>'+esc(gv.worst_component)+'</strong></div>':'')+
+      (sub?'<div class="graph-verdict-sub">'+esc(sub)+'</div>':'')+
+    '</div>'+
+  '</div>';
+}
+
+function renderRepoSummary(s){
+  if(!s) return '';
+
+  // Card 1: description + risk_summary only
+  var descCard='<div class="repo-card2">'+
+    '<div class="repo-card2-hd">📋 '+t('repoDescription')+'</div>'+
+    (s.description?'<div class="repo-card2-desc">'+esc(s.description)+'</div>':'')+
+    (s.risk_summary?'<div class="repo-card2-desc" style="margin-top:8px;border-top:1px solid var(--border-light);padding-top:8px">'+esc(s.risk_summary)+'</div>':'')+
+  '</div>';
+
+  // Card 2: meta chips + key_components + sensitive_files as sub-cards
+  var metaFields=[['primaryLang',s.primary_language],['framework',s.framework],['transport',s.transport],['authModel',s.auth_model]].filter(function(p){return p[1];});
+  var subcards=[];
+  if(metaFields.length){
+    subcards.push('<div class="repo-subcard2">'+
+      '<div class="repo-meta-chips">'+
+        metaFields.map(function(p){
+          return '<div class="repo-meta-chip"><span class="repo-meta-chip-lbl">'+t(p[0])+'</span><span class="repo-meta-chip-val">'+esc(p[1])+'</span></div>';
+        }).join('')+
+      '</div>'+
+    '</div>');
+  }
+  if(s.key_components&&s.key_components.length){
+    subcards.push('<div class="repo-subcard2">'+
+      '<div class="repo-subcard2-lbl">'+t('keyComponents')+'</div>'+
+      '<div class="repo-subcard2-tags">'+s.key_components.map(function(c){return '<span class="comp-tag">'+esc(c)+'</span>';}).join('')+'</div>'+
+    '</div>');
+  }
+  if(s.sensitive_files_detected&&s.sensitive_files_detected.length){
+    subcards.push('<div class="repo-subcard2">'+
+      '<div class="repo-subcard2-lbl">'+t('sensitiveFiles')+'</div>'+
+      '<div class="repo-subcard2-tags">'+s.sensitive_files_detected.map(function(f){return '<span class="sensitive-tag">'+esc(f)+'</span>';}).join('')+'</div>'+
+    '</div>');
+  }
+  var compCard='<div class="repo-card2">'+
+    '<div class="repo-card2-hd">🔍 '+t('keyComponents')+'</div>'+
+    (subcards.length?'<div class="repo-subcards-stack">'+subcards.join('')+'</div>':
+      '<div class="risk-comp-empty">'+t('noData')+'</div>')+
+  '</div>';
+
+  return section('section-repo','📁',t('repoSummary'),null,
+    '<div class="repo-two-col">'+descCard+compCard+'</div>'
+  );
+}
+
+function findingCard(f, extraMeta, extraBody){
+  return '<div class="finding-card"'+(f.id?' id="finding-'+esc(f.id)+'"':'')+'>'+
+    '<div class="finding-header">'+
+      '<span class="finding-id">'+esc(f.id||'')+'</span>'+
+      '<span class="finding-title">'+esc(f.issue||f.title||'')+'</span>'+
+      sevBadge(f.severity)+
+      verdictBadge(f.verdict)+
+      (f.status?'<span class="status-badge">'+esc(f.status)+'</span>':'')+
+    '</div>'+
+    '<div class="finding-meta">'+
+      (f.file?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('file')+':</span><code>'+esc(f.file)+'</code></div>':'')+
+      (f.line?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('line')+':</span><code>'+esc(String(f.line))+'</code></div>':'')+
+      (f.agent?'<div class="finding-meta-item"><span class="finding-meta-label">Agent:</span><code>'+esc(f.agent)+'</code></div>':'')+
+      (f.pattern?'<div class="finding-meta-item"><span class="finding-meta-label">Pattern:</span><code>'+esc(f.pattern)+'</code></div>':'')+
+      (f.gitignore_status?'<div class="finding-meta-item"><span class="finding-meta-label">.gitignore:</span><span>'+esc(f.gitignore_status)+'</span></div>':'')+
+      (extraMeta||'')+
+    '</div>'+
+    (f.description?'<div class="finding-description">'+esc(f.description)+'</div>':'')+
+    (f.detail?'<div class="finding-description">'+esc(f.detail)+'</div>':'')+
+    (f.examples?detail('Examples',f.examples):'')+
+    (f.disallowed_tools&&f.disallowed_tools.length?'<div class="cve-list">'+f.disallowed_tools.map(function(c){return '<span class="cve-badge" style="background:var(--sev-i-bg);color:var(--sev-i-text);border-color:var(--sev-i-border)">'+esc(c)+'</span>';}).join('')+'</div>':'')+
+    (extraBody||'')+
+    (f.deep_dive_result?detailPre(t('deepDive'),f.deep_dive_result):'')+
+    (f.code_fix?codeFixBlock(f.code_fix):'')+
+    (f.analysis?detail(t('analysis'),f.analysis):'')+
+    (f.recommendation?detail(t('recommendation'),f.recommendation):'')+
+    (f.cve_ids&&f.cve_ids.length?'<div class="cve-list">'+f.cve_ids.map(function(c){return '<span class="cve-badge">'+esc(c)+'</span>';}).join('')+'</div>':'')+
+  '</div>';
+}
+
+function detail(title, content){
+  return '<div class="finding-detail"><div class="finding-detail-title">'+esc(title)+'</div><div class="finding-detail-content">'+esc(content)+'</div></div>';
+}
+
+// Like detail() but preserves line breaks (Level 1/2/3/결론 of deep_dive_result)
+function detailPre(title, content){
+  return '<div class="finding-detail"><div class="finding-detail-title">'+esc(title)+'</div><div class="finding-detail-content dd-pre">'+esc(content)+'</div></div>';
+}
+
+// Render a single labeled code block. Code is esc()'d so quotes/<>/& are safe.
+function codeBlock(label, code, lang, kind){
+  if(code===undefined||code===null||code==='') return '';
+  var tag=(lang?'<span class="code-lang">'+esc(lang)+'</span>':'');
+  return '<div class="code-fix-block '+(kind||'')+'">'+
+    '<div class="code-fix-label">'+esc(label)+tag+'</div>'+
+    '<pre class="code-block"><code>'+esc(code)+'</code></pre>'+
+  '</div>';
+}
+
+// Render a deep-dive code_fix object: before(취약)/after(수정)/note. All values are JSON strings.
+function codeFixBlock(cf){
+  if(!cf||typeof cf!=='object') return '';
+  var lang=cf.language||'';
+  return '<div class="code-fix"><div class="finding-detail-title">'+t('codeFix')+'</div>'+
+    codeBlock(t('before'),cf.before,lang,'cf-before')+
+    codeBlock(t('after'),cf.after,lang,'cf-after')+
+    (cf.note?'<div class="code-fix-note">'+esc(cf.note)+'</div>':'')+
+  '</div>';
+}
+
+function section(id, icon, label, count, body){
+  return '<div class="section" id="'+id+'">'+
+    '<div class="section-header" onclick="toggleSection(\''+id+'\')">'+
+      '<div class="section-title">'+
+        '<span>'+icon+'</span> '+label+
+        (count!==null&&count!==undefined?'<span class="section-count">'+count+'</span>':'')+
+      '</div>'+
+      '<span class="section-toggle">▼</span>'+
+    '</div>'+
+    '<div class="section-content">'+body+'</div>'+
+  '</div>';
+}
+
+function renderStatic(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-static','🔍',t('staticFindings'),arr.length,arr.map(function(f){return findingCard(f);}).join(''));
+}
+
+function renderBinary(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-binary','🔒',t('binaryFindings'),arr.length,arr.map(function(f){return findingCard(f);}).join(''));
+}
+
+function renderSkill(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-skill','🛡️',t('skillFindings'),arr.length,arr.map(function(f){
+    var extra=f.model_effectiveness?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('modelEff')+':</span>'+meffBadge(f.model_effectiveness)+'</div>':'';
+    return findingCard(f,extra);
+  }).join(''));
+}
+
+function renderAgent(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-agent','🤖',t('agentFindings'),arr.length,arr.map(function(f){return findingCard(f);}).join(''));
+}
+
+function renderSensitive(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-sensitive','🔑',t('sensitivePatterns'),arr.length,arr.map(function(f){
+    var extra=(f.pattern_type?'<div class="finding-meta-item"><span class="finding-meta-label">Type:</span><code>'+esc(f.pattern_type)+'</code></div>':'')+
+      (f.risk_summary?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('riskSummary')+':</span><span>'+esc(f.risk_summary)+'</span></div>':'');
+    return findingCard(f,extra);
+  }).join(''));
+}
+
+function renderPrompt(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-prompt','✨',t('promptOptimization'),arr.length,arr.map(function(f){
+    var extra=f.model_effectiveness?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('modelEff')+':</span>'+meffBadge(f.model_effectiveness)+'</div>':'';
+    return findingCard(f,extra);
+  }).join(''));
+}
+
+function renderRelationship(arr){
+  if(!arr||!arr.length) return '';
+  var body=arr.map(function(f){
+    var src=f.component||f.source_component;
+    var tgt=f.target_component;
+    var srcChip=src?'<span class="node-chip">'+esc(src)+(f.component_type?'<span style="color:var(--text-muted);font-weight:400"> · '+esc(f.component_type)+'</span>':'')+'</span>':'';
+    var tgtChip=tgt?'<span class="node-chip">'+esc(tgt)+(f.target_type?'<span style="color:var(--text-muted);font-weight:400"> · '+esc(f.target_type)+'</span>':'')+'</span>':'';
+    var pp='';
+    if(f.propagation_path){
+      pp=Array.isArray(f.propagation_path)?f.propagation_path.map(esc).join('<br>'):esc(f.propagation_path);
+    }
+    return '<div class="rel-card"'+(f.id?' id="finding-'+esc(f.id)+'"':'')+'>'+
+      '<div class="finding-header">'+
+        '<span class="finding-id">'+esc(f.id||'')+'</span>'+
+        (f.issue?'<span class="finding-title">'+esc(f.issue)+'</span>':'')+
+        sevBadge(f.severity)+
+        verdictBadge(f.verdict)+
+      '</div>'+
+      ((src||tgt)?
+      '<div class="edge-path">'+
+        srcChip+
+        (f.edge_type?'<span class="edge-arrow">→</span><span class="edge-badge">'+esc(f.edge_type)+'</span><span class="edge-arrow">→</span>':(tgt?'<span class="edge-arrow">→</span>':''))+
+        tgtChip+
+        (f.own_severity?'<span class="score-chip">'+t('ownSeverity')+': '+esc(f.own_severity)+'</span>':'')+
+        (f.propagated_risk!==undefined&&f.propagated_risk!==null?'<span class="score-chip">'+t('propagatedRisk')+': '+esc(String(f.propagated_risk))+'</span>':'')+
+      '</div>':'')+
+      (f.description?'<div class="finding-description">'+esc(f.description)+'</div>':'')+
+      (pp?'<div class="finding-detail"><div class="finding-detail-title">'+esc(t('propagationPath'))+'</div><div class="finding-detail-content">'+pp+'</div></div>':'')+
+      (f.deep_dive_result?detailPre(t('deepDive'),f.deep_dive_result):'')+
+      (f.code_fix?codeFixBlock(f.code_fix):'')+
+      (f.recommendation?detail(t('recommendation'),f.recommendation):'')+
+    '</div>';
+  }).join('');
+  return section('section-rel','🔗',t('relationshipFindings'),arr.length,body);
+}
+
+function renderModelValidity(arr){
+  if(!arr||!arr.length) return '';
+  return section('section-model','🧠',t('modelValidityFindings'),arr.length,arr.map(function(f){
+    var extra=
+      (f.component?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('component')+':</span><code>'+esc(f.component)+'</code></div>':'')+
+      (f.model_id?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('modelId')+':</span><code>'+esc(f.model_id)+'</code></div>':'')+
+      (f.pattern_type?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('patternType')+':</span><span class="pattern-badge">'+esc(f.pattern_type)+'</span></div>':'')+
+      (f.registry_field?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('registryField')+':</span><code>'+esc(f.registry_field)+'</code></div>':'')+
+      (f.model_effectiveness?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('modelEff')+':</span>'+meffBadge(f.model_effectiveness)+'</div>':'');
+    var extraBody=f.evidence?detail(t('evidence'),f.evidence):'';
+    return findingCard(f,extra,extraBody);
+  }).join(''));
+}
+
+function renderSbom(sbom){
+  if(!sbom) return '';
+  var ov=sbom.overview||{};
+  var matrix=sbom.risk_matrix||{};
+  var pa=sbom.priority_actions||[];
+  var vf=sbom.vulnerability_findings||[];
+  var lf=sbom.license_findings||[];
+  var vrf=sbom.version_risk_findings||[];
+  var scf=sbom.supply_chain_findings||[];
+  var dd=sbom.direct_dependencies||[];
+  var td=sbom.notable_transitive_dependencies||[];
+
+  var body='';
+
+  // Overview stats — support both flat v1.3 fields and the legacy overview object
+  var totalPkgs=(sbom.total_packages!==undefined)?sbom.total_packages:ov.total_packages;
+  if(totalPkgs!==undefined){
+    body+='<div class="sbom-overview">'+
+      stat(esc(String(totalPkgs||0)),'cnt-a',t('totalPkgs'))+
+      (sbom.production_packages!==undefined?stat(esc(String(sbom.production_packages||0)),'',t('prodPkgs')):'')+
+      (sbom.dev_packages!==undefined?stat(esc(String(sbom.dev_packages||0)),'',t('devPkgs')):'')+
+      (ov.critical_packages!==undefined?stat(esc(String(ov.critical_packages||0)),'cnt-c',t('criticalPkgs')):'')+
+      (ov.high_risk_packages!==undefined?stat(esc(String(ov.high_risk_packages||0)),'cnt-h',t('high')):'')+
+    '</div>';
+  }
+
+  // Package manager / lockfile meta
+  var metaChips=[];
+  if(sbom.package_manager) metaChips.push([t('packageManager'),sbom.package_manager]);
+  if(sbom.lockfile_version!==undefined) metaChips.push([t('lockfile'),String(sbom.lockfile_version)]);
+  if(metaChips.length){
+    body+='<div class="scan-meta-bar" style="margin-bottom:14px">'+metaChips.map(function(p){
+      return '<div class="scan-meta-item"><span class="scan-meta-label">'+p[0]+'</span><span class="scan-meta-value">'+esc(p[1])+'</span></div>';
+    }).join('')+'</div>';
+  }
+
+  // Direct dependencies table
+  if(dd.length){
+    body+='<div class="sub-heading">📦 '+t('directDeps')+' <span class="section-count">'+dd.length+'</span></div>'+
+      '<table class="risk-matrix"><thead><tr><th>'+t('pkgName')+'</th><th>'+t('pkgVersion')+'</th><th>'+t('license')+'</th><th>'+t('risk')+'</th><th>'+t('cveLookup')+'</th></tr></thead><tbody>'+
+      dd.map(function(d){
+        return '<tr><td><code>'+esc(d.name||'')+'</code></td><td>'+esc(d.version||'')+'</td><td>'+esc(d.license||'')+'</td><td>'+(d.risk?sevBadge(d.risk):'')+'</td><td>'+vulnLinks(d.name,d.version,d.lookup_links,d.ecosystem||sbom.package_manager)+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  }
+
+  // Notable transitive dependencies table
+  if(td.length){
+    body+='<div class="sub-heading">🔗 '+t('transitiveDeps')+' <span class="section-count">'+td.length+'</span></div>'+
+      '<table class="risk-matrix"><thead><tr><th>'+t('pkgName')+'</th><th>'+t('pkgVersion')+'</th><th>'+t('note')+'</th><th>'+t('cveLookup')+'</th></tr></thead><tbody>'+
+      td.map(function(d){
+        return '<tr><td><code>'+esc(d.name||'')+'</code></td><td>'+esc(d.version||'')+'</td><td>'+esc(d.note||'')+'</td><td>'+vulnLinks(d.name,d.version,d.lookup_links,d.ecosystem||sbom.package_manager)+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  }
+
+  // Text summary fields
+  if(sbom.integrity_check) body+=detail(t('integrity'),sbom.integrity_check);
+  if(sbom.known_vulnerabilities) body+=detail(t('knownVulns'),sbom.known_vulnerabilities);
+  if(sbom.supply_chain_risk) body+=detail(t('supplyChainRisk'),sbom.supply_chain_risk);
+  if(sbom.scan_notes) body+=detail('Scan Notes',sbom.scan_notes);
+
+  // Risk matrix
+  if(matrix.vulnerabilities||matrix.license_issues||matrix.version_risks||matrix.supply_chain){
+    body+='<table class="risk-matrix">'+
+      '<thead><tr><th></th><th style="color:var(--sev-c-text)">'+t('critical')+'</th><th style="color:var(--sev-h-text)">'+t('high')+'</th><th style="color:var(--sev-m-text)">'+t('medium')+'</th><th style="color:var(--sev-l-text)">'+t('low')+'</th></tr></thead>'+
+      '<tbody>'+
+      (matrix.vulnerabilities?mrow(t('vulns'),matrix.vulnerabilities):'')+
+      (matrix.license_issues?mrow(t('licenseIssues'),matrix.license_issues):'')+
+      (matrix.version_risks?mrow(t('versionRisks'),matrix.version_risks):'')+
+      (matrix.supply_chain?mrow(t('supplyChain'),matrix.supply_chain):'')+
+      '</tbody></table>';
+  }
+
+  // Priority actions
+  if(pa.length){
+    body+='<div style="font-weight:700;font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:0 0 8px">🎯 '+t('priorityActions')+'</div>'+
+    pa.map(function(a){
+      return '<div class="priority-action">'+
+        '<div class="priority-rank">'+esc(String(a.rank||'?'))+'</div>'+
+        '<div>'+
+          '<div class="priority-pkg">'+esc(a.package||'')+
+            (a.category?'<span class="cat-badge">'+esc(a.category)+'</span>':'')+
+            sevBadge(a.severity)+
+          '</div>'+
+          (a.current_version?'<div class="priority-ver">'+t('currentVer')+': '+esc(a.current_version)+'</div>':'')+
+          (a.action?'<div class="priority-act">→ '+esc(a.action)+'</div>':'')+
+          (a.rationale?'<div class="priority-rationale">'+esc(a.rationale)+'</div>':'')+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  // Sub-findings
+  if(vf.length) body+=subSection('🔓',t('vulns'),vf.length)+vf.map(function(f){
+    return '<div class="finding-card">'+
+      '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+'@'+esc(f.version||'')+'</span>'+sevBadge(f.severity)+(f.confidence?'<span class="status-badge">'+esc(f.confidence)+'</span>':'')+'</div>'+
+      '<div class="finding-meta">'+
+        (f.file?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('file')+':</span><code>'+esc(f.file)+'</code></div>':'')+
+        (f.fixed_version?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('fixedVer')+':</span><code style="color:var(--accent)">'+esc(f.fixed_version)+'</code></div>':'')+
+        (f.package?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('cveLookup')+':</span>'+vulnLinks(f.package,f.version,f.lookup_links,f.ecosystem||sbom.package_manager)+'</div>':'')+
+      '</div>'+
+      (f.description?'<div class="finding-description">'+esc(f.description)+'</div>':'')+
+      (f.cve_ids&&f.cve_ids.length?'<div class="cve-list">'+f.cve_ids.map(function(c){return cveLink(c);}).join('')+'</div>':'')+
+      (f.recommendation?detail(t('recommendation'),f.recommendation):'')+
+    '</div>';
+  }).join('');
+
+  if(lf.length) body+=subSection('⚖️',t('licenseIssues'),lf.length)+lf.map(function(f){
+    return '<div class="finding-card">'+
+      '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+' — '+esc(f.license||'')+'</span>'+sevBadge(f.severity)+'</div>'+
+      (f.issue?'<div class="finding-description">'+esc(f.issue)+'</div>':'')+
+      (f.recommendation?detail(t('recommendation'),f.recommendation):'')+
+    '</div>';
+  }).join('');
+
+  if(vrf.length) body+=subSection('📌',t('versionRisks'),vrf.length)+vrf.map(function(f){
+    return '<div class="finding-card">'+
+      '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+' — '+esc(f.issue||'')+'</span>'+sevBadge(f.severity)+'</div>'+
+      (f.current_version?'<div class="finding-meta"><div class="finding-meta-item"><span class="finding-meta-label">'+t('currentVer')+':</span><code>'+esc(f.current_version)+'</code></div></div>':'')+
+      (f.recommendation?detail(t('recommendation'),f.recommendation):'')+
+    '</div>';
+  }).join('');
+
+  if(scf.length) body+=subSection('🔗',t('supplyChain'),scf.length)+scf.map(function(f){
+    return '<div class="finding-card">'+
+      '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+' — '+esc(f.risk_type||'')+'</span>'+sevBadge(f.severity)+'</div>'+
+      (f.detail?'<div class="finding-description">'+esc(f.detail)+'</div>':'')+
+      (f.recommendation?detail(t('recommendation'),f.recommendation):'')+
+    '</div>';
+  }).join('');
+
+  return section('section-sbom','📦',t('sbomAnalysis'),null,body);
+
+  function stat(val,cls,label){ return '<div class="sbom-stat"><div class="sbom-stat-label">'+label+'</div><div class="sbom-stat-val '+cls+'">'+val+'</div></div>'; }
+  function mrow(label,d){ return '<tr><td>'+label+'</td><td style="color:var(--sev-c-text)">'+((d.critical)||0)+'</td><td style="color:var(--sev-h-text)">'+((d.high)||0)+'</td><td style="color:var(--sev-m-text)">'+((d.medium)||0)+'</td><td style="color:var(--sev-l-text)">'+((d.low)||0)+'</td></tr>'; }
+  function subSection(icon,label,count){ return '<div class="sub-heading">'+icon+' '+label+' <span class="section-count">'+count+'</span></div>'; }
+}
+
+function renderRecs(arr){
+  if(!arr||!arr.length) return '';
+  var body=arr.map(function(r){
+    var pc=sevClass(r.priority);
+    // Header row: REC id, rank, priority badge (id/rank are V1.3.1 traceability fields, optional)
+    var head='<div class="rec-head">'+
+      (r.id?'<span class="rec-id">'+esc(r.id)+'</span>':'')+
+      (r.rank!==undefined&&r.rank!==null&&r.rank!==''?'<span class="rec-rank">#'+esc(String(r.rank))+'</span>':'')+
+      (r.priority!==undefined&&r.priority!==null&&r.priority!==''?'<span class="rec-prio-badge sev-'+esc(pc)+'">'+t('priority')+': '+esc(String(r.priority))+'</span>':'')+
+    '</div>';
+    // finding_ids → clickable chips that jump to the referenced finding card
+    var refs='';
+    if(r.finding_ids&&r.finding_ids.length){
+      refs='<div class="rec-refs"><span class="rec-refs-label">'+t('relatedFindings')+':</span>'+
+        r.finding_ids.map(function(fid){
+          return '<button class="finding-ref" onclick="scrollToFinding(\''+esc(String(fid))+'\')" title="'+t('relatedFindings')+'">'+esc(String(fid))+'</button>';
+        }).join('')+
+      '</div>';
+    }
+    return '<div class="rec-card p-'+esc(pc)+'">'+
+      head+
+      '<div class="rec-action">'+esc(r.action||'')+'</div>'+
+      '<div class="rec-rationale">'+esc(r.rationale||'')+'</div>'+
+      refs+
+      (r.affected_files&&r.affected_files.length?'<div class="rec-files">'+t('affectedFiles')+': '+r.affected_files.map(esc).join(', ')+'</div>':'')+
+    '</div>';
+  }).join('');
+  return section('section-recs','✅',t('recommendations'),arr.length,body);
+}
+
+// Jump to a finding card by id: reveal its section (if collapsed), scroll, briefly highlight.
+function scrollToFinding(id){
+  var el=document.getElementById('finding-'+id);
+  if(!el) return;
+  var sec=el.closest('.section');
+  if(sec) sec.classList.remove('collapsed');
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.remove('finding-flash');
+  // force reflow so the animation restarts on repeat clicks
+  void el.offsetWidth;
+  el.classList.add('finding-flash');
+}
+
+function exportHTML(){
+  if(!reports.length){ alert('No report loaded'); return; }
+  var report=reports[currentReportIndex];
+  var origFilename=report._filename||'scanreport.json';
+  var exportLang=currentLang;
+
+  var exportData=JSON.parse(JSON.stringify(report));
+  delete exportData._filename;
+  var dataJson=JSON.stringify(exportData).replace(/</g,'\\u003C');
+  var safeFilename=origFilename.replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+
+  var so='<'+'script';
+  var sc='<'+'/'+'script>';
+
+  var dataBlock=so+' id="__TSS__" type="application/json">\n'+dataJson+'\n'+sc;
+
+  var exportStyle='<style id="__tss_ex__">#exportBtn,.upload-btn,.nav-controls{display:none!important}</style>';
+
+  var bootScript=
+    so+'>\n'+
+    '(function(){\n'+
+    '  var _D=JSON.parse(document.getElementById("__TSS__").textContent);\n'+
+    '  _D._filename="'+safeFilename+'";\n'+
+    '  currentLang="'+exportLang+'";\n'+
+    '  function _init(){\n'+
+    '    reports=[_D]; currentReportIndex=0;\n'+
+    '    document.querySelectorAll(".lang-btn").forEach(function(b){\n'+
+    '      b.classList.toggle("active",b.dataset.lang===currentLang);\n'+
+    '    });\n'+
+    '    renderReport(reports[0]); updateNav();\n'+
+    '  }\n'+
+    '  if(document.readyState==="loading")\n'+
+    '    document.addEventListener("DOMContentLoaded",_init);\n'+
+    '  else _init();\n'+
+    '})();\n'+
+    sc;
+
+  var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  var headClose=html.indexOf('</head>');
+  if(headClose!==-1) html=html.slice(0,headClose)+exportStyle+'\n</head>'+html.slice(headClose+7);
+  var bodyClose=html.lastIndexOf('</body>');
+  if(bodyClose===-1) bodyClose=html.lastIndexOf('</BODY>');
+  html=bodyClose===-1
+    ? html+'\n'+dataBlock+'\n'+bootScript
+    : html.slice(0,bodyClose)+dataBlock+'\n'+bootScript+'\n</body>';
+
+  var filename=origFilename.replace(/\.json$/i,'')+'.html';
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function toggleSection(id){
+  var el=document.getElementById(id);
+  if(el) el.classList.toggle('collapsed');
+}
+
+function renderFooter(report){
+  var el=document.getElementById('reportFooter');
+  if(!el) return;
+  var meta=report.scan_metadata||{};
+  var repoUrl='https://github.com/bosong2/Threat-Scan-Security';
+  var items=[
+    {label:t('reportVer'),val:esc(meta.scanner_version||'-')},
+    {label:t('schemaVer'),val:'V1.3'},
+    {label:t('footerAuthor'),val:'Bosung Hong (bosong2)'}
+  ];
+  if(meta.scanner_model) items.splice(2,0,{label:t('scannerModel'),val:esc(meta.scanner_model)});
+  var blocks=items.map(function(it,i){
+    return (i>0?'<div class="footer-sep"></div>':'')+
+      '<div class="footer-block"><span class="footer-label">'+it.label+'</span><span class="footer-value">'+it.val+'</span></div>';
+  }).join('');
+  var dateStr=meta.scan_date?new Date(meta.scan_date).toLocaleString():'-';
+  el.innerHTML='<div class="report-footer"><div class="footer-inner">'+
+    '<div class="footer-row">'+blocks+'</div>'+
+    '<div class="footer-credit">'+
+      '<span>'+t('footerGenerated')+': '+esc(dateStr)+'</span>'+
+      '<span><a class="footer-repo-link" href="'+repoUrl+'" target="_blank" rel="noopener">'+esc(repoUrl.replace('https://',''))+'</a></span>'+
+      '<span class="footer-credit-logo">Claude Threat Scan · Apache-2.0</span>'+
+    '</div>'+
+  '</div></div>';
+  el.style.display='block';
+}
+
+function renderReport(report){
+  if(!report) return;
+  var data=getData(report);
+  var meta=report.scan_metadata;
+  document.getElementById('reportContent').innerHTML=
+    renderScanMeta(meta)+
+    renderSummary(report)+
+    renderRepoSummary(data.repository_summary)+
+    renderStatic(data.static_code_findings)+
+    renderBinary(data.binary_analysis_findings)+
+    renderSkill(data.skill_risk_findings)+
+    renderAgent(data.agent_policy_findings)+
+    renderSensitive(data.sensitive_patterns)+
+    renderPrompt(data.prompt_optimization)+
+    renderSbom(data.sbom_analysis)+
+    renderRelationship(data.relationship_findings)+
+    renderModelValidity(data.model_validity_findings)+
+    renderRecs(data.recommendations);
+  document.getElementById('reportContent').style.display='block';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('printBtn').style.display='flex';
+  document.getElementById('exportBtn').style.display='flex';
+  var _c=countSev(data,'critical'),_h=countSev(data,'high'),_m=countSev(data,'medium'),_l=countSev(data,'low');
+  initRiskChart(_c,_h,_m,_l);
+  renderFooter(report);
+}
+
+function updateNav(){
+  document.getElementById('prevReport').disabled=currentReportIndex<=0;
+  document.getElementById('nextReport').disabled=currentReportIndex>=reports.length-1;
+  document.getElementById('reportIndicator').textContent=reports.length>0?(currentReportIndex+1)+' / '+reports.length:'0 / 0';
+}
+
+function loadReports(files){
+  var promises=Array.from(files).map(function(file){
+    return new Promise(function(resolve){
+      var r=new FileReader();
+      r.onload=function(e){
+        try{ var j=JSON.parse(e.target.result); j._filename=file.name; resolve(j); }
+        catch(err){ console.error('Parse error:',file.name,err); resolve(null); }
+      };
+      r.onerror=function(){ resolve(null); };
+      r.readAsText(file);
+    });
+  });
+  Promise.all(promises).then(function(res){
+    reports=res.filter(Boolean);
+    reports.sort(function(a,b){ return (b._filename||'').localeCompare(a._filename||''); });
+    if(reports.length>0){ currentReportIndex=0; renderReport(reports[0]); }
+    updateNav();
+  });
+}
+
+document.getElementById('fileInput').addEventListener('change',function(e){
+  if(e.target.files.length>0) loadReports(e.target.files);
+});
+document.getElementById('prevReport').addEventListener('click',function(){
+  if(currentReportIndex>0){ currentReportIndex--; renderReport(reports[currentReportIndex]); updateNav(); }
+});
+document.getElementById('nextReport').addEventListener('click',function(){
+  if(currentReportIndex<reports.length-1){ currentReportIndex++; renderReport(reports[currentReportIndex]); updateNav(); }
+});
+document.querySelectorAll('.lang-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentLang=btn.dataset.lang;
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      el.textContent=currentLang==='ko'?el.dataset.ko:el.dataset.en;
+    });
+    if(reports.length>0) renderReport(reports[currentReportIndex]);
+  });
+});
+
+// Drag and Drop
+var dropZone=document.getElementById('dropZone');
+document.body.addEventListener('dragover',function(e){ e.preventDefault(); });
+document.body.addEventListener('dragenter',function(){ if(dropZone) dropZone.classList.add('drag-over'); });
+document.body.addEventListener('dragleave',function(e){ if(!e.relatedTarget||!document.body.contains(e.relatedTarget)) if(dropZone) dropZone.classList.remove('drag-over'); });
+document.body.addEventListener('drop',function(e){
+  e.preventDefault();
+  if(dropZone) dropZone.classList.remove('drag-over');
+  var files=Array.from(e.dataTransfer.files).filter(function(f){ return f.name.endsWith('.json'); });
+  if(files.length>0) loadReports(files);
+});
+
+updateNav();
+</script>
+</body>
+</html>

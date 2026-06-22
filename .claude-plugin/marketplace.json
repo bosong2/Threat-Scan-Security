@@ -1,0 +1,14 @@
+{
+  "name": "threat-scan-security-marketplace",
+  "owner": { "name": "Bosung Hong (bosong2)", "url": "https://github.com/bosong2" },
+  "metadata": {
+    "description": "Threat-scan-security — security + model-validity scanner with bilingual JSON and HTML reporting"
+  },
+  "plugins": [
+    {
+      "name": "threat-scan-security",
+      "source": "./",
+      "description": "Full threat-scan pipeline (단계 0–11) → bilingual JSON + KO HTML report. Dual-mode: Claude Code plugin and Claude Desktop skill."
+    }
+  ]
+}
