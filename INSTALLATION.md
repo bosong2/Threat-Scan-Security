@@ -4,7 +4,7 @@
 
 | 모드 | 대상 | 한 줄 설치 |
 |------|------|-----------|
-| **Claude Code Plugin** | 터미널·IDE에서 Claude Code 사용 | `/plugin marketplace add <path>` |
+| **Claude Code Plugin** | 터미널·IDE에서 Claude Code 사용 | `/plugin marketplace add bosong2/Threat-Scan-Security` |
 | **Claude Desktop Skill** | Claude Desktop 앱 | `build_claude_desktop.sh` → zip 업로드 |
 
 ```mermaid
@@ -29,9 +29,12 @@ flowchart TD
 이 리포지토리 자체가 마켓플레이스입니다(`.claude-plugin/marketplace.json`).
 
 ```text
-/plugin marketplace add /path/to/Threat-scan-security
+/plugin marketplace add bosong2/Threat-Scan-Security
 /plugin install threat-scan-security@threat-scan-security-marketplace
 ```
+
+> 로컬 개발 중이라면 GitHub 대신 클론한 경로를 지정해도 됩니다:
+> `/plugin marketplace add /path/to/Threat-Scan-Security`
 
 확인:
 ```text
