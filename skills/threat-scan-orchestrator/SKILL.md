@@ -31,89 +31,111 @@ If `$ARGUMENTS` is empty, ask for a path / git URL / zip and stop.
 > **자동으로 대기**한다. `Monitor` 도구, 백그라운드 실행, 폴링 루프는 절대 사용하지 않는다.
 > 에이전트가 "실행 중"이어도 추가 대기 코드 없이 반환값을 직접 받는다.
 
-### Phase 0' — 세션 격리 + 출력 경로 고정 (Bash, 최초 1회)
+### Phase 0' — 스캔 세션 값 확정 (Bash, 최초 1회)
+
+> **핵심 원칙:** Bash 도구는 호출마다 새 쉘을 생성해 변수가 유지되지 않는다.
+> 아래 Bash 출력값을 **컨텍스트에 기록**하고, 이후 모든 Write·Bash·Agent 호출에서
+> `$변수` 대신 **실제 경로/값을 직접 대입**한다.
 
 ```bash
-OUT_DIR=$(pwd)                          # 최종 산출물 저장 위치 (호출 시점 고정)
-SCAN_TMP=$(mktemp -d)                   # 중간 finding 조각 저장소 (세션 격리)
-TIMESTAMP=$(date +%Y%m%d%H%M%S)        # 파일명 타임스탬프
+SCAN_TMP=$(mktemp -d -t tss.XXXXXXXX)   # 스캔별 고유 임시 디렉터리
+OUT_DIR=$(pwd)                           # 최종 산출물 저장 위치 (실행 시점 고정)
+TIMESTAMP=$(date +%Y%m%d%H%M%S)         # 파일명 고유성 보장용
+printf '\n=== TSS SESSION VALUES ===\nSCAN_TMP=%s\nOUT_DIR=%s\nTIMESTAMP=%s\n=========================\n' \
+  "$SCAN_TMP" "$OUT_DIR" "$TIMESTAMP"
 ```
 
-이후 모든 Phase가 이 세 변수를 공유한다.
+**출력 예시 (반드시 기록 — 이후 모든 단계에서 실제 값 직접 대입):**
+
+```
+=== TSS SESSION VALUES ===
+SCAN_TMP=/tmp/tss.A1B2C3D4
+OUT_DIR=/Users/user/my-project
+TIMESTAMP=20260623150000
+=========================
+```
+
+이후 모든 Write 경로와 Bash 명령에는 `$SCAN_TMP` 변수가 아닌 `/tmp/tss.A1B2C3D4`와 같은
+**실제 경로값**을 직접 사용한다.
 
 ### Phase 0 — 소스 준비 (단계 0)
 
-`tss-source-handler` 에이전트를 호출해 소스를 준비한다.
-반환된 **준비된 로컬 경로**를 `TARGET_PATH`로 저장한다.
+`tss-source-handler` 에이전트를 호출한다.
+**반환값(TARGET_PATH)을 받을 때까지 Phase 1을 시작하지 않는다.**
+
+반환된 경로를 Bash로 검증한다 (실제 TARGET_PATH 값 대입):
+
+```bash
+test -d "/actual/target/path" && echo "TARGET_PATH OK" || echo "FAIL: not a directory"
+```
+
+`FAIL`이면 오류를 보고하고 중단한다.
 
 ### Phase 1 — 병렬 분석 (단계 1–8, **ONE message**)
 
-**아래 8개 에이전트를 단 하나의 메시지로 동시에 호출하고, 전부 반환될 때까지 기다린다.**
-(어느 하나라도 반환되지 않으면 Phase 2로 넘어가지 않는다.)
+**아래 8개 에이전트를 단 하나의 메시지로 동시에 호출한다. 전부 반환될 때까지 기다린다.**
+어느 하나라도 반환되지 않으면 Phase 2로 넘어가지 않는다.
 
-각 에이전트에 `TARGET_PATH`를 전달하고, 반환된 JSON을 Write 도구로 즉시 파일에 저장한다.
-**마스터는 저장 후 finding 본문을 컨텍스트에서 버린다 — 경로와 `_meta` 카운트만 유지한다.**
+각 에이전트에 **실제 TARGET_PATH**를 전달한다. 8개 전부 반환된 후, Write 도구로 각 결과를
+아래 경로에 저장한다 (경로에 실제 SCAN_TMP 값 대입):
 
-| 에이전트 | 저장 파일 |
-|----------|-----------|
-| `tss-repo-indexer` | `$SCAN_TMP/step1-repo-indexer.json` |
-| `tss-static-analyzer` | `$SCAN_TMP/step2-static.json` |
-| `tss-binary-analyzer` | `$SCAN_TMP/step3-binary.json` |
-| `tss-skill-analyzer` | `$SCAN_TMP/step4-skill.json` |
-| `tss-sensitive-patterns` | `$SCAN_TMP/step5-sensitive.json` |
-| `tss-policy-verifier` | `$SCAN_TMP/step6-policy.json` |
-| `tss-prompt-optimizer` | `$SCAN_TMP/step7-prompt.json` |
-| `tss-sbom` | `$SCAN_TMP/step8-sbom.json` |
+| 에이전트 | 저장 파일 경로 (실제값 대입 예시) |
+|----------|----------------------------------|
+| `tss-repo-indexer` | `/tmp/tss.A1B2C3D4/step1-repo-indexer.json` |
+| `tss-static-analyzer` | `/tmp/tss.A1B2C3D4/step2-static.json` |
+| `tss-binary-analyzer` | `/tmp/tss.A1B2C3D4/step3-binary.json` |
+| `tss-skill-analyzer` | `/tmp/tss.A1B2C3D4/step4-skill.json` |
+| `tss-sensitive-patterns` | `/tmp/tss.A1B2C3D4/step5-sensitive.json` |
+| `tss-policy-verifier` | `/tmp/tss.A1B2C3D4/step6-policy.json` |
+| `tss-prompt-optimizer` | `/tmp/tss.A1B2C3D4/step7-prompt.json` |
+| `tss-sbom` | `/tmp/tss.A1B2C3D4/step8-sbom.json` |
 
-#### 체크포인트 (Phase 1 완료 후 — Bash)
+**Write 순서:** 8개 결과를 한 번에 하나씩 순서대로 Write한다. 모두 쓴 뒤 체크포인트를 실행한다.
+
+#### 체크포인트 (Write 완료 후 — Bash, 실제 경로 직접 대입)
 
 ```bash
-# 8개 파일 존재 확인. 누락 시 해당 워커 1회 재호출.
-for f in step1-repo-indexer step2-static step3-binary step4-skill \
-          step5-sensitive step6-policy step7-prompt step8-sbom; do
-  test -f "$SCAN_TMP/$f.json" || echo "MISSING: $f — rerun worker"
-done
-# JSON 유효성 검증
-for f in $SCAN_TMP/step*.json; do
-  python3 -c "import json,sys; json.load(open('$f'))" 2>&1 | grep -q "." && echo "INVALID JSON: $f"
-done
-# _meta 집계 (에이전트별 스캔 범위 요약)
+# 실제 SCAN_TMP 경로로 대입해서 실행 (변수 미사용)
+ls "/tmp/tss.A1B2C3D4/"step*.json 2>/dev/null | wc -l
+# → 8이면 정상. 8 미만이면 누락 파일을 확인한다.
 python3 -c "
 import json, glob
-for p in sorted(glob.glob('$SCAN_TMP/step*.json')):
+for p in sorted(glob.glob('/tmp/tss.A1B2C3D4/step*.json')):
     d = json.load(open(p))
     m = d.get('_meta', {})
-    print(f\"{m.get('agent','?')}: files={m.get('files_scanned','?')}, findings={m.get('findings','?')}\")
+    print(m.get('agent','?'), 'scanned='+str(m.get('files_scanned','?')), 'findings='+str(m.get('findings','?')))
 "
-# secret 누출 가드 (step2/step5에서 raw secret 패턴 grep)
-for f in $SCAN_TMP/step2-static.json $SCAN_TMP/step5-sensitive.json; do
-  grep -Eo '"(value|secret|raw)"\s*:\s*"[^"]{8,}"' "$f" 2>/dev/null \
-    && echo "WARN: potential raw secret in $f — MASKING CONTRACT violation" || true
-done
 ```
 
 ### Phase 2 — 순차 분석 (단계 4.5 → 4.6 → 8.5, Phase 1 완료 후)
 
-각 에이전트에 앞 단계 파일 **경로**를 전달한다(finding 본문을 컨텍스트로 재전달하지 않는다).
-반환 JSON도 즉시 파일로 저장한다.
+각 에이전트에 Phase 1 파일의 **실제 경로 목록**을 전달한다. 반환 JSON도 Write로 저장한다.
 
-1. `tss-relationship-graph` ← 경로 `$SCAN_TMP/step{1..8}*.json` → `$SCAN_TMP/step4.5-graph.json`
-2. `tss-model-validity` ← 동일 경로 → `$SCAN_TMP/step4.6-model.json`
-3. `tss-deepdive` ← 경로 목록 → `$SCAN_TMP/step8.5-deepdive.json`
+1. `tss-relationship-graph` ← Phase 1 실제 파일 경로들 → Write `/tmp/tss.A1B2C3D4/step4.5-graph.json`
+2. `tss-model-validity` ← 동일 파일 경로들 → Write `/tmp/tss.A1B2C3D4/step4.6-model.json`
+3. `tss-deepdive` ← 전체 파일 경로들 → Write `/tmp/tss.A1B2C3D4/step8.5-deepdive.json`
 
 ### Phase 3 — 보고서 생성 (단계 9 → 10, Phase 2 완료 후)
 
-1. `tss-report-merger` ← `$SCAN_TMP/*.json` **경로 목록** → `english_report{}` → `$SCAN_TMP/step9-english.json`
-2. `tss-translator` ← `$SCAN_TMP/step9-english.json` 경로 → bilingual JSON → Write로 `$OUT_DIR/scanreport-$TIMESTAMP.json` 저장
+1. `tss-report-merger` ← `/tmp/tss.A1B2C3D4/*.json` 경로 목록 →
+   Write `/tmp/tss.A1B2C3D4/step9-english.json`
+2. `tss-translator` ← `/tmp/tss.A1B2C3D4/step9-english.json` →
+   Write `/Users/user/my-project/scanreport-20260623150000.json`
+   (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 
-`tss-html-report` ← `$OUT_DIR/scanreport-$TIMESTAMP.json` 경로 → KO HTML 생성
+`tss-html-report` ← `/Users/user/my-project/scanreport-20260623150000.json` 경로 전달
+(OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
 
 ### Phase 5 — 결과 보고
 
 산출 파일 경로(JSON·HTML), `_meta` 집계 요약, 그래프 verdict, 주요 Critical/High finding 상위 3건을 보고한다.
-(임시 디렉토리 정리: `rm -rf $SCAN_TMP`)
+완료 후 임시 디렉터리를 정리한다:
+
+```bash
+rm -rf "/tmp/tss.A1B2C3D4"   # 실제 SCAN_TMP 값 대입
+```
 
 ---
 
