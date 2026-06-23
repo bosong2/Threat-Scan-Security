@@ -9,23 +9,65 @@ allowed-tools: Agent(tss-source-handler), Agent(tss-repo-indexer), Agent(tss-sta
 
 # Claude Threat Scan Orchestrator
 
-## 개요
+Scan target: **$ARGUMENTS**
 
-Claude Threat Scan V2.1의 메인 오케스트레이터 스킬. 전체 보안 스캔 프로세스를 조율하고 최종 보고서를 생성한다.
-v2.1.0 추가: 컴포넌트 연관관계 그래프 + 위험 전파(단계 4.5), 모델 유효성/진부화 판정(단계 4.6), 조치 verdict 체계.
+You orchestrate an 11-stage pipeline. Sequence the agents exactly as below and
+**wait for each stage to complete before starting the next**. Do not terminate
+after spawning agents — proceed through every phase and report only when
+Phase 5 is done.
 
-## 역할
+---
 
-1. 스캔 대상 리포지토리 분석 및 스캔 계획 수립
-2. 각 스캔 스킬 순차적/병렬 호출 조율
-3. 개별 스캔 결과 수집 및 병합
-4. 최종 bilingual JSON 보고서 생성
+## Phase 0 — 소스 준비 (단계 0)
 
-## 호출 방법
+`tss-source-handler` 에이전트를 호출해 대상 소스를 준비한다.
+반환된 **준비된 로컬 경로**를 이후 모든 단계에 전달한다.
 
-```
-@threat-scan-orchestrator 전체 보안 스캔 수행
-```
+If `$ARGUMENTS` is empty, ask for a path / git URL / zip and stop.
+
+## Phase 1 — 병렬 분석 (단계 1–8, **ONE message**)
+
+**모든 에이전트를 단 하나의 메시지로 동시에 호출하고, 전부 반환될 때까지 기다린다.**
+(어느 하나라도 반환되지 않으면 Phase 2로 넘어가지 않는다.)
+
+준비된 경로를 각 에이전트에 전달:
+1. `tss-repo-indexer` — 리포지토리 인덱싱
+2. `tss-static-analyzer` — 정적 코드 분석
+3. `tss-binary-analyzer` — 바이너리 분석
+4. `tss-skill-analyzer` — Skill/도구 보안 분석
+5. `tss-sensitive-patterns` — 민감 패턴 탐지
+6. `tss-policy-verifier` — 에이전트 정책 검증
+7. `tss-prompt-optimizer` — 프롬프트 최적화
+8. `tss-sbom` — SBOM/의존성 분석
+
+## Phase 2 — 순차 분석 (단계 4.5 → 4.6 → 8.5, Phase 1 완료 후)
+
+Phase 1 전체가 완료된 후 순서대로 실행한다:
+
+1. `tss-relationship-graph` — 연관관계 그래프 + 위험 전파 (Phase 1 결과 전달)
+2. `tss-model-validity` — 모델 유효성/진부화 판정 (Phase 1 결과 전달)
+3. `tss-deepdive` — Medium↑ finding 심층 트리아지 (Phase 1+2 전체 finding 전달)
+
+## Phase 3 — 보고서 생성 (단계 9 → 10, Phase 2 완료 후)
+
+1. `tss-report-merger` — Phase 1·2 전체 fragment를 병합해 `english_report{}` 생성
+2. `tss-translator` — 영문 보고서를 한글로 번역, bilingual JSON 완성
+   JSON 파일명: `scanreport-YYYYMMDDhhmmss.json`
+
+## Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
+
+`tss-html-report` 에이전트를 호출해 Python 생성기로 KO HTML을 산출한다.
+
+## Phase 5 — 결과 보고 (모든 단계 완료 후)
+
+다음을 보고한다:
+1. 산출 파일 경로 (JSON + HTML)
+2. 그래프 verdict 요약 (worst component, INSTALL_OK/REVIEW/DISABLE/REMOVE)
+3. 주요 Critical/High finding 상위 3건
+
+---
+
+## 참조 (방법론 상세)
 
 ## 스캔 순서
 
