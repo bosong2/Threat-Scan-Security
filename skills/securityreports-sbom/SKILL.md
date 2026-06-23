@@ -2,8 +2,8 @@
 name: securityreports-sbom
 description: >
   Analyze software bill of materials and dependency security: CVE detection, license
-  compliance, supply-chain risk, outdated packages. Used by tss-sbom agent (step 8)
-  and threat-scan-orchestrator pipeline.
+  compliance, supply-chain risk, outdated packages. Used by threat-scan-orchestrator
+  pipeline (step 8). Supports 17 ecosystems with lock-file-first transitive detection.
 disable-model-invocation: true
 argument-hint: <project-path>
 ---
