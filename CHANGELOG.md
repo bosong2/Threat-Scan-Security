@@ -2,6 +2,17 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.3.5] — 2026-06-23
+
+### Fixed
+
+- **오케스트레이터 컨텍스트 폭발 + 완료 이벤트 오해석 (BUG-06)** — Claude Code에서 Agent 완료 이벤트는 1건씩 개별 도달한다. 오케스트레이터가 대용량 JSON을 8개 수신·Write하면 컨텍스트가 폭발(Churned 3m 50s → 진행 불능), 첫 번째 완료를 "stray notification"으로 오해해 결과를 소실하는 구조적 버그. `agents/tss-*` 분석 워커 13개에 Write 권한 추가 — 각 에이전트가 `OUTPUT_PATH`(프롬프트에서 수신)에 직접 Write하고 짧은 확인 메시지만 반환. 오케스트레이터는 대용량 JSON을 수신·Write할 필요 없이 확인 메시지만 집계하고 체크포인트를 실행한다.
+
+### Changed
+
+- **에이전트 패턴 변경**: `tools: Read` → `tools: Read, Write` (분석 워커 13개). 오케스트레이터 Phase 1–3 지시문을 "OUTPUT_PATH 전달 + 확인 수신" 방식으로 재작성. Desktop `skills/*/SKILL.md`는 무변경 (Dual-Mode 영향 없음).
+- `CLAUDE.md` 에이전트 패턴·LLM 실행 경계 섹션 업데이트 (BUG-06 설명 포함).
+
 ## [2.3.4] — 2026-06-23
 
 ### Fixed
