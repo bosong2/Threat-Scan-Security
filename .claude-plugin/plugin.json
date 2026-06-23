@@ -6,6 +6,5 @@
   "homepage": "https://github.com/bosong2/Threat-Scan-Security",
   "repository": "https://github.com/bosong2/Threat-Scan-Security",
   "license": "Apache-2.0",
-  "keywords": ["security", "skill", "agent", "plugin", "audit", "threat-scan", "html-report"],
-  "hooks": "./hooks/hooks.json"
+  "keywords": ["security", "skill", "agent", "plugin", "audit", "threat-scan", "html-report"]
 }
