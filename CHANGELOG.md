@@ -2,6 +2,15 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.3.4] — 2026-06-23
+
+### Fixed
+
+- **오케스트레이터 쉘 변수 유실 (BUG-04)** — Bash 도구는 호출마다 새 쉘을 생성해 `$SCAN_TMP`·`$OUT_DIR`·`$TIMESTAMP` 변수가 유실되는 구조적 문제. `/tmp/tss_session_env` 전역 파일 방식(동시 스캔 충돌 위험)을 제거하고, Phase 0'에서 `=== TSS SESSION VALUES ===` 블록으로 전체 세션값을 한 번에 출력 → LLM이 컨텍스트에 기록하고 이후 모든 Write·Bash 호출에 **실제값을 직접 대입**하는 방식으로 전환. `source` 명령 완전 제거.
+- **동시 스캔 경로 충돌** — `mktemp -d` → `mktemp -d -t tss.XXXXXXXX`로 교체해 스캔별 `tss.AbCd1234` 패턴의 인식 가능·고유 임시 디렉터리 생성.
+- **TARGET_PATH 미검증 진입** — Phase 0에서 `test -d` Bash 검증 추가. FAIL 시 Phase 1 시작 전 명시적 중단.
+- **Monitor 도구 오남용 (BUG-05)** — 오케스트레이터가 Agent 완료 대기에 `Monitor` 도구를 사용해 `InputValidationError` 발생. `Agent()` 호출은 동기(blocking)임을 명시하고 Monitor·폴링 루프 사용 금지 경고 추가.
+
 ## [2.3.3] — 2026-06-23
 
 ### Security
