@@ -27,6 +27,10 @@ If `$ARGUMENTS` is empty, ask for a path / git URL / zip and stop.
 > 컨텍스트를 얇게 유지하므로 **Opus** 사용을 권장한다(라우팅·검증 판단력 ↑, 토큰 ↓).
 > 워커 모델은 각 `agents/tss-*.md` frontmatter에 고정돼 있다.
 
+> **⛔ Agent 호출 = 동기(blocking):** `Agent(tss-*)` 호출은 에이전트가 반환할 때까지
+> **자동으로 대기**한다. `Monitor` 도구, 백그라운드 실행, 폴링 루프는 절대 사용하지 않는다.
+> 에이전트가 "실행 중"이어도 추가 대기 코드 없이 반환값을 직접 받는다.
+
 ### Phase 0' — 세션 격리 + 출력 경로 고정 (Bash, 최초 1회)
 
 ```bash
