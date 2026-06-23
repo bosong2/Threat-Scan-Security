@@ -50,7 +50,7 @@ cat > "${SKILL_DIR}/SKILL.md" << 'SKILLEOF'
 ---
 name: threat-scan-security
 description: >
-  AI 기반 보안 위협 스캐너 v2.3.1. 코드 리포지토리, ZIP 파일, GitHub URL을 대상으로
+  AI 기반 보안 위협 스캐너 v2.3.2. 코드 리포지토리, ZIP 파일, GitHub URL을 대상으로
   정적 코드 분석, 바이너리 분석, 민감 정보 탐지, SBOM 의존성 분석(17개 생태계·lock 파일 인식), 에이전트 정책 검증,
   스킬 보안 분석, 컴포넌트 연관관계 그래프 분석, 모델 유효성/진부화 판정을 수행하고
   영문/한글 bilingual JSON 보고서와 정적 HTML 리포트를 생성합니다.

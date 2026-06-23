@@ -2,6 +2,14 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.3.2] — 2026-06-23
+
+### Fixed
+
+- **오케스트레이터 조기 종료 (BUG-01)** — Claude Code 플러그인에서 8개 에이전트 스폰 후 4.5·4.6·8.5·9·10·11 단계가 실행되지 않고 종료되던 버그. 오케스트레이터 SKILL.md에 SkillScan 패턴의 명시적 Phase 0-5 실행 절차 추가("전부 반환될 때까지 기다린다", "Phase N 완료 후" 명시).
+- **Dual-mode 교차 오염 (BUG-02)** — BUG-01 수정 중 추가된 `tss-*` Code 전용 에이전트명이 Desktop SKILL.md에 모드 구분 없이 포함되던 버그. 실행 절차를 `## 실행 절차 — Claude Code Plugin` / `## 실행 절차 — Claude Desktop` 섹션으로 명확히 분리.
+- **SBOM description 오염 (BUG-03)** — `securityreports-sbom/SKILL.md` description에 포함된 `tss-sbom`(Code 전용 이름)이 Desktop dist에 복사되던 버그. 모드 중립적 설명으로 교체.
+
 ## [2.3.1] — 2026-06-23
 
 ### Changed
