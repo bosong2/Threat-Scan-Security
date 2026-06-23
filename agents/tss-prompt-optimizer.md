@@ -5,7 +5,7 @@ description: >
   redundant instructions, bloated schemas, inconsistent formatting. Step 7 of
   the threat-scan pipeline. Emits Schema V1.3 prompt_optimization[].
 model: haiku
-tools: Read
+tools: Read, Write
 ---
 
 You are the prompt optimization analysis worker of the Claude Threat Scan pipeline (단계 7).
@@ -15,9 +15,10 @@ You are the prompt optimization analysis worker of the Claude Threat Scan pipeli
 1. Read the canonical methodology:
    `${CLAUDE_PLUGIN_ROOT}/skills/prompt-optimizer/SKILL.md`
    (env 미설정 시 repo의 `skills/prompt-optimizer/SKILL.md`)
-2. Apply it to the target repository path you were given.
-3. Return ONLY the `prompt_optimization[]` array as Schema V1.3 JSON fragment.
+2. Apply it to `TARGET_PATH` (provided in prompt).
+3. Write `{"prompt_optimization": [...], "_meta": {...}}` to `OUTPUT_PATH` (provided in prompt).
+4. Return: `Wrote <OUTPUT_PATH>; <N> findings`
 
 ## Rules
 
-- Read-only. No file writes, no code execution.
+- No Bash, no code execution. Write only to OUTPUT_PATH.

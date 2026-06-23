@@ -73,14 +73,22 @@ test -d "/actual/target/path" && echo "TARGET_PATH OK" || echo "FAIL: not a dire
 
 ### Phase 1 — 병렬 분석 (단계 1–8, **ONE message**)
 
-**아래 8개 에이전트를 단 하나의 메시지로 동시에 호출한다. 전부 반환될 때까지 기다린다.**
-어느 하나라도 반환되지 않으면 Phase 2로 넘어가지 않는다.
+**아래 8개 에이전트를 단 하나의 메시지로 동시에 호출한다.**
 
-각 에이전트에 **실제 TARGET_PATH**를 전달한다. 8개 전부 반환된 후, Write 도구로 각 결과를
-아래 경로에 저장한다 (경로에 실제 SCAN_TMP 값 대입):
+> **에이전트 완료 이벤트는 1건씩 도착한다.** 각 확인이 도달할 때마다 즉시 기록하고
+> 다음 완료를 기다린다. **8개 확인 수신 후 체크포인트를 실행한다.**
+> 오케스트레이터는 Write를 수행하지 않는다 — 에이전트가 직접 OUTPUT_PATH에 Write한다.
 
-| 에이전트 | 저장 파일 경로 (실제값 대입 예시) |
-|----------|----------------------------------|
+각 에이전트 프롬프트에 `TARGET_PATH`와 `OUTPUT_PATH`를 함께 명시한다:
+
+```
+TARGET_PATH: /actual/target/path
+OUTPUT_PATH: /tmp/tss.A1B2C3D4/step1-repo-indexer.json
+(에이전트 역할 지시)
+```
+
+| 에이전트 | OUTPUT_PATH (프롬프트에 포함, 실제값 대입) |
+|----------|--------------------------------------------|
 | `tss-repo-indexer` | `/tmp/tss.A1B2C3D4/step1-repo-indexer.json` |
 | `tss-static-analyzer` | `/tmp/tss.A1B2C3D4/step2-static.json` |
 | `tss-binary-analyzer` | `/tmp/tss.A1B2C3D4/step3-binary.json` |
@@ -90,14 +98,14 @@ test -d "/actual/target/path" && echo "TARGET_PATH OK" || echo "FAIL: not a dire
 | `tss-prompt-optimizer` | `/tmp/tss.A1B2C3D4/step7-prompt.json` |
 | `tss-sbom` | `/tmp/tss.A1B2C3D4/step8-sbom.json` |
 
-**Write 순서:** 8개 결과를 한 번에 하나씩 순서대로 Write한다. 모두 쓴 뒤 체크포인트를 실행한다.
+에이전트는 `Wrote <OUTPUT_PATH>; <N> findings` 형태로 짧은 확인만 반환한다.
+**8개 확인 수신 완료 후** 체크포인트를 실행한다.
 
-#### 체크포인트 (Write 완료 후 — Bash, 실제 경로 직접 대입)
+#### 체크포인트 (8개 확인 수신 후 — Bash, 실제 경로 직접 대입)
 
 ```bash
-# 실제 SCAN_TMP 경로로 대입해서 실행 (변수 미사용)
 ls "/tmp/tss.A1B2C3D4/"step*.json 2>/dev/null | wc -l
-# → 8이면 정상. 8 미만이면 누락 파일을 확인한다.
+# → 8이면 정상. 8 미만이면 누락 OUTPUT_PATH를 확인한다.
 python3 -c "
 import json, glob
 for p in sorted(glob.glob('/tmp/tss.A1B2C3D4/step*.json')):
@@ -109,19 +117,25 @@ for p in sorted(glob.glob('/tmp/tss.A1B2C3D4/step*.json')):
 
 ### Phase 2 — 순차 분석 (단계 4.5 → 4.6 → 8.5, Phase 1 완료 후)
 
-각 에이전트에 Phase 1 파일의 **실제 경로 목록**을 전달한다. 반환 JSON도 Write로 저장한다.
+각 에이전트 프롬프트에 `SCAN_TMP` 경로 + 입력 파일 목록 + `OUTPUT_PATH`를 전달한다.
+에이전트가 직접 OUTPUT_PATH에 Write하고 확인을 반환한다. 오케스트레이터는 Write 불필요.
 
-1. `tss-relationship-graph` ← Phase 1 실제 파일 경로들 → Write `/tmp/tss.A1B2C3D4/step4.5-graph.json`
-2. `tss-model-validity` ← 동일 파일 경로들 → Write `/tmp/tss.A1B2C3D4/step4.6-model.json`
-3. `tss-deepdive` ← 전체 파일 경로들 → Write `/tmp/tss.A1B2C3D4/step8.5-deepdive.json`
+1. `tss-relationship-graph` ← SCAN_TMP 실제값 + step1–8 파일 경로 목록
+   → OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step4.5-graph.json`
+2. `tss-model-validity` ← 동일
+   → OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step4.6-model.json`
+3. `tss-deepdive` ← SCAN_TMP 실제값 + step1–8 파일 경로 목록
+   → OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step8.5-deepdive.json`
 
 ### Phase 3 — 보고서 생성 (단계 9 → 10, Phase 2 완료 후)
 
-1. `tss-report-merger` ← `/tmp/tss.A1B2C3D4/*.json` 경로 목록 →
-   Write `/tmp/tss.A1B2C3D4/step9-english.json`
-2. `tss-translator` ← `/tmp/tss.A1B2C3D4/step9-english.json` →
-   Write `/Users/user/my-project/scanreport-20260623150000.json`
-   (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
+1. `tss-report-merger` 프롬프트:
+   - SCAN_TMP 실제값 + 모든 step*.json 경로 목록
+   - OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step9-english.json`
+2. `tss-translator` 프롬프트:
+   - INPUT_PATH: `/tmp/tss.A1B2C3D4/step9-english.json`
+   - OUTPUT_PATH: `/Users/user/my-project/scanreport-20260623150000.json`
+     (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 

@@ -58,20 +58,30 @@ Code Plugin 섹션을 수정할 때 Desktop 섹션을 오염시키면 **BUG-02(D
 
 ## 에이전트 패턴
 
-각 `agents/tss-*.md`는 방법론을 복제하지 않는다. 표준 패턴:
+각 `agents/tss-*.md`는 방법론을 복제하지 않는다. 표준 패턴 (v2.3.5+):
 
 ```markdown
 ---
 name: tss-<name>
 model: sonnet        # 분석 워커: sonnet, 기계적 작업: haiku, 고난도 트리아지: opus
-tools: Read          # 탐지·분석 워커는 Read만. 셸 허용은 source-handler·html-report만
+tools: Read, Write   # 분석 워커는 Read+Write. 셸 허용은 source-handler·html-report만
 ---
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`
-2. Apply to target path.
-3. Return Schema V1.3 JSON fragment only.
+2. Apply to TARGET_PATH (from prompt).
+3. Write Schema V1.3 JSON to OUTPUT_PATH (from prompt).
+4. Return: `Wrote <OUTPUT_PATH>; <N> findings`
 ```
 
+**에이전트가 스스로 Write하는 이유:** Claude Code에서 Agent 완료 이벤트는 1건씩 도착한다.
+오케스트레이터가 대용량 JSON을 수신·Write하면 컨텍스트 폭발이 발생한다(BUG-06).
+에이전트가 직접 OUTPUT_PATH에 Write하면 오케스트레이터는 짧은 확인 메시지만 받는다.
+
 `${CLAUDE_PLUGIN_ROOT}`는 Claude Code 플러그인 런타임이 주입한다. 미설정 환경에서는 `skills/<name>/SKILL.md`로 폴백.
+
+**LLM·셸 실행 경계 (v2.3.5 개정):**
+- `tss-source-handler`(단계 0)·`tss-html-report`(단계 11): Bash·파일 생성 허용.
+- `tss-*` 분석 워커 (단계 1–10): `tools: Read, Write` — Bash 실행 금지, OUTPUT_PATH Write만 허용.
+- Desktop 서브스킬(`skills/*/SKILL.md`): 파일 생성 없음 (Desktop 샌드박스 호환 — 별도 계층).
 
 ## Desktop 빌드 동작
 
