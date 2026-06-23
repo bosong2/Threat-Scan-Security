@@ -245,6 +245,17 @@ code_snippet  → 제거
 cwe, owasp    → 제거
 ```
 
+### secret/PII 맥락 추가 금지 필드 (v2.3.3 MASKING CONTRACT)
+
+```text
+value         → masked_value 사용 (raw secret 노출 금지)
+secret        → masked_value 사용 (raw secret 노출 금지)
+raw           → masked_value 사용 (raw secret 노출 금지)
+snippet       → masked_value 사용 (secret 맥락에서 raw 포함 시 금지)
+```
+
+> 이 필드들이 sensitive_patterns[] 또는 static_code_findings[]의 하드코딩 자격 증명 finding에 존재하면 스키마 위반으로 처리한다. `masked_value`(앞 4자 + 나머지 마스킹)만 허용.
+
 ---
 
 ## 4. ID 형식 전체 목록 (V1.3 갱신)

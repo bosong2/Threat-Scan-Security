@@ -4,7 +4,7 @@ description: >
   Deep-dive triage on Medium+ severity findings: up to 3-level recursive analysis,
   status confirmation (Confirmed/Mitigated/False Positive), and code_fix suggestions.
   Step 8.5 of the threat-scan pipeline. Enriches existing findings in-place.
-model: sonnet
+model: opus
 tools: Read
 ---
 

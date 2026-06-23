@@ -83,9 +83,17 @@ Class.forName(...)  // 동적 클래스 로딩
 ObjectInputStream  // 역직렬화
 ```
 
+## MASKING CONTRACT — 하드코딩 자격 증명 (필수 — v2.3.3)
+
+하드코딩 패스워드·토큰·API 키가 finding으로 탐지될 때, **raw 값을 절대 출력하지 않는다.**
+
+- `masked_value`: 앞 4자 + 나머지 마스킹 (`AKIA****************`, `sk-l****`).
+- `value` / `secret` / `raw` / `snippet` 키를 절대 사용하지 않는다.
+- 자세한 마스킹 규약은 `skills/sensitive-pattern-matcher/SKILL.md` § MASKING CONTRACT.
+
 ## 출력 형식
 
-⚠️ **필수: Schema V1.2 엄격 준수** - [SCHEMA_V1.2_ENFORCEMENT.md](../../docs/SCHEMA_V1.2_ENFORCEMENT.md) 참조
+⚠️ **필수: Schema V1.3 엄격 준수** - [SCHEMA_V1.3_ENFORCEMENT.md](../../docs/SCHEMA_V1.3_ENFORCEMENT.md) 참조
 
 ```json
 {
@@ -100,8 +108,26 @@ ObjectInputStream  // 역직렬화
       "status": "Confirmed",
       "deep_dive_result": "Input is passed from HTTP request without sanitization",
       "recommendation": "Use subprocess with shell=False and sanitize inputs"
+    },
+    {
+      "id": "STATIC-002",
+      "file": "src/config.py",
+      "line": 12,
+      "issue": "Hardcoded API Key",
+      "description": "OpenAI API key hardcoded in source",
+      "masked_value": "sk-l****",
+      "severity": "High",
+      "status": "Confirmed",
+      "recommendation": "Use environment variables or secrets manager"
     }
-  ]
+  ],
+  "_meta": {
+    "agent": "tss-static-analyzer",
+    "files_scanned": 64,
+    "findings": 2,
+    "depthReached": 1,
+    "notes": ""
+  }
 }
 ```
 
@@ -115,8 +141,20 @@ ObjectInputStream  // 역직렬화
 | `remediation` | `recommendation` |
 | `code_snippet` | 제거 |
 | `cwe`, `owasp` | 제거 |
+| `value`, `secret`, `raw`, `snippet` (자격증명 맥락) | `masked_value` |
 | severity 소문자 | 대문자 시작 |
-```
+
+### `_meta` footer 규약
+
+모든 반환 JSON에 `_meta` 객체를 포함한다(report-merger가 최종 리포트에서 제외):
+
+| 필드 | 설명 |
+|------|------|
+| `agent` | `tss-static-analyzer` |
+| `files_scanned` | 실제 점검한 파일 수 |
+| `findings` | 발견된 finding 수 |
+| `depthReached` | 분석 깊이 |
+| `notes` | 제외 경로 등 메모 (optional) |
 
 ## Deep Dive 기준
 

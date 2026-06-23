@@ -2,6 +2,24 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.3.3] — 2026-06-23
+
+### Security
+
+- **Secret 반환 계약 강제** — `tss-sensitive-patterns`·`tss-static-analyzer` 워커가 raw secret/PII 값을 절대 반환하지 않도록 공유 방법론(`skills/sensitive-pattern-matcher/SKILL.md`, `skills/static-code-analyzer/SKILL.md`)에 **MASKING CONTRACT** 명문화(1차 방어선). `masked_value`(앞 4자+마스킹)만 허용, `value`/`secret`/`raw`/`snippet` 필드 스키마 위반으로 추가.
+- **SubagentStop 리댁션 훅** — `hooks/hooks.json` + `scripts/redact_secrets.sh` 신설(2차 방어선). AWS/GitHub/Slack/Private Key/일반 고엔트로피 패턴을 결정론적 정규식으로 마스킹. LLM 호출 없음. Desktop 빌드에서 자동 제외.
+
+### Changed
+
+- **오케스트레이터를 얇은 컨텍스트 master로 재설계** — 워커 산출물을 `$SCAN_TMP/*.json` 파일로 라우팅, 마스터 컨텍스트에 finding 본문 누적 제거. Phase 경계 Bash 무결성 체크포인트(파일 존재·JSON 유효성·secret 가드·`_meta` 집계) 추가. `allowed-tools`에 `Write` 추가(SecurityScanCode `securityscan-triage` 패턴 이식). Opus 사용 권장 노트 추가.
+- **모델·권한 차등 정합화** — `tss-deepdive` sonnet → **opus**(최고 난도 트리아지), `tss-binary-analyzer` haiku → sonnet, `tss-model-validity`/`tss-prompt-optimizer` sonnet → haiku(룰 기반·포맷 점검), `tss-translator` haiku → sonnet(번역 품질). 탐지·분석 워커 `tools: Read`(셸·쓰기 구조적 차단), 셸 허용 2개(source-handler·html-report)로 한정.
+
+### Added
+
+- 워커 자기보고 `_meta` footer 규약(`files_scanned`/`findings`/`depthReached`) — 공유 방법론에 명시, 오케스트레이터 Phase 1 체크포인트에서 집계 요약 출력.
+- `scripts/agent_efficiency.sh` — 사후 트랜스크립트 기반 per-agent 토큰·turn 효율 요약(best-effort, 미존재 환경 graceful skip).
+- `CLAUDE.md` — Claude Code 작업 가이드(Dual-mode 규칙·에이전트 패턴·빌드 동작·스킬 상태).
+
 ## [2.3.2] — 2026-06-23
 
 ### Fixed

@@ -4,7 +4,7 @@ description: >
   Translate the English scan report into Korean using the standard security
   terminology dictionary, and produce the final Schema V1.3 bilingual JSON
   (english_report + korean_report). Step 10 of the threat-scan pipeline.
-model: haiku
+model: sonnet
 tools: Read
 ---
 

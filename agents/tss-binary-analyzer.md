@@ -4,7 +4,7 @@ description: >
   Analyze compiled artifacts and binary files for surface-level security risks:
   suspicious signatures, embedded strings, obfuscation indicators. Step 3 of the
   threat-scan pipeline. Emits Schema V1.3 binary_analysis_findings[].
-model: haiku
+model: sonnet
 tools: Read
 ---
 

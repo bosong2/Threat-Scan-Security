@@ -4,7 +4,7 @@ description: >
   Identify token-wasteful or poorly formatted prompts in skills and agents:
   redundant instructions, bloated schemas, inconsistent formatting. Step 7 of
   the threat-scan pipeline. Emits Schema V1.3 prompt_optimization[].
-model: sonnet
+model: haiku
 tools: Read
 ---
 

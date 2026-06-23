@@ -4,7 +4,7 @@ description: >
   Orchestrate the full Claude Threat Scan pipeline (단계 0–11) over a target
   skill/agent/plugin/repo and produce a bilingual JSON report plus a KO HTML
   report. Use when asked to scan, audit, or vet a repository for security threats.
-allowed-tools: Agent(tss-source-handler), Agent(tss-repo-indexer), Agent(tss-static-analyzer), Agent(tss-binary-analyzer), Agent(tss-skill-analyzer), Agent(tss-relationship-graph), Agent(tss-model-validity), Agent(tss-sensitive-patterns), Agent(tss-policy-verifier), Agent(tss-prompt-optimizer), Agent(tss-sbom), Agent(tss-deepdive), Agent(tss-report-merger), Agent(tss-translator), Agent(tss-html-report), Bash, Read
+allowed-tools: Agent(tss-source-handler), Agent(tss-repo-indexer), Agent(tss-static-analyzer), Agent(tss-binary-analyzer), Agent(tss-skill-analyzer), Agent(tss-relationship-graph), Agent(tss-model-validity), Agent(tss-sensitive-patterns), Agent(tss-policy-verifier), Agent(tss-prompt-optimizer), Agent(tss-sbom), Agent(tss-deepdive), Agent(tss-report-merger), Agent(tss-translator), Agent(tss-html-report), Bash, Read, Write
 ---
 
 # Claude Threat Scan Orchestrator
@@ -23,43 +23,93 @@ If `$ARGUMENTS` is empty, ask for a path / git URL / zip and stop.
 > 이 섹션은 Claude Code Plugin 모드 전용입니다. Claude Desktop은 아래
 > **실행 절차 — Claude Desktop** 섹션과 **스캔 순서** 표를 따릅니다.
 
+> **모델 권장(v2.3.3):** 이 오케스트레이터는 finding 본문을 파일로 라우팅해
+> 컨텍스트를 얇게 유지하므로 **Opus** 사용을 권장한다(라우팅·검증 판단력 ↑, 토큰 ↓).
+> 워커 모델은 각 `agents/tss-*.md` frontmatter에 고정돼 있다.
+
+### Phase 0' — 세션 격리 + 출력 경로 고정 (Bash, 최초 1회)
+
+```bash
+OUT_DIR=$(pwd)                          # 최종 산출물 저장 위치 (호출 시점 고정)
+SCAN_TMP=$(mktemp -d)                   # 중간 finding 조각 저장소 (세션 격리)
+TIMESTAMP=$(date +%Y%m%d%H%M%S)        # 파일명 타임스탬프
+```
+
+이후 모든 Phase가 이 세 변수를 공유한다.
+
 ### Phase 0 — 소스 준비 (단계 0)
 
 `tss-source-handler` 에이전트를 호출해 소스를 준비한다.
-반환된 **준비된 로컬 경로**를 이후 모든 단계에 전달한다.
+반환된 **준비된 로컬 경로**를 `TARGET_PATH`로 저장한다.
 
 ### Phase 1 — 병렬 분석 (단계 1–8, **ONE message**)
 
 **아래 8개 에이전트를 단 하나의 메시지로 동시에 호출하고, 전부 반환될 때까지 기다린다.**
 (어느 하나라도 반환되지 않으면 Phase 2로 넘어가지 않는다.)
 
-1. `tss-repo-indexer` — 리포지토리 인덱싱
-2. `tss-static-analyzer` — 정적 코드 분석
-3. `tss-binary-analyzer` — 바이너리 분석
-4. `tss-skill-analyzer` — Skill/도구 보안 분석
-5. `tss-sensitive-patterns` — 민감 패턴 탐지
-6. `tss-policy-verifier` — 에이전트 정책 검증
-7. `tss-prompt-optimizer` — 프롬프트 최적화
-8. `tss-sbom` — SBOM/의존성 분석
+각 에이전트에 `TARGET_PATH`를 전달하고, 반환된 JSON을 Write 도구로 즉시 파일에 저장한다.
+**마스터는 저장 후 finding 본문을 컨텍스트에서 버린다 — 경로와 `_meta` 카운트만 유지한다.**
+
+| 에이전트 | 저장 파일 |
+|----------|-----------|
+| `tss-repo-indexer` | `$SCAN_TMP/step1-repo-indexer.json` |
+| `tss-static-analyzer` | `$SCAN_TMP/step2-static.json` |
+| `tss-binary-analyzer` | `$SCAN_TMP/step3-binary.json` |
+| `tss-skill-analyzer` | `$SCAN_TMP/step4-skill.json` |
+| `tss-sensitive-patterns` | `$SCAN_TMP/step5-sensitive.json` |
+| `tss-policy-verifier` | `$SCAN_TMP/step6-policy.json` |
+| `tss-prompt-optimizer` | `$SCAN_TMP/step7-prompt.json` |
+| `tss-sbom` | `$SCAN_TMP/step8-sbom.json` |
+
+#### 체크포인트 (Phase 1 완료 후 — Bash)
+
+```bash
+# 8개 파일 존재 확인. 누락 시 해당 워커 1회 재호출.
+for f in step1-repo-indexer step2-static step3-binary step4-skill \
+          step5-sensitive step6-policy step7-prompt step8-sbom; do
+  test -f "$SCAN_TMP/$f.json" || echo "MISSING: $f — rerun worker"
+done
+# JSON 유효성 검증
+for f in $SCAN_TMP/step*.json; do
+  python3 -c "import json,sys; json.load(open('$f'))" 2>&1 | grep -q "." && echo "INVALID JSON: $f"
+done
+# _meta 집계 (에이전트별 스캔 범위 요약)
+python3 -c "
+import json, glob
+for p in sorted(glob.glob('$SCAN_TMP/step*.json')):
+    d = json.load(open(p))
+    m = d.get('_meta', {})
+    print(f\"{m.get('agent','?')}: files={m.get('files_scanned','?')}, findings={m.get('findings','?')}\")
+"
+# secret 누출 가드 (step2/step5에서 raw secret 패턴 grep)
+for f in $SCAN_TMP/step2-static.json $SCAN_TMP/step5-sensitive.json; do
+  grep -Eo '"(value|secret|raw)"\s*:\s*"[^"]{8,}"' "$f" 2>/dev/null \
+    && echo "WARN: potential raw secret in $f — MASKING CONTRACT violation" || true
+done
+```
 
 ### Phase 2 — 순차 분석 (단계 4.5 → 4.6 → 8.5, Phase 1 완료 후)
 
-1. `tss-relationship-graph` — 연관관계 그래프 + 위험 전파
-2. `tss-model-validity` — 모델 유효성/진부화 판정
-3. `tss-deepdive` — Medium↑ finding 심층 트리아지
+각 에이전트에 앞 단계 파일 **경로**를 전달한다(finding 본문을 컨텍스트로 재전달하지 않는다).
+반환 JSON도 즉시 파일로 저장한다.
+
+1. `tss-relationship-graph` ← 경로 `$SCAN_TMP/step{1..8}*.json` → `$SCAN_TMP/step4.5-graph.json`
+2. `tss-model-validity` ← 동일 경로 → `$SCAN_TMP/step4.6-model.json`
+3. `tss-deepdive` ← 경로 목록 → `$SCAN_TMP/step8.5-deepdive.json`
 
 ### Phase 3 — 보고서 생성 (단계 9 → 10, Phase 2 완료 후)
 
-1. `tss-report-merger` — 전체 fragment 병합 → `english_report{}`
-2. `tss-translator` — 한글 번역 → bilingual JSON (`scanreport-YYYYMMDDhhmmss.json`)
+1. `tss-report-merger` ← `$SCAN_TMP/*.json` **경로 목록** → `english_report{}` → `$SCAN_TMP/step9-english.json`
+2. `tss-translator` ← `$SCAN_TMP/step9-english.json` 경로 → bilingual JSON → Write로 `$OUT_DIR/scanreport-$TIMESTAMP.json` 저장
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 
-`tss-html-report` 에이전트를 호출해 KO HTML을 생성한다.
+`tss-html-report` ← `$OUT_DIR/scanreport-$TIMESTAMP.json` 경로 → KO HTML 생성
 
 ### Phase 5 — 결과 보고
 
-산출 파일 경로(JSON·HTML), 그래프 verdict 요약, 주요 Critical/High finding 상위 3건을 보고한다.
+산출 파일 경로(JSON·HTML), `_meta` 집계 요약, 그래프 verdict, 주요 Critical/High finding 상위 3건을 보고한다.
+(임시 디렉토리 정리: `rm -rf $SCAN_TMP`)
 
 ---
 

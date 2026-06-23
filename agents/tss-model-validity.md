@@ -4,7 +4,7 @@ description: >
   Determine whether skills and agents are pinned to a specific model or made
   obsolete by current native capabilities. Step 4.6 of the threat-scan pipeline.
   Emits Schema V1.3 model_validity_findings[].
-model: sonnet
+model: haiku
 tools: Read
 ---
 

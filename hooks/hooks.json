@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": "tss-sensitive-patterns|tss-static-analyzer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/redact_secrets.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

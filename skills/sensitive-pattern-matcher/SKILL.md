@@ -81,36 +81,94 @@ bearer\s+[a-zA-Z0-9\-._~+/]+=*
 | 신용카드 | 주요 카드사 번호 패턴 |
 | IP 주소 | 내부 IP 주소 (10.x, 192.168.x) |
 
+---
+
+## MASKING CONTRACT (필수 — v2.3.3)
+
+탐지된 secret/PII의 **raw 값을 절대 산출하지 않는다.** 다음 규칙을 강제한다:
+
+- `masked_value`: 앞 4자 + 나머지 전체 마스킹. 예: `AKIA****************`, `ghp_****`, 이메일 `j***@***.com`. 원본 길이를 유지하지 말 것(길이도 정보 누출).
+- `value` / `secret` / `raw` / `snippet` 등 **원문 필드 금지**. 이 필드들을 출력에 포함하는 것은 스키마 위반이다.
+- 위치는 `file` + `line` + `rule`(예: `aws-access-key`)로만 식별한다.
+- 컨텍스트가 꼭 필요하면 raw 줄 대신 `±0 라인의 마스킹된 발췌`만 허용 — `detail` 필드에 마스킹 형태로 기재.
+
+### 산출 객체 필드 (각 sensitive_patterns[] 항목)
+
+| 필드 | 예시 | 필수 |
+|------|------|------|
+| `id` | `"SENS-001"` | ✅ |
+| `file` | `"src/config.py"` | ✅ |
+| `line` | `42` | ✅ |
+| `rule` | `"aws-access-key"` | ✅ |
+| `pattern` | `"AWS Access Key"` | ✅ |
+| `masked_value` | `"AKIA****************"` | ✅ (**raw 금지**) |
+| `severity` | `"Critical"` | ✅ (대문자 시작) |
+| `status` | `"Confirmed"` | ✅ |
+| `gitignore_status` | `"Not in .gitignore - RISK"` | optional |
+| `detail` | `"aws_access_key_id=AKIA****"` | optional (마스킹만 허용) |
+| `recommendation` | `"Rotate key immediately"` | optional |
+| `verdict` | `"REMOVE"` | optional |
+
+---
+
 ## 출력 형식
 
-⚠️ **필수: Schema V1.2 엄격 준수** - [SCHEMA_V1.2_ENFORCEMENT.md](../../docs/SCHEMA_V1.2_ENFORCEMENT.md) 참조
+⚠️ **필수: Schema V1.3 엄격 준수** - [SCHEMA_V1.3_ENFORCEMENT.md](../../docs/SCHEMA_V1.3_ENFORCEMENT.md) 참조
 
 ```json
 {
   "sensitive_patterns": [
     {
       "id": "SENS-001",
-      "file": ".env.production",
-      "pattern": "AWS Secret Key",
-      "detail": "AWS_SECRET_ACCESS_KEY=***masked***",
+      "file": "config/secrets.yaml",
+      "line": 12,
+      "rule": "aws-access-key",
+      "pattern": "AWS Access Key",
+      "masked_value": "AKIA****************",
       "severity": "Critical",
       "status": "Confirmed",
-      "gitignore_status": "Not in .gitignore - RISK"
+      "gitignore_status": "Not in .gitignore - RISK",
+      "recommendation": "Rotate key immediately and add file to .gitignore",
+      "verdict": "REMOVE"
     }
-  ]
+  ],
+  "_meta": {
+    "agent": "tss-sensitive-patterns",
+    "files_scanned": 128,
+    "findings": 1,
+    "depthReached": 1,
+    "notes": "skipped node_modules, .git"
+  }
 }
 ```
 
 ### ❌ 절대 금지 필드
-| 사용 금지 | 올바른 필드 |
-|-----------|-------------|
-| `finding_id` | `id` |
-| `location` | `file` |
-| `issue` | `pattern` |
-| `type` | `pattern` |
-| `description` | `detail` |
-| severity 소문자 | 대문자 시작 |
-```
+| 사용 금지 | 이유 |
+|-----------|------|
+| `value` | raw secret 노출 |
+| `secret` | raw secret 노출 |
+| `raw` | raw secret 노출 |
+| `snippet` (secret 맥락) | raw secret 노출 |
+| `finding_id` | `id` 사용 |
+| `location` | `file` 사용 |
+| `issue` | `pattern` 사용 |
+| `type` | `pattern` 사용 |
+| `description` | `detail` 사용 |
+| severity 소문자 | 대문자 시작 필수 |
+
+### `_meta` footer 규약
+
+모든 반환 JSON에 `_meta` 객체를 포함한다(internal metric — report-merger가 최종 리포트에서 제외):
+
+| 필드 | 설명 |
+|------|------|
+| `agent` | 에이전트 이름 (`tss-sensitive-patterns`) |
+| `files_scanned` | 실제 점검한 파일 수 |
+| `findings` | 발견된 finding 수 |
+| `depthReached` | 분석 깊이 (1=Level 1만) |
+| `notes` | 제외 경로 등 메모 (optional) |
+
+---
 
 ## Deep Dive 기준
 
@@ -146,17 +204,6 @@ Medium/High severity 항목에 대해 심층 분석 수행:
 | Low | 플레이스홀더, 테스트 데이터 |
 | Info | 형식만 매칭, 실제 값 아님 |
 
-## 마스킹 규칙
-
-출력 시 민감 값은 마스킹 처리:
-```
-실제 값: AKIAIOSFODNN7EXAMPLE
-마스킹: AKIA***************LE
-
-실제 값: ghp_1234567890abcdefghijklmnopqrstuvwxyz
-마스킹: ghp_************************************
-```
-
 ## 제외 패턴
 
 다음은 분석에서 제외:
@@ -170,28 +217,3 @@ Medium/High severity 항목에 대해 심층 분석 수행:
 - Git 히스토리 직접 접근 불가 (구조 분석만)
 - 암호화된 파일 분석 불가
 - 대용량 바이너리 파일 제외
-
-## 사용 예시
-
-```
-사용자: @sensitive-pattern-matcher /Users/user/project
-
-응답:
-[SENSITIVE_PATTERN]
-file: config/secrets.yaml
-pattern: AWS Credentials
-detail: 
-  - aws_access_key_id: AKIA***LE
-  - aws_secret_access_key: ***masked***
-severity: Critical
-status: Confirmed
-gitignore_status: Not in .gitignore - RISK
-
-Deep Dive 결과:
-- 사용처: src/aws/client.py (line 23)
-- Git 상태: 파일이 커밋됨 - 키 로테이션 필요
-- 권장: 
-  1. 즉시 AWS 키 로테이션
-  2. config/secrets.yaml을 .gitignore에 추가
-  3. git filter-branch로 히스토리 정리
-```
