@@ -31,111 +31,157 @@ If `$ARGUMENTS` is empty, ask for a path / git URL / zip and stop.
 > **자동으로 대기**한다. `Monitor` 도구, 백그라운드 실행, 폴링 루프는 절대 사용하지 않는다.
 > 에이전트가 "실행 중"이어도 추가 대기 코드 없이 반환값을 직접 받는다.
 
-### Phase 0' — 스캔 세션 값 확정 (Bash, 최초 1회)
+> **🎯 완료 판정 = 출력 파일(OUTPUT_PATH)의 존재·유효성.** 에이전트의 리턴 메시지가
+> 아니라 **파일이 진실**이다. 리턴 메시지 유실·오해·무응답 종료에 견고하다.
+> 각 Phase는 Bash 체크포인트로 파일을 검증한 뒤에만 다음 Phase로 라우팅한다.
+
+### Phase 0' — 환경 적정성 검증 (Bash, 최초 1회)
 
 > **핵심 원칙:** Bash 도구는 호출마다 새 쉘을 생성해 변수가 유지되지 않는다.
-> 아래 Bash 출력값을 **컨텍스트에 기록**하고, 이후 모든 Write·Bash·Agent 호출에서
+> 아래 출력값을 **컨텍스트에 기록**하고, 이후 모든 Write·Bash·Agent 호출에서
 > `$변수` 대신 **실제 경로/값을 직접 대입**한다.
 
 ```bash
-SCAN_TMP=$(mktemp -d -t tss.XXXXXXXX)   # 스캔별 고유 임시 디렉터리
-OUT_DIR=$(pwd)                           # 최종 산출물 저장 위치 (실행 시점 고정)
-TIMESTAMP=$(date +%Y%m%d%H%M%S)         # 파일명 고유성 보장용
-printf '\n=== TSS SESSION VALUES ===\nSCAN_TMP=%s\nOUT_DIR=%s\nTIMESTAMP=%s\n=========================\n' \
-  "$SCAN_TMP" "$OUT_DIR" "$TIMESTAMP"
+SCAN_TMP=$(mktemp -d "${TMPDIR:-/tmp}/tss.XXXXXXXX")   # 크로스플랫폼: X가 치환된 고유 경로
+OUT_DIR=$(pwd)                                          # 최종 산출물 저장 위치 (실행 시점 고정)
+TIMESTAMP=$(date +%Y%m%d%H%M%S)                        # 파일명 고유성 보장용
+# 환경 적정성 검증
+touch "$SCAN_TMP/.probe" && rm "$SCAN_TMP/.probe" && WJ=OK || WJ=FAIL
+command -v git     >/dev/null && GIT=OK || GIT=FAIL
+command -v python3 >/dev/null && PY=OK  || PY=FAIL
+printf '\n=== TSS SESSION VALUES ===\nSCAN_TMP=%s\nOUT_DIR=%s\nTIMESTAMP=%s\nwritable=%s git=%s python3=%s\n=========================\n' \
+  "$SCAN_TMP" "$OUT_DIR" "$TIMESTAMP" "$WJ" "$GIT" "$PY"
 ```
 
-**출력 예시 (반드시 기록 — 이후 모든 단계에서 실제 값 직접 대입):**
+**출력 예시 (반드시 기록):**
 
 ```
 === TSS SESSION VALUES ===
-SCAN_TMP=/tmp/tss.A1B2C3D4
+SCAN_TMP=/var/folders/.../T/tss.a1b2c3d4
 OUT_DIR=/Users/user/my-project
 TIMESTAMP=20260623150000
+writable=OK git=OK python3=OK
 =========================
 ```
 
-이후 모든 Write 경로와 Bash 명령에는 `$SCAN_TMP` 변수가 아닌 `/tmp/tss.A1B2C3D4`와 같은
-**실제 경로값**을 직접 사용한다.
+`writable`/`git`/`python3` 중 하나라도 `FAIL`이면 원인을 보고하고 **중단**한다.
+이후 모든 경로에는 `$SCAN_TMP` 변수가 아닌 `/var/folders/.../tss.a1b2c3d4`처럼 **실제값**을 대입한다.
 
-### Phase 0 — 소스 준비 (단계 0)
+### Phase 0 — 소스 준비 + 서브에이전트 Write 프로브 (단계 0 → 1)
 
-`tss-source-handler` 에이전트를 호출한다.
-**반환값(TARGET_PATH)을 받을 때까지 Phase 1을 시작하지 않는다.**
-
-반환된 경로를 Bash로 검증한다 (실제 TARGET_PATH 값 대입):
+**(a) 소스 준비:** `tss-source-handler` 에이전트를 호출한다.
+**반환값(TARGET_PATH)을 받을 때까지** 다음으로 진행하지 않는다. Bash로 검증:
 
 ```bash
 test -d "/actual/target/path" && echo "TARGET_PATH OK" || echo "FAIL: not a directory"
 ```
 
-`FAIL`이면 오류를 보고하고 중단한다.
+`FAIL`이면 보고 후 중단한다.
 
-### Phase 1 — 병렬 분석 (단계 1–8, **ONE message**)
+**(b) Write 프로브 겸 단계 1:** `tss-repo-indexer` **1개만 먼저** 호출한다(병렬 배치 이전).
+이 에이전트가 OUTPUT_PATH에 Write에 성공하면 **서브에이전트 Write 권한이 정상**임이
+확인된다 — 즉 repo-indexer가 권한 프로브를 겸한다(별도 비용 0, repo 인덱스는 어차피 필요).
 
-**아래 8개 에이전트를 단 하나의 메시지로 동시에 호출한다.**
-
-> **에이전트 완료 이벤트는 1건씩 도착한다.** 각 확인이 도달할 때마다 즉시 기록하고
-> 다음 완료를 기다린다. **8개 확인 수신 후 체크포인트를 실행한다.**
-> 오케스트레이터는 Write를 수행하지 않는다 — 에이전트가 직접 OUTPUT_PATH에 Write한다.
-
-각 에이전트 프롬프트에 `TARGET_PATH`와 `OUTPUT_PATH`를 함께 명시한다:
-
+프롬프트:
 ```
 TARGET_PATH: /actual/target/path
-OUTPUT_PATH: /tmp/tss.A1B2C3D4/step1-repo-indexer.json
-(에이전트 역할 지시)
+OUTPUT_PATH: /var/folders/.../tss.a1b2c3d4/step1-repo-indexer.json
+(repo 인덱싱 지시)
 ```
 
-| 에이전트 | OUTPUT_PATH (프롬프트에 포함, 실제값 대입) |
-|----------|--------------------------------------------|
-| `tss-repo-indexer` | `/tmp/tss.A1B2C3D4/step1-repo-indexer.json` |
-| `tss-static-analyzer` | `/tmp/tss.A1B2C3D4/step2-static.json` |
-| `tss-binary-analyzer` | `/tmp/tss.A1B2C3D4/step3-binary.json` |
-| `tss-skill-analyzer` | `/tmp/tss.A1B2C3D4/step4-skill.json` |
-| `tss-sensitive-patterns` | `/tmp/tss.A1B2C3D4/step5-sensitive.json` |
-| `tss-policy-verifier` | `/tmp/tss.A1B2C3D4/step6-policy.json` |
-| `tss-prompt-optimizer` | `/tmp/tss.A1B2C3D4/step7-prompt.json` |
-| `tss-sbom` | `/tmp/tss.A1B2C3D4/step8-sbom.json` |
-
-에이전트는 `Wrote <OUTPUT_PATH>; <N> findings` 형태로 짧은 확인만 반환한다.
-**8개 확인 수신 완료 후** 체크포인트를 실행한다.
-
-#### 체크포인트 (8개 확인 수신 후 — Bash, 실제 경로 직접 대입)
+호출 복귀 후 Bash로 프로브 검증:
 
 ```bash
-ls "/tmp/tss.A1B2C3D4/"step*.json 2>/dev/null | wc -l
-# → 8이면 정상. 8 미만이면 누락 OUTPUT_PATH를 확인한다.
-python3 -c "
-import json, glob
-for p in sorted(glob.glob('/tmp/tss.A1B2C3D4/step*.json')):
-    d = json.load(open(p))
-    m = d.get('_meta', {})
-    print(m.get('agent','?'), 'scanned='+str(m.get('files_scanned','?')), 'findings='+str(m.get('findings','?')))
-"
+if [ -f "/var/folders/.../tss.a1b2c3d4/step1-repo-indexer.json" ]; then
+  echo "PROBE OK: 서브에이전트 Write 정상 — 병렬 배치 진행"
+else
+  echo "PROBE FAIL: 서브에이전트가 파일을 쓰지 못함 (권한 미설정 가능성)"
+  echo "→ .claude/settings.json 의 permissions.allow 에 다음을 추가해야 합니다:"
+  echo '   "Write('"/var/folders/.../tss.a1b2c3d4"'/**)"'
+  echo "   (또는 docs/INSTALLATION.md 의 allow-rule 안내 참조)"
+fi
 ```
+
+`PROBE FAIL`이면 **8개 병렬 배치를 띄우지 않고 중단**한다(통째 hang 예방).
+
+### Phase 1 — 병렬 분석 (단계 2–8, **ONE message**, 7개 동시)
+
+> repo-indexer(단계 1)는 Phase 0(b)에서 완료됐다. 여기서는 **나머지 7개를 한 메시지로 병렬** 호출한다.
+> 완료 판정은 리턴이 아니라 **OUTPUT_PATH 파일**이다(파일=진실).
+
+각 에이전트 프롬프트에 `TARGET_PATH` + `OUTPUT_PATH`를 명시한다:
+
+| 에이전트 | OUTPUT_PATH (실제값 대입) |
+|----------|---------------------------|
+| `tss-static-analyzer` | `/var/folders/.../tss.a1b2c3d4/step2-static.json` |
+| `tss-binary-analyzer` | `/var/folders/.../tss.a1b2c3d4/step3-binary.json` |
+| `tss-skill-analyzer` | `/var/folders/.../tss.a1b2c3d4/step4-skill.json` |
+| `tss-sensitive-patterns` | `/var/folders/.../tss.a1b2c3d4/step5-sensitive.json` |
+| `tss-policy-verifier` | `/var/folders/.../tss.a1b2c3d4/step6-policy.json` |
+| `tss-prompt-optimizer` | `/var/folders/.../tss.a1b2c3d4/step7-prompt.json` |
+| `tss-sbom` | `/var/folders/.../tss.a1b2c3d4/step8-sbom.json` |
+
+#### 체크포인트 (배치 복귀 후 — Bash, 파일=진실 검증)
+
+```bash
+D="/var/folders/.../tss.a1b2c3d4"   # 실제 SCAN_TMP 값 대입
+python3 - "$D" <<'PY'
+import json, sys, os
+d = sys.argv[1]
+expect = {
+ "step1-repo-indexer":"repo-indexer","step2-static":"static","step3-binary":"binary",
+ "step4-skill":"skill","step5-sensitive":"sensitive","step6-policy":"policy",
+ "step7-prompt":"prompt","step8-sbom":"sbom",
+}
+missing=[]
+for stem in expect:
+    p=os.path.join(d,stem+".json")
+    if not os.path.exists(p): print(f"{stem}: MISSING"); missing.append(stem); continue
+    try:
+        obj=json.load(open(p)); m=obj.get("_meta",{})
+        print(f"{stem}: OK  findings={m.get('findings','?')} scanned={m.get('files_scanned','?')}")
+    except Exception as e:
+        print(f"{stem}: INVALID ({e})"); missing.append(stem)
+print("MISSING_OR_INVALID="+(",".join(missing) if missing else "NONE"))
+PY
+```
+
+#### 재시도·중단 정책 (D=실패 시 중단)
+
+- `MISSING_OR_INVALID`에 나온 에이전트만 **타깃 재호출(1회)** → 체크포인트 재실행.
+- 1회 재시도 후에도 남으면 → **어떤 에이전트가 왜 실패했는지 명시하고 스캔을 중단**한다.
+  부분 진행하지 않는다(보안 스캔 완전성 우선 — 사용자 확정).
+- `MISSING_OR_INVALID=NONE`(전 8개 OK)일 때만 Phase 2로 라우팅한다.
 
 ### Phase 2 — 순차 분석 (단계 4.5 → 4.6 → 8.5, Phase 1 완료 후)
 
 각 에이전트 프롬프트에 `SCAN_TMP` 경로 + 입력 파일 목록 + `OUTPUT_PATH`를 전달한다.
-에이전트가 직접 OUTPUT_PATH에 Write하고 확인을 반환한다. 오케스트레이터는 Write 불필요.
+각 호출 복귀 후 **OUTPUT_PATH 존재를 Bash로 확인**한 뒤 다음으로 진행한다(파일=진실).
 
 1. `tss-relationship-graph` ← SCAN_TMP 실제값 + step1–8 파일 경로 목록
-   → OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step4.5-graph.json`
+   → OUTPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step4.5-graph.json`
 2. `tss-model-validity` ← 동일
-   → OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step4.6-model.json`
+   → OUTPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step4.6-model.json`
 3. `tss-deepdive` ← SCAN_TMP 실제값 + step1–8 파일 경로 목록
-   → OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step8.5-deepdive.json`
+   → OUTPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step8.5-deepdive.json`
 
 ### Phase 3 — 보고서 생성 (단계 9 → 10, Phase 2 완료 후)
 
+각 호출 복귀 후 OUTPUT_PATH 존재를 Bash로 확인한 뒤 진행한다(파일=진실).
+
 1. `tss-report-merger` 프롬프트:
    - SCAN_TMP 실제값 + 모든 step*.json 경로 목록
-   - OUTPUT_PATH: `/tmp/tss.A1B2C3D4/step9-english.json`
+   - OUTPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step9-english.json`
 2. `tss-translator` 프롬프트:
-   - INPUT_PATH: `/tmp/tss.A1B2C3D4/step9-english.json`
+   - INPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step9-english.json`
    - OUTPUT_PATH: `/Users/user/my-project/scanreport-20260623150000.json`
      (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
+
+최종 산출 검증:
+```bash
+test -f "/Users/user/my-project/scanreport-20260623150000.json" \
+  && echo "REPORT OK" || echo "FAIL: bilingual report not written"
+```
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 
@@ -145,10 +191,10 @@ for p in sorted(glob.glob('/tmp/tss.A1B2C3D4/step*.json')):
 ### Phase 5 — 결과 보고
 
 산출 파일 경로(JSON·HTML), `_meta` 집계 요약, 그래프 verdict, 주요 Critical/High finding 상위 3건을 보고한다.
-완료 후 임시 디렉터리를 정리한다:
+배치 진행 로그(`progress.log`)가 있으면 함께 요약한다. 완료 후 임시 디렉터리를 정리한다:
 
 ```bash
-rm -rf "/tmp/tss.A1B2C3D4"   # 실제 SCAN_TMP 값 대입
+rm -rf "/var/folders/.../tss.a1b2c3d4"   # 실제 SCAN_TMP 값 대입
 ```
 
 ---

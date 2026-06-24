@@ -2,7 +2,7 @@
 description: Show Claude Threat Scan usage, pipeline steps, verdicts, and migration from legacy commands
 ---
 
-**Claude Threat Scan** (v2.3.5) — AI 에이전트 생태계 아티팩트 보안 감사 도구.
+**Claude Threat Scan** (v2.4.0) — AI 에이전트 생태계 아티팩트 보안 감사 도구.
 
 ## 커맨드
 

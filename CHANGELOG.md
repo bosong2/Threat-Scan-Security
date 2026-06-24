@@ -2,6 +2,25 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.4.0] — 2026-06-24
+
+### Changed
+
+- **오케스트레이션 장애 방어 재설계 (BUG-07)** — 병렬 분석 단계에서 권한 hang·무응답 종료·다음 단계 미진행(stuck)을 제거. 근본 원인은 서브에이전트 Write 권한 게이트 + 오케스트레이터 블로킹 모델(공식 문서 확인: 비대화형 서브에이전트는 권한 프롬프트에 응답 못 해 hang, 병렬 배치 중 1개 hang이 배치 전체를 블로킹). "출력 파일=완료 진실" 원칙 + 3계층 장애 방어로 전환.
+
+### Added
+
+- **계층 ① 사전 프로브** — Phase 0(b): `tss-repo-indexer` 1개를 8개 병렬 배치 *이전에* 먼저 호출. 이 에이전트가 OUTPUT_PATH Write에 성공하면 서브에이전트 Write 권한 정상 확인(repo 인덱스는 어차피 필요 — 별도 비용 0). PROBE FAIL 시 배치를 띄우지 않고 allow-rule 안내 후 중단(통째 hang 예방).
+- **계층 ② 배치 후 체크포인트** — Phase 1 복귀 후 순수 Bash로 8개 파일 존재·JSON유효·`_meta` 검증, 상태표 출력. MISSING/INVALID 에이전트만 1회 타깃 재시도, 그래도 실패 시 원인 명시 후 **중단**(부분 진행 안 함 — 보안 스캔 완전성 우선). 전 8개 OK일 때만 다음 Phase로 라우팅. LLM 토큰 0.
+- **계층 ③ 완료 로깅 훅** — `hooks/hooks.json` matcher `tss-.*` → `scripts/log_completion.sh` 신설. 각 서브에이전트 종료를 `progress.log`에 기록(배치 진행 가시성). 페이로드 비변경·non-blocking. Desktop 빌드 자동 제외.
+- `docs/INSTALLATION.md` 권한 설정 안내 — 서브에이전트 Write allow-rule(`Write(/tmp/tss.*/**)` 등) 추가로 무중단 스캔.
+- `docs/v2.4.0/` 설계 문서(PROPOSAL.md·GOAL.md).
+
+### Fixed
+
+- **mktemp 크로스플랫폼** — `mktemp -d -t tss.XXXXXXXX`(macOS에서 X 미치환 → `tss.XXXXXXXX.<random>`) → `mktemp -d "${TMPDIR:-/tmp}/tss.XXXXXXXX"`(macOS·Linux 모두 X 치환 → `tss.a1b2c3d4`).
+- Phase 0' 환경 적정성 검증 추가 — SCAN_TMP 쓰기가능·git·python3 사전 점검, FAIL 시 중단.
+
 ## [2.3.5] — 2026-06-23
 
 ### Fixed

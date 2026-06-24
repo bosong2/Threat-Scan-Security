@@ -56,6 +56,23 @@ Code Plugin 섹션을 수정할 때 Desktop 섹션을 오염시키면 **BUG-02(D
 
 **오케스트레이터가 에이전트(Agent)가 아니라 스킬(Skill)인 이유:** Claude Code에서 서브에이전트는 다른 서브에이전트를 호출할 수 없다. 오케스트레이터를 스킬로 두고 `allowed-tools: Agent(tss-*)` frontmatter로 워커를 구동하는 패턴이 올바르다.
 
+### 장애 방어 모델 (v2.4.0 — 반드시 이해할 것)
+
+Claude Code 네이티브 제약상 **오케스트레이터(Skill)는 Agent 호출 동안 블로킹**된다. 따라서
+실행 중 라이브 모니터링·중간 개입은 불가능하다. 대신 3계층으로 장애를 방어한다:
+
+| 계층 | 구현 | 목적 |
+|------|------|------|
+| ① 사전 프로브 | Phase 0(b): `tss-repo-indexer` 1개를 병렬 배치 전에 먼저 호출 | 서브에이전트 Write 권한을 값싸게 검증 → 8개 통째 hang 예방 |
+| ② 배치 후 체크포인트 | Phase 1 복귀 후 순수 Bash로 파일 존재·JSON유효·`_meta` 검증 | **파일=진실**. MISSING/INVALID는 1회 재시도 후 실패 시 **중단** |
+| ③ 완료 로깅 훅 | `hooks/hooks.json` matcher `tss-.*` → `scripts/log_completion.sh` | 각 종료를 `progress.log`에 기록(가시성) |
+
+**핵심 원칙 — 파일=진실:** 완료 판정은 에이전트의 리턴 메시지가 아니라 **OUTPUT_PATH 파일의
+존재·유효성**이다. 리턴 유실·오해·무응답 종료에 견고하다.
+
+**핵심 제약 — Monitor/폴링 금지:** `Agent(tss-*)` 호출은 동기(blocking)다. `Monitor` 도구·
+백그라운드·폴링 루프를 쓰면 안 된다(BUG-05 재발).
+
 ## 에이전트 패턴
 
 각 `agents/tss-*.md`는 방법론을 복제하지 않는다. 표준 패턴 (v2.3.5+):
@@ -72,9 +89,13 @@ tools: Read, Write   # 분석 워커는 Read+Write. 셸 허용은 source-handler
 4. Return: `Wrote <OUTPUT_PATH>; <N> findings`
 ```
 
-**에이전트가 스스로 Write하는 이유:** Claude Code에서 Agent 완료 이벤트는 1건씩 도착한다.
-오케스트레이터가 대용량 JSON을 수신·Write하면 컨텍스트 폭발이 발생한다(BUG-06).
-에이전트가 직접 OUTPUT_PATH에 Write하면 오케스트레이터는 짧은 확인 메시지만 받는다.
+**에이전트가 스스로 Write하는 이유:** 오케스트레이터가 대용량 JSON을 수신·Write하면
+컨텍스트 폭발이 발생한다(BUG-06). 에이전트가 직접 OUTPUT_PATH에 Write하면 오케스트레이터는
+짧은 확인 메시지만 받고, 완료 판정은 **파일 존재**로 결정론적으로 수행한다(파일=진실).
+
+> **권한 의존:** 서브에이전트 Write는 비대화형이라 미승인 경로에서 권한 게이트에 걸려 hang할 수
+> 있다. Phase 0(b)의 `tss-repo-indexer` 프로브가 배치 전에 이를 검출하고, INSTALLATION의
+> allow-rule 안내(`Write(/tmp/tss.*/**)` 등)로 무중단 실행을 보장한다. 이 모델을 바꾸지 말 것.
 
 `${CLAUDE_PLUGIN_ROOT}`는 Claude Code 플러그인 런타임이 주입한다. 미설정 환경에서는 `skills/<name>/SKILL.md`로 폴백.
 

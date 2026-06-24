@@ -41,16 +41,26 @@ echo "📁 디렉토리 구조 생성 완료"
 # 3. 메인 SKILL.md 생성
 echo "📝 통합 SKILL.md 생성 중..."
 
-# 오케스트레이터 본문만 추출 — 선행 YAML frontmatter(--- ... ---) 제거.
-# (frontmatter의 Claude Code 전용 allowed-tools: Agent(tss-*) 가 Desktop SKILL.md에
-#  섞이지 않도록 함. dual-mode 회귀 방지)
-ORCH_BODY=$(awk 'BEGIN{fm=0} NR==1 && $0=="---"{fm=1; next} fm==1 && $0=="---"{fm=2; next} fm!=1{print}' "${SCRIPT_DIR}/skills/threat-scan-orchestrator/SKILL.md")
+# 오케스트레이터 본문 추출 — ① 선행 YAML frontmatter(--- ... ---) 제거,
+# ② Claude Code 전용 섹션('## 실행 절차 — Claude Code Plugin' ~ 다음 '## ' 헤딩 직전) 제거.
+# (frontmatter의 allowed-tools: Agent(tss-*) 및 본문 Code 섹션의 tss-*·$SCAN_TMP 가
+#  Desktop SKILL.md에 섞이지 않도록 함. BUG-02 dual-mode 교차 오염 회귀 방지)
+ORCH_BODY=$(awk '
+  BEGIN{fm=0; skip=0}
+  NR==1 && $0=="---"{fm=1; next}
+  fm==1 && $0=="---"{fm=2; next}
+  fm==1{next}
+  /^## 실행 절차 — Claude Code Plugin/{skip=1; next}
+  skip==1 && /^## /{skip=0}
+  skip==1{next}
+  {print}
+' "${SCRIPT_DIR}/skills/threat-scan-orchestrator/SKILL.md")
 
 cat > "${SKILL_DIR}/SKILL.md" << 'SKILLEOF'
 ---
 name: threat-scan-security
 description: >
-  AI 기반 보안 위협 스캐너 v2.3.2. 코드 리포지토리, ZIP 파일, GitHub URL을 대상으로
+  AI 기반 보안 위협 스캐너 v2.4.0. 코드 리포지토리, ZIP 파일, GitHub URL을 대상으로
   정적 코드 분석, 바이너리 분석, 민감 정보 탐지, SBOM 의존성 분석(17개 생태계·lock 파일 인식), 에이전트 정책 검증,
   스킬 보안 분석, 컴포넌트 연관관계 그래프 분석, 모델 유효성/진부화 판정을 수행하고
   영문/한글 bilingual JSON 보고서와 정적 HTML 리포트를 생성합니다.
