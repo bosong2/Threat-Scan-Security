@@ -56,10 +56,11 @@ Code Plugin 섹션을 수정할 때 Desktop 섹션을 오염시키면 **BUG-02(D
 
 **오케스트레이터가 에이전트(Agent)가 아니라 스킬(Skill)인 이유:** Claude Code에서 서브에이전트는 다른 서브에이전트를 호출할 수 없다. 오케스트레이터를 스킬로 두고 `allowed-tools: Agent(tss-*)` frontmatter로 워커를 구동하는 패턴이 올바르다.
 
-### 장애 방어 모델 (v2.4.0 — 반드시 이해할 것)
+### 장애 방어 모델 (v2.4.0 / v2.5.0 — 반드시 이해할 것)
 
-Claude Code 네이티브 제약상 **오케스트레이터(Skill)는 Agent 호출 동안 블로킹**된다. 따라서
-실행 중 라이브 모니터링·중간 개입은 불가능하다. 대신 3계층으로 장애를 방어한다:
+Agent 실행 모델은 런타임에 따라 다르다: 일부는 `Agent(tss-*)`를 blocking으로 처리하고,
+일부는 async(백그라운드)로 실행해 즉시 "실행 중"만 반환한다(v2.4.1 실측 확인). 따라서
+완료 판정을 리턴 메시지에 의존하지 않고 3계층으로 장애를 방어한다:
 
 | 계층 | 구현 | 목적 |
 |------|------|------|
@@ -70,8 +71,13 @@ Claude Code 네이티브 제약상 **오케스트레이터(Skill)는 Agent 호�
 **핵심 원칙 — 파일=진실:** 완료 판정은 에이전트의 리턴 메시지가 아니라 **OUTPUT_PATH 파일의
 존재·유효성**이다. 리턴 유실·오해·무응답 종료에 견고하다.
 
-**핵심 제약 — Monitor/폴링 금지:** `Agent(tss-*)` 호출은 동기(blocking)다. `Monitor` 도구·
-백그라운드·폴링 루프를 쓰면 안 된다(BUG-05 재발).
+**Monitor 정책 (v2.5.0 개정):** Agent가 async로 반환되면 `Monitor`(`until [ -f <OUTPUT_PATH> ]; do sleep N; done`)로
+**OUTPUT_PATH 파일 출현을 대기하는 용도로만 허용**한다 — 완료 신호 수신 수단이지 폴링 남용이 아니다.
+스톨 복구용 `TaskStop`도 허용. 그 외 불필요한 폴링 루프는 금지. (BUG-05 이력은 "Monitor 파라미터
+오용 금지"로 재해석 — 잘못된 인자로 호출하지 말 것.)
+
+**자율 완주 (v2.4.1-auto):** 스캔 시작 후 사용자에게 확인·질문하지 않고 Phase 5까지 완주한다.
+유일한 예외는 Phase 0(d) AI 구성요소 게이트 질문 1회 + Phase 0'' 권한 셋업 승인 1회(규칙 부재 시).
 
 ## 에이전트 패턴
 
@@ -80,14 +86,18 @@ Claude Code 네이티브 제약상 **오케스트레이터(Skill)는 Agent 호�
 ```markdown
 ---
 name: tss-<name>
-model: sonnet        # 분석 워커: sonnet, 기계적 작업: haiku, 고난도 트리아지: opus
-tools: Read, Write   # 분석 워커는 Read+Write. 셸 허용은 source-handler·html-report만
+model: sonnet              # 분석 워커: sonnet, 기계적 작업: haiku, 고난도 트리아지: opus
+tools: Read, Write, Glob, Grep   # 분석 워커는 읽기전용 탐색(Glob/Grep) 포함. 셸 허용은 source-handler·html-report만
 ---
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`
-2. Apply to TARGET_PATH (from prompt).
-3. Write Schema V1.3 JSON to OUTPUT_PATH (from prompt).
-4. Return: `Wrote <OUTPUT_PATH>; <N> findings`
+2. Glob으로 TARGET_PATH 전체 트리 완전 열거(경로 추측 금지) → Grep으로 sink 탐색.
+3. Apply to every discovered file.
+4. Write Schema V1.4 JSON to OUTPUT_PATH (from prompt).
+5. Return: `Wrote <OUTPUT_PATH>; <N> findings`
 ```
+
+**Glob/Grep은 읽기 전용 탐색 도구**로 "단계 1–10 코드 실행 금지" 제약과 상충하지 않는다.
+경로 추측으로 파일을 놓치던 커버리지 결함(reviewOS-security 스캔 실측)을 방지한다.
 
 **에이전트가 스스로 Write하는 이유:** 오케스트레이터가 대용량 JSON을 수신·Write하면
 컨텍스트 폭발이 발생한다(BUG-06). 에이전트가 직접 OUTPUT_PATH에 Write하면 오케스트레이터는

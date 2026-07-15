@@ -4,7 +4,7 @@ description: >
   Orchestrate the full Claude Threat Scan pipeline (단계 0–11) over a target
   skill/agent/plugin/repo and produce a bilingual JSON report plus a KO HTML
   report. Use when asked to scan, audit, or vet a repository for security threats.
-allowed-tools: Agent(tss-source-handler), Agent(tss-repo-indexer), Agent(tss-static-analyzer), Agent(tss-binary-analyzer), Agent(tss-skill-analyzer), Agent(tss-relationship-graph), Agent(tss-model-validity), Agent(tss-sensitive-patterns), Agent(tss-policy-verifier), Agent(tss-prompt-optimizer), Agent(tss-sbom), Agent(tss-deepdive), Agent(tss-report-merger), Agent(tss-translator), Agent(tss-html-report), Bash, Read, Write
+allowed-tools: Agent(tss-source-handler), Agent(tss-repo-indexer), Agent(tss-static-analyzer), Agent(tss-binary-analyzer), Agent(tss-skill-analyzer), Agent(tss-relationship-graph), Agent(tss-model-validity), Agent(tss-sensitive-patterns), Agent(tss-policy-verifier), Agent(tss-prompt-optimizer), Agent(tss-sbom), Agent(tss-deepdive), Agent(tss-report-merger), Agent(tss-translator), Agent(tss-html-report), Bash, Read, Write, Monitor, TaskStop, AskUserQuestion
 ---
 
 # Claude Threat Scan Orchestrator
@@ -23,13 +23,32 @@ If `$ARGUMENTS` is empty, ask for a path / git URL / zip and stop.
 > 이 섹션은 Claude Code Plugin 모드 전용입니다. Claude Desktop은 아래
 > **실행 절차 — Claude Desktop** 섹션과 **스캔 순서** 표를 따릅니다.
 
+> ### 🤖 AUTONOMOUS-COMPLETION CONTRACT (v2.4.1-auto — 최우선)
+> 스캔이 시작되면 **사용자에게 어떤 확인·질문도 하지 않고 Phase 5까지 자동 완주**한다.
+> 사용자가 중간에 개입해야 하는 상황을 스스로 제거한다.
+> **예외는 정확히 2가지**: ① Phase 0''의 권한 셋업 승인(규칙 부재 시 1회), ② Phase 0(d)의
+> **AI 에이전트 구성요소 스캔 범위 확인**(대상 폴더에 `.claude/`, `.cursor/` 등 AI 에이전트 관련
+> 구성요소가 존재할 때 스캔 포함 여부를 1회 질문 — v1.4.3). 답을 받은 즉시 다시 묻지 않고 완주한다.
+> - **에이전트 실행 모델 불문:** 런타임이 `Agent(tss-*)`를 blocking으로 처리하든
+>   async(백그라운드)로 처리하든, **완료 판정은 항상 OUTPUT_PATH 파일의 존재·유효성**이다.
+>   async면 해당 파일이 나타날 때까지 대기한다(파일-appear 대기 목적의 `Monitor`
+>   `until [ -f <OUTPUT_PATH> ]; do sleep N; done` 사용 허용 — 폴링 남용이 아니라 완료 신호 수신 수단).
+> - **스톨 자동 복구:** 어떤 에이전트가 정해진 시간 안에 OUTPUT_PATH를 쓰지 못하고 무진전이면
+>   (특히 단계 10 번역), 사용자에게 묻지 말고 **자동으로 중단(TaskStop)→더 잘게 분할→재호출**한다.
+>   재분할·재시도는 이 문서의 각 Phase 복구 규칙을 따른다.
+> - **하드 실패에서만 중단:** 환경 부적합(Phase 0'), 서브에이전트 Write 권한 실패(Phase 0(b) PROBE FAIL),
+>   또는 1회 재시도·재분할 후에도 산출물이 없는 경우에만 원인을 명시하고 중단한다.
+>   그 외에는 절대 멈추지 않는다.
+
 > **모델 권장(v2.3.3):** 이 오케스트레이터는 finding 본문을 파일로 라우팅해
 > 컨텍스트를 얇게 유지하므로 **Opus** 사용을 권장한다(라우팅·검증 판단력 ↑, 토큰 ↓).
 > 워커 모델은 각 `agents/tss-*.md` frontmatter에 고정돼 있다.
 
-> **⛔ Agent 호출 = 동기(blocking):** `Agent(tss-*)` 호출은 에이전트가 반환할 때까지
-> **자동으로 대기**한다. `Monitor` 도구, 백그라운드 실행, 폴링 루프는 절대 사용하지 않는다.
-> 에이전트가 "실행 중"이어도 추가 대기 코드 없이 반환값을 직접 받는다.
+> **⛔ Agent 호출 동작은 런타임에 따라 다르다:** 일부 런타임은 `Agent(tss-*)`를 blocking으로
+> 처리해 반환까지 자동 대기한다 — 이때는 추가 대기 코드가 필요 없다. 그러나 async(백그라운드)로
+> 실행하는 런타임에서는 즉시 "실행 중"만 돌아온다. **어느 경우든 완료 판정은 OUTPUT_PATH 파일**이며
+> (아래 🎯), async면 파일 출현까지 대기한다. 이 목적의 `Monitor`(`until [ -f <path> ]` 대기)와
+> 스톨 복구용 `TaskStop`만 허용하며, 그 외 불필요한 폴링 루프는 쓰지 않는다.
 
 > **🎯 완료 판정 = 출력 파일(OUTPUT_PATH)의 존재·유효성.** 에이전트의 리턴 메시지가
 > 아니라 **파일이 진실**이다. 리턴 메시지 유실·오해·무응답 종료에 견고하다.
@@ -104,10 +123,87 @@ fi
 
 `PROBE FAIL`이면 **8개 병렬 배치를 띄우지 않고 중단**한다(통째 hang 예방).
 
+**(c) 실제 프로젝트 루트 자동 해석 (0-파일 오탐 방지):** repo-indexer가 `total_files=0`
+또는 "empty"를 보고하면 사용자에게 묻지 말고 **자동으로 중첩 루트를 탐색**한다. 아래 Bash로
+매니페스트(`package.json`/`pyproject.toml`/`go.mod`/`Cargo.toml`/`pom.xml`/`.git`)의 실제 위치를
+찾아 그 디렉터리를 새 `TARGET_PATH`로 삼고 **repo-indexer를 1회 재호출**한 뒤 진행한다.
+
+```bash
+T="/actual/target/path"
+ROOT=$(python3 - "$T" <<'PY'
+import os,sys
+t=sys.argv[1]
+marks={"package.json","pyproject.toml","go.mod","Cargo.toml","pom.xml","build.gradle",".git"}
+# 최상위에 매니페스트가 있으면 그대로, 없으면 가장 얕은 매니페스트 보유 디렉터리로 하강
+best=None;bestdepth=10**9
+for dp,dns,fns in os.walk(t):
+    dns[:]=[d for d in dns if d not in {"node_modules",".next","dist","build",".git","vendor"}]
+    depth=dp[len(t):].count(os.sep)
+    if marks & (set(fns)|set(dns)):
+        if depth<bestdepth: best=dp;bestdepth=depth
+print(best or t)
+PY
+)
+echo "RESOLVED_TARGET_ROOT=$ROOT"
+```
+
+`RESOLVED_TARGET_ROOT`이 원래 경로와 다르면 그 값을 이후 모든 Phase의 `TARGET_PATH`로 사용한다.
+
+**(d) AI 에이전트 구성요소 스캔 범위 확인 (신규 — v1.4.3, 유일한 사용자 질문 지점).**
+`RESOLVED_TARGET_ROOT` 하위에 `.claude/`, `.cursor/`, `.github/copilot-instructions.md`,
+`AGENTS.md`, `SKILL.md`, `.mcp.json`/`mcp.json`, `agents/**`, `prompts/**` 같은 **AI 에이전트/도구
+구성요소**가 존재하는지 Bash로 탐지한다. 이 항목들은 프로젝트 소스코드가 아니라 사용자(또는 다른 팀)의
+AI 도구 설정·프롬프트·권한 구성일 수 있어, 스캔 범위 포함 여부는 **사용자가 직접 결정해야 하는 사안**이다.
+
+```bash
+T="/actual/RESOLVED_TARGET_ROOT"
+python3 - "$T" <<'PY'
+import os, sys
+t = sys.argv[1]
+dir_names = {".claude", ".cursor", "agents", "prompts"}
+file_names = {"AGENTS.md", "SKILL.md", ".mcp.json", "mcp.json", "copilot-instructions.md"}
+found = []
+for root, dns, fns in os.walk(t):
+    dns[:] = [d for d in dns if d not in {"node_modules", ".git", ".next", "dist", "build", "vendor"}]
+    rel = os.path.relpath(root, t)
+    for d in list(dns):
+        if d in dir_names:
+            found.append((os.path.join(rel, d) if rel != "." else d) + "/")
+    for f in fns:
+        if f in file_names:
+            found.append(os.path.join(rel, f) if rel != "." else f)
+print("AI_AGENT_PATHS_FOUND:")
+print("\n".join(sorted(set(found))) if found else "NONE")
+PY
+```
+
+- **`NONE`이면 질문 없이 조용히 Phase 1로 진행**한다(해당 없는 대다수 프로젝트는 이 게이트를 인지하지 못함).
+- **하나 이상 발견되면**, Phase 1 배치를 띄우기 **전에** `AskUserQuestion` 도구로 **정확히 1회** 사용자에게 묻는다:
+  - 질문: "대상 폴더에서 AI 에이전트 관련 구성요소가 발견되었습니다: `<발견된 경로 목록>`. 이번 보안
+    스캔 범위에 포함할까요?"
+  - 옵션(권장 표시 포함):
+    1. **포함(권장)** — 정상적으로 skill/policy 분석 대상에 포함(단계 4 `tss-skill-analyzer`,
+       단계 6 `tss-policy-verifier`가 이미 이런 구성요소를 검사하도록 설계돼 있음).
+    2. **제외** — 이 경로들을 스캔 대상에서 배제하고 애플리케이션 코드만 스캔.
+  - 답을 받으면 **그 즉시 다시 묻지 않고** 나머지 Phase 5까지 자율 완주한다(위 AUTONOMOUS-COMPLETION
+    CONTRACT의 유일한 예외가 여기서 소진됨).
+- **제외를 선택한 경우:** Phase 1의 `tss-skill-analyzer`·`tss-policy-verifier`(및 필요 시 다른 분석
+  에이전트) 프롬프트에 `EXCLUDE_PATHS: <발견된 경로 목록>`을 명시하고 "이 경로들의 내용을 읽거나
+  분석하지 말 것(존재 여부만 무시)"이라고 지시한다. 단계 9 `repository_summary`에
+  `ai_agent_scope: "excluded"`(포함 시 `"included"`) 필드를 함께 기록해 최종 리포트에서 이 결정이
+  투명하게 드러나게 한다.
+- **포함을 선택한 경우:** 별도 조치 없이 기존 설계대로 진행(경로 배제 안 함). `repository_summary`에
+  `ai_agent_scope: "included"`만 기록.
+
 ### Phase 1 — 병렬 분석 (단계 2–8, **ONE message**, 7개 동시)
 
 > repo-indexer(단계 1)는 Phase 0(b)에서 완료됐다. 여기서는 **나머지 7개를 한 메시지로 병렬** 호출한다.
 > 완료 판정은 리턴이 아니라 **OUTPUT_PATH 파일**이다(파일=진실).
+
+> **커버리지 (v2.4.1-auto):** 분석 에이전트는 이제 `Glob`/`Grep`로 대상 트리를 **직접 완전 열거**한다
+> (경로 추측 금지). 각 프롬프트에 `TARGET_PATH`가 실제 프로젝트 루트인지 확인하고, 에이전트에
+> "전체 트리를 Glob으로 열거해 모든 관련 파일을 빠짐없이 스캔하라"고 명시한다. 별도의 보충 스캔
+> 패스를 수동으로 돌릴 필요가 없다 — 커버리지 미달은 체크포인트에서 자동 감지·재호출로 처리한다.
 
 각 에이전트 프롬프트에 `TARGET_PATH` + `OUTPUT_PATH`를 명시한다:
 
@@ -207,15 +303,21 @@ echo "Phase 3 mode: $MODE (size=${FILE_SIZE}B, findings=$FINDING_COUNT)"
 - OUTPUT_PATH: `$OUT_DIR/scanreport-$TIMESTAMP.json`
   (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
 
-**분할 모드 (MODE=split)**: 카테고리 5묶음을 병렬 `tss-translator` 5개로 처리.
+**분할 모드 (MODE=split)**: 카테고리 5묶음을 병렬 `tss-translator`로 처리하되,
+**대형 배열 카테고리는 미리 조각내어 hang을 원천 예방**한다(v2.4.1-auto).
 
-각 에이전트 프롬프트에 포함:
-- INPUT_PATH: `$SCAN_TMP/step9-english.json`
-- CATEGORIES: (각 묶음의 카테고리 키 목록)
-- OUTPUT_PATH: `$SCAN_TMP/step10-frag-N.json` (N=1..5)
-- 모드: "Fragment call — Mode B"
+**(1) 카테고리 단위 분할 우선(권장 기본값) — v2.4.1-auto 실측 반영.**
+번역기 ANTI-HANG CONTRACT 적용 후에는 **단일 카테고리 조각이 30–120초에 안정적으로 완료**된다
+(실측). 따라서 기본 전략은 **"카테고리(또는 소수 카테고리 묶음)당 조각 1개"**이며, 큰 배열이라도
+그 카테고리를 통째로 한 조각에 담는다(예: static 10개, recommendations 11개 각각 단독 조각).
+- **`ITEM_RANGE` 슬라이스는 기본값이 아니라 최후 백스톱**이다. 실측상 워커가 end-exclusive 범위를
+  일관되게 지키지 못해 **경계 항목이 중복**되는 파싱-후 parity 불일치가 발생했다(static KR=11/EN=10 등).
+  그러므로 슬라이싱은 "단일 카테고리 조각조차 반복해서 hang/과대해 실패"할 때만 쓰고, 이때
+  프롬프트에 **정확한 id 목록**(예: "REC-001..REC-006만")을 명시해 중복을 원천 차단한다.
+- 조각 파일명: 기본 `step10-frag-N.json`. 부득이 슬라이스 시 `-Na.json`/`-Nb.json`(정렬·연속).
+  조립기가 동일 키 배열을 정렬 순서대로 concat한다.
 
-카테고리 분할:
+기본 5묶음(각 배열이 CHUNK 이하일 때):
 | Fragment | CATEGORIES |
 |----------|-----------|
 | 1 | `repository_summary` |
@@ -224,33 +326,70 @@ echo "Phase 3 mode: $MODE (size=${FILE_SIZE}B, findings=$FINDING_COUNT)"
 | 4 | `sensitive_patterns,prompt_optimization,sbom_analysis` |
 | 5 | `relationship_findings,model_validity_findings,recommendations` |
 
-5개 에이전트 모두 복귀 후 체크포인트:
-```bash
-MISSING=""
-for N in 1 2 3 4 5; do
-  test -f "$SCAN_TMP/step10-frag-$N.json" || MISSING="$MISSING frag-$N"
-done
-[ -z "$MISSING" ] && echo "FRAGS OK" || { echo "MISSING:$MISSING"; exit 1; }
-```
+각 translator 프롬프트: `INPUT_PATH`, `CATEGORIES`, (해당 시)`ITEM_RANGE`, `OUTPUT_PATH`, 모드 "Fragment call — Mode B".
+
+**(2) 완료 대기 = 파일 출현.** async 실행 시 각 조각의 OUTPUT_PATH가 나타날 때까지 대기한다
+(`until [ -f <path> ]; do sleep 5; done` 형태의 파일-appear 대기 허용).
+
+**(3) 스톨 자동 복구 (무진전 감지 → 재분할, 사용자 확인 없이).**
+어떤 조각이 발주 후 **진전 없이 정체**(예: `progress.log` 무성장 + 파일 미생성 상태가 지속)되면
+사용자에게 묻지 말고 다음을 자동 수행한다:
+  1. 해당 translator를 `TaskStop`으로 중단.
+  2. 그 조각이 **다중 카테고리**였다면 → 카테고리별 **단일 조각**으로 쪼개 재발주.
+  3. 이미 **단일 배열 카테고리**였다면 → `ITEM_RANGE`를 **절반**으로 더 쪼개 재발주(≤ 4항목까지 축소 가능).
+  4. 재발주 조각들의 파일 출현을 다시 대기.
+관찰된 근본 원인은 번역기의 영문 재출력·단일 거대 Write였고, 이는 translator 프롬프트의
+ANTI-HANG CONTRACT로 1차 예방된다. 위 재분할은 그래도 남는 경우의 백스톱이다.
 
 #### 3-C. 단계 10.5 — 조립 (분할 모드 한정, 결정론·셸 허용 예외)
 
+모든 조각의 파일 출현을 확인한 뒤, **조립 전에 각 조각이 유효 JSON인지 먼저 검증**한다(v2.4.1-auto).
+번역기가 이스케이프 안 된 큰따옴표 등으로 깨진 JSON을 쓰면 조립기가 통째로 실패하므로, 깨진 조각은
+사용자 확인 없이 **해당 카테고리만 재번역(JSON-safety 지시 명시)** 후 재검증한다:
+
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/assemble_bilingual.py" \
-  --english "$SCAN_TMP/step9-english.json" \
-  --frags "$SCAN_TMP/step10-frag-1.json" "$SCAN_TMP/step10-frag-2.json" \
-         "$SCAN_TMP/step10-frag-3.json" "$SCAN_TMP/step10-frag-4.json" \
-         "$SCAN_TMP/step10-frag-5.json" \
-  --out "$OUT_DIR/scanreport-$TIMESTAMP.json"
+D="/var/folders/.../tss.a1b2c3d4"
+for f in "$D"/step10-frag-*.json; do
+  python3 -c "import json,sys;json.load(open(sys.argv[1]))" "$f" 2>/dev/null \
+    || echo "INVALID_JSON: $f  → 해당 카테고리 재번역 필요"
+done
 ```
 
-(env 미설정 시 `scripts/assemble_bilingual.py`로 폴백)
+그 다음 **디렉터리의 모든 `step10-frag-*.json`을 동적으로** 조립한다
+(고정 5개 가정 금지 — 재분할로 `-2a/-2b` 등이 생겼을 수 있음).
 
-최종 산출 검증:
+**⚠️ 셸 호환(zsh):** `--frags $(ls ...)` 처럼 명령치환 결과를 unquoted로 넘기면 **zsh는 단어분할을
+하지 않아** 여러 파일이 하나의 인자로 뭉쳐 `Fragment file not found`로 실패한다. 그러므로
+`--frags`를 **직접 나열하지 말고**, 조립기의 자동수집을 쓴다: `SCAN_TMP` env만 실제값으로 설정하고
+`--frags`를 생략하면 스크립트가 `$SCAN_TMP/step10-frag-*.json`을 **정렬 자동수집**해 동일 키 배열을
+순서대로 concat한다(셸 무관, 결정론적).
+
+```bash
+SCAN_TMP="/var/folders/.../tss.a1b2c3d4" \
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/assemble_bilingual.py" \
+  --english "/var/folders/.../tss.a1b2c3d4/step9-english.json" \
+  --out "/Users/user/my-project/scanreport-20260623150000.json"
+```
+
+(env `CLAUDE_PLUGIN_ROOT` 미설정 시 `scripts/assemble_bilingual.py` 상대경로로 폴백.
+조각을 명시해야 할 불가피한 경우에만 `--frags a.json b.json …`을 **공백으로 직접 나열**한다 — 명령치환 금지.)
+
+최종 산출 검증 — EN/KR 항목 수 일치까지 확인:
 ```bash
 test -f "$OUT_DIR/scanreport-$TIMESTAMP.json" \
   && echo "REPORT OK" || echo "FAIL: bilingual report not written"
+python3 - "$OUT_DIR/scanreport-$TIMESTAMP.json" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+er,kr=d.get("english_report",{}),d.get("korean_report",{})
+arrs=['static_code_findings','binary_analysis_findings','skill_risk_findings',
+      'agent_policy_findings','sensitive_patterns','prompt_optimization',
+      'relationship_findings','model_validity_findings','recommendations']
+bad=[k for k in arrs if len(er.get(k,[]))!=len(kr.get(k,[]))]
+print("PARITY_OK" if not bad else "PARITY_MISMATCH="+",".join(bad))
+PY
 ```
+`PARITY_MISMATCH`이 나오면 해당 카테고리만 translator로 재발주 후 재조립한다(자동, 사용자 확인 없이).
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 
@@ -407,7 +546,9 @@ scanreport-YYYYMMDDhhmmss.json
 ## 제약 사항
 
 - **단계 0(`@source-handler`)·단계 11(`@html-report-generator`)만 스크립트/파일 생성 허용** — 단계 0은 소스 준비(git clone/unzip), 단계 11은 결정론적 HTML 리포트 생성에 한정
-- 단계 1–10: 코드 실행 금지, Claude 추론으로만 분석 수행 (Claude Desktop 샌드박스 호환)
+- 단계 1–10: 셸/코드 실행 금지, Claude 추론으로만 분석 수행 (Claude Desktop 샌드박스 호환).
+  단, Claude Code 플러그인 에이전트는 **읽기 전용 파일 탐색 도구 `Glob`/`Grep` 사용 허용**
+  (셸/코드 실행이 아님) — 전체 트리 완전 열거·커버리지 확보용. (v2.4.1-auto)
 - 단계 1–10은 파일 생성 금지 (JSON 출력만 수행). 단계 11은 번들 스크립트로 HTML 파일 생성 — 입력 JSON을 변형하지 않고 그대로 임베드
 - 각 스킬의 결과를 신뢰하되 일관성 검증 수행
 
