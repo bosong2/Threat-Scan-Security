@@ -166,3 +166,18 @@ recommendation:
   2. 입력 화이트리스트 적용
   3. 읽기 전용 권한으로 제한
 ```
+
+
+## Compliance Tagging (v2.5.0 — Schema V1.4)
+
+finding 생성 시점에 `compliance_tags`를 부여한다. 규칙은
+`${CLAUDE_PLUGIN_ROOT}/docs/compliance-tagmap-distilled.md`(CTID-D)를 로드해 따른다
+(env 미설정 시 repo `docs/` 경로).
+
+- 문법: `^#(KISA|AILLM|TA)-[A-Z0-9]+(_[A-Z0-9]+)*$` · 0–4개 유일 · primary(근본원인) 우선.
+- 근본원인 기준 태깅(증상 아님). 해당 제어 없으면 `[]`. 근사 태깅 금지.
+- CWE/OWASP-LLM/ATLAS 식별자는 prose(description/recommendation) 전용 — `#`-태그 금지.
+- `AILLM`은 LLM/에이전트 기능 확인 시에만, `TA`는 IaC/설정 아티팩트 증거 시에만 사용.
+- 태그는 분류 메타데이터 — 기존 MASKING CONTRACT 등 증거 마스킹 규칙을 완화하지 않는다.
+- 스키마가 V1.4 미만이면 이 필드를 방출하지 않는다.
+- **이 단계의 기대 범위**: `#KISA-1_*`, `#AILLM-8_1`–`8_4`, `8_7`

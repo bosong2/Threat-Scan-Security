@@ -62,6 +62,22 @@ dictionary/security-terms-en-ko.json
 ## 번역 규칙
 
 ### 1. 번역하지 않는 항목
+
+> **⛔ enum 값 번역 금지 (v2.5.0 가드레일 — 최우선):** 아래 13종 필드의 **값**은 등급/판정
+> enum으로, `english_report`와 `korean_report` **양쪽 모두 영어 원문 그대로** 유지한다.
+> korean_report에서도 절대 번역하지 않는다(표시 언어 처리는 HTML 템플릿 계층 책임).
+>
+> `severity` · `status` · `verdict` · `security_verdict` · `priority` · `confidence` ·
+> `model_effectiveness` · `edge_type` · `component_type` · `target_type` · `pattern_type` ·
+> `risk_level` · `gitignore_status`
+>
+> - 예: `"severity": "Critical"` → (KO에서도) `"Critical"` — `"심각"` 금지.
+> - 예: `graph_verdict.security_verdict: "REMOVE"` → `"REMOVE"` — `"제거"` 금지.
+> - 예: `recommendations[].priority: "High"` → `"High"` — `"높음"` 금지.
+>
+> **`compliance_tags`(V1.4)**: 불변 토큰. korean_report에 **byte-identical** 복사. 제어 항목명
+> 한국어는 서술(prose)에서만(사전 `compliance_controls` 참조), 태그 문자열 치환 금지.
+
 ```
 - 파일 경로: /path/to/file.js
 - 코드 조각: eval("code")
@@ -69,15 +85,21 @@ dictionary/security-terms-en-ko.json
 - CVE ID: CVE-2020-8203
 - ID 필드: STATIC-001, VULN-001, REL-001, MODEL-001, REC-001
 - recommendations 구조 필드: id, rank(정수 순서), finding_ids(배열) — 원형 유지
-  ※ recommendations.priority는 severity처럼 등급 번역(Critical→심각). action/rationale/category는 번역.
+  ※ recommendations.priority는 enum — 번역 금지, 영어 원문 유지. action/rationale/category는 번역.
 - code_fix 코드: code_fix.before, code_fix.after, code_fix.language — 코드/식별자는 원형 유지(번역 금지)
   ※ deep_dive_result(서술), code_fix.note(설명)는 번역 대상.
+- compliance_tags: 불변 토큰 (byte-identical, 번역 금지)
 - 라이선스명: MIT, Apache-2.0, GPL-3.0
 - 기술 약어: SBOM, API, URL, JSON
 - 모델 ID: claude-sonnet-4-6, claude-haiku-4-5-20251001 등
-- verdict 값: INSTALL_OK, REVIEW, DISABLE, REMOVE (대문자 그대로 유지)
+- severity 값: Critical, High, Medium, Low, Info (영어 원문 유지)
+- status 값: Confirmed, Mitigated, False Positive 등 (영어 원문 유지)
+- priority 값: Critical, High, Medium, Low (영어 원문 유지)
+- verdict / security_verdict 값: INSTALL_OK, REVIEW, DISABLE, REMOVE (대문자 그대로 유지)
 - model_effectiveness 값: VALID, DEGRADED, OBSOLETE, MODEL_LOCKED (대문자 그대로 유지)
+- confidence / risk_level / gitignore_status 값: 영어 원문 유지
 - edge_type 값: bundles, delegates_to, preloads, uses_mcp, invokes_hook, references
+- component_type / target_type 값: 영어 원문 유지
 - pattern_type 값: MC1, MC2, MC3, MC4, OB1
 ```
 
@@ -94,7 +116,10 @@ dictionary/security-terms-en-ko.json
 
 ### 3. 용어 표준화
 
-#### Severity 번역
+> **⚠️ 아래 Severity/Status 표는 서술 문장 안의 단어 번역용이다**(예: "이는 심각한 취약점입니다").
+> **JSON enum 값(`severity`/`status` 필드)에는 적용하지 않는다** — enum 값은 §1 규칙대로 영어 원문 유지.
+
+#### Severity 번역 (prose 전용)
 | English | 한국어 |
 |---------|--------|
 | Critical | 심각 |
@@ -103,7 +128,7 @@ dictionary/security-terms-en-ko.json
 | Low | 낮음 |
 | Info | 정보 |
 
-#### Status 번역
+#### Status 번역 (prose 전용)
 | English | 한국어 |
 |---------|--------|
 | Confirmed | 확인됨 |
@@ -214,8 +239,8 @@ dictionary/security-terms-en-ko.json
         "line": 45,
         "issue": "명령 주입 위험",
         "description": "사용자 입력과 함께 os.system() 호출됨",
-        "severity": "높음",
-        "status": "확인됨",
+        "severity": "High",
+        "status": "Confirmed",
         "deep_dive_result": "입력이 HTTP 요청에서 새니타이징 없이 전달됨",
         "recommendation": "shell=False로 subprocess를 사용하고 입력을 새니타이징하세요"
       }
@@ -238,8 +263,9 @@ dictionary/security-terms-en-ko.json
    - 예: "Prototype Pollution (프로토타입 오염)"
 
 ### 번역 품질 체크리스트
-- [ ] 모든 severity 값 일관되게 번역
-- [ ] 기술 용어 표준화
+- [ ] 모든 enum 값(severity·status·verdict·priority 등 13종)이 EN/KO 동일(영어 원문) — 번역 안 됨
+- [ ] compliance_tags EN/KO byte-identical
+- [ ] 기술 용어 표준화 (서술 문장 한정)
 - [ ] 파일 경로/코드 미번역
 - [ ] 문장 자연스러움
 - [ ] 조사(은/는, 을/를) 적절성
@@ -303,7 +329,7 @@ dictionary/translation-rules-ja.md
         "id": "STATIC-001",
         "issue": "명령 주입 위험",
         "description": "사용자 입력과 함께 os.system() 호출됨",
-        "severity": "높음",
+        "severity": "High",
         "recommendation": "shell=False로 subprocess를 사용하세요"
       }
     ]

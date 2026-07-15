@@ -109,6 +109,10 @@ bearer\s+[a-zA-Z0-9\-._~+/]+=*
 | `recommendation` | `"Rotate key immediately"` | optional |
 | `verdict` | `"REMOVE"` | optional |
 
+> **verdict 화이트리스트 (v2.5.0):** `verdict`는 `INSTALL_OK` / `REVIEW` / `DISABLE` / `REMOVE`
+> **4종만** 허용한다. `MASK`·`KEEP` 등 임의 값을 발명하지 않는다. "마스킹이 필요하다"는 의미는
+> verdict가 아니라 `recommendation` 텍스트로 서술한다(예: "값을 마스킹하고 키를 회전하세요").
+
 ---
 
 ## 출력 형식
@@ -217,3 +221,18 @@ Medium/High severity 항목에 대해 심층 분석 수행:
 - Git 히스토리 직접 접근 불가 (구조 분석만)
 - 암호화된 파일 분석 불가
 - 대용량 바이너리 파일 제외
+
+
+## Compliance Tagging (v2.5.0 — Schema V1.4)
+
+finding 생성 시점에 `compliance_tags`를 부여한다. 규칙은
+`${CLAUDE_PLUGIN_ROOT}/docs/compliance-tagmap-distilled.md`(CTID-D)를 로드해 따른다
+(env 미설정 시 repo `docs/` 경로).
+
+- 문법: `^#(KISA|AILLM|TA)-[A-Z0-9]+(_[A-Z0-9]+)*$` · 0–4개 유일 · primary(근본원인) 우선.
+- 근본원인 기준 태깅(증상 아님). 해당 제어 없으면 `[]`. 근사 태깅 금지.
+- CWE/OWASP-LLM/ATLAS 식별자는 prose(description/recommendation) 전용 — `#`-태그 금지.
+- `AILLM`은 LLM/에이전트 기능 확인 시에만, `TA`는 IaC/설정 아티팩트 증거 시에만 사용.
+- 태그는 분류 메타데이터 — 기존 MASKING CONTRACT 등 증거 마스킹 규칙을 완화하지 않는다.
+- 스키마가 V1.4 미만이면 이 필드를 방출하지 않는다.
+- **이 단계의 기대 범위**: `#KISA-2_5`, `2_6`, `2_12`, `2_13`, `#AILLM-8_4`

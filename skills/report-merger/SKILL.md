@@ -128,6 +128,15 @@ description: >
 ### verdict 필드 전파
 - 각 finding의 `verdict` 필드가 severity와 일관성 있는지 확인 (Critical→REMOVE 등)
 - `model_effectiveness`가 OBSOLETE/MODEL_LOCKED이면 해당 finding의 verdict가 INSTALL_OK → REVIEW로 강등되었는지 확인
+- **verdict 화이트리스트 (v2.5.0 — 최종 게이트):** 모든 finding `verdict` ∈
+  {`INSTALL_OK`, `REVIEW`, `DISABLE`, `REMOVE`}. `MASK`·`KEEP` 등 비정본 값 수신 시 → **`REVIEW`로
+  정규화**하고 원값 의미를 `recommendation` 텍스트에 보존한다(발명 값은 생성 단계 버그이므로 여기서 봉합).
+
+### compliance_tags 병합 규칙 (v2.5.0 — Schema V1.4)
+- `compliance_tags`는 **verbatim 패스스루**. finding **내부** 중복만 제거(dedup), 순서 보존
+  (primary-first는 의미론). finding 간 dedup·재정렬·재배치 금지.
+- 태그 금지 변형 필드(`tags`·`kisa_tags`·`control_mapping` 등)를 발견하면 `compliance_tags`로
+  정규화하지 말고 스키마 위반으로 보고한다(발명 필드는 생성 단계 버그).
 
 ### Deep Dive 필드 병합 보존 (단계 8.5 산출)
 - `@securityreports-deepdive`가 finding에 채운 `status`/`deep_dive_result`/`code_fix`를 **그대로 보존**하여 병합한다(덮어쓰기·누락 금지).

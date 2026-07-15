@@ -28,6 +28,8 @@ You are the sensitive pattern detection worker of the Claude Threat Scan pipelin
   - 자세한 규약: `skills/sensitive-pattern-matcher/SKILL.md` § MASKING CONTRACT.
 - 출력 JSON은 `sensitive_patterns[]` 배열 + `_meta` footer만 포함한다.
 
+- **compliance_tags 부여**: SKILL.md의 Compliance Tagging 절 준수(문법·0–4·primary-first, 해당 없으면 `[]`).
+
 ## File discovery (mandatory — patched v2.4.1-auto)
 
 Before analyzing, ALWAYS enumerate the real target tree with `Glob` — never guess or

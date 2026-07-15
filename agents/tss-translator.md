@@ -71,3 +71,4 @@ Prompt MAY also include `ITEM_RANGE` (예: `0-8`, 0-index, end-exclusive) — �
 - 개행·탭·백슬래시도 JSON 규칙대로 이스케이프한다. 코드펜스(```) 금지.
 - Write 직전, 산출물이 유효 JSON인지 스스로 점검한다. 조립기가 `json.load`로 각 조각을 읽으므로
   깨진 조각 하나가 전체 조립을 실패시킨다.
+- **enum·compliance_tags 번역 금지**: severity/status/verdict/priority 등 13종 enum과 태그는 영어 원문 유지(EN/KO 동일).

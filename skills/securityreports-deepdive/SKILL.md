@@ -220,8 +220,42 @@ Deep Dive 후에도 다음 필드 규칙 준수 필수:
 ✓ code_fix 내 코드는 JSON 이스케이프 (\n, \", \\)
 ```
 
+## Tag Verification (v2.5.0 — CTID-V, Schema V1.4)
+
+단계 8.5는 finding이 단계 1–8에서 부여받은 `compliance_tags`를 **검증·교정하는 유일한 추론
+단계**다(단계 9–11은 태그 읽기전용). 상세 규칙은
+`${CLAUDE_PLUGIN_ROOT}/docs/compliance-tagging-deepdive.md`(CTID-V)를 로드해 따른다.
+
+기존 MAX DEPTH=3 분석에 **별도 pass 없이 폴딩**한다:
+
+- **L1(직접 분석)**: primary 태그의 근본원인 트리거가 실제 코드와 일치하는지 확인.
+- **L2(맥락 추적)**: 재귀속(re-attribution) 탐지 — 진짜 근본원인이 다른 제어면 primary 태그 교체.
+- **L3(영향 평가)**: 추적으로 드러난 보조 태그 추가(총 ≤4), primary-first 순서 확정.
+
+검증 규칙(요지):
+
+- **V-1 재귀속**: primary 태그 교체 시 `deep_dive_result`에 1문장 기록
+  (예: "Tag re-attributed #KISA-1_2 → #KISA-2_2: sink 도달 불가, 실제 결함은 소유권 검사 누락").
+- **V-2 status 독립**: 태그는 위반한 제어 클래스를 기술, `status`는 악용가능성을 기술.
+  `Mitigated`·`False Positive`여도 태그를 제거하지 않는다(면책은 status에).
+- **V-3 추가**: 동일 증거가 독립적으로 위반하는 제어만 보조 태그로 추가(≤4, dedup 필수).
+- **V-4 네임스페이스 규율**: `AILLM`은 추적 경로에 LLM/에이전트 기능이 확인될 때만.
+  `TA`는 IaC/설정 아티팩트 증거만. 보고 편의로 AILLM→KISA 이동 금지(프레임워크 격리).
+- **V-5 빈 배열 유효**: 해당 제어 없다고 판정하면 `[]` + `deep_dive_result`에 사유.
+- **V-6 증거 확장 금지**: 태그 검증이 MASKING CONTRACT를 완화하지 않는다.
+- **V-7 형식 재검증**: write-back 시 regex·대문자·유일·≤4·primary-first 재확인(8.5가 병합 전 마지막 추론).
+
+세션당 1회 cross-finding sweep 3종: ① 동일 file:line 결함의 태그 일관성 정렬(finding 병합은
+단계 9), ② 배열별 태그 범위 타당성(CTID-D §2), ③ AILLM 게이트 정합(태그가 있으면 대상에 LLM 기능 실재).
+
+`code_fix` 자기일관성: fix는 **primary 태그**가 지목한 제어를 교정해야 한다 — 불일치 시 write-back 전 해소.
+
+출력 계약 delta: `compliance_tags` in-place 검증·교정(빈 배열화 가능), 태그가 **변경된 경우에만**
+`deep_dive_result`에 사유 1문장 추가. 그 외 신규 필드 없음.
+
 ## 참조
 
-- [claude-threat-scan-json-schema-v1.3.md](../../docs/claude-threat-scan-json-schema-v1.3.md) — §18.5 Deep Dive 필드
-- [SCHEMA_V1.3_ENFORCEMENT.md](../../docs/SCHEMA_V1.3_ENFORCEMENT.md) — §2.7 code_fix + JSON 안전 규칙
+- [claude-threat-scan-json-schema-v1.4.md](../../docs/claude-threat-scan-json-schema-v1.4.md) — §18.5 Deep Dive 필드, §21 compliance_tags
+- [SCHEMA_V1.4_ENFORCEMENT.md](../../docs/SCHEMA_V1.4_ENFORCEMENT.md) — §2.7 code_fix + JSON 안전 규칙, §8 태그 강제
+- [compliance-tagging-deepdive.md](../../docs/compliance-tagging-deepdive.md) — CTID-V 전문(V-1~V-7 + 3 sweep)
 - [claude_threat_scan_prompt_v_2.md](../../docs/claude_threat_scan_prompt_v_2.md) - SECTION 0 참조

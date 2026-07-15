@@ -163,7 +163,7 @@
 | `rank` | integer, 1부터 처리 순서 (1=최우선). **순서는 여기에만.** |
 | `priority` | **문자열만**: `Critical`/`High`/`Medium`/`Low`. **정수 금지.** 참조 finding들의 최고 severity. |
 | `finding_ids` | string[], 근거 finding ID. **보고서 내 실제 존재하는 finding id만 참조**, 빈 배열 금지(최소 1개). |
-| 번역 처리 | `id`/`rank`/`finding_ids`는 **번역 비대상(구조 필드)**. `priority`는 severity처럼 등급 번역(Critical→심각). `action`/`rationale`/`category` 번역. |
+| 번역 처리 | `id`/`rank`/`finding_ids`는 **번역 비대상(구조 필드)**. `priority`도 **enum — 번역 비대상**(영어 원문 유지, §9 참조). `action`/`rationale`/`category`만 번역. |
 
 #### ❌ 금지 패턴 (recommendations 내)
 ```

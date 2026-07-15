@@ -47,3 +47,4 @@ english_report keys to merge in this fragment).
 - verdict must be uppercase: INSTALL_OK / REVIEW / DISABLE / REMOVE.
 - `repository_summary` 필드명 정본 준수: 비정본 별칭(`overview`/`key_concerns`/`risk_level`)은
   병합 전에 정본 필드명(`description`/`key_components`/`risk_summary`)으로 정규화한다.
+- **compliance_tags**: verbatim 패스스루(finding 내 dedup만). **verdict 화이트리스트**: 4종 외 값은 REVIEW로 정규화.
