@@ -337,8 +337,8 @@ button.vuln-link:disabled{opacity:.55;cursor:wait}
   <div id="emptyState" class="empty-state">
     <div class="empty-icon">&#128196;</div>
     <div class="empty-title" data-en="No Report Loaded" data-ko="리포트 없음">No Report Loaded</div>
-    <div class="empty-desc" data-en="Load a Claude Threat Scan JSON file. Supports v1.2 and v1.3 schema." data-ko="Claude Threat Scan JSON 파일을 불러오세요. v1.2 및 v1.3 스키마를 지원합니다.">
-      Load a Claude Threat Scan JSON file. Supports v1.2 and v1.3 schema.
+    <div class="empty-desc" data-en="Load a Claude Threat Scan JSON file. Supports v1.2–v1.4 schema." data-ko="Claude Threat Scan JSON 파일을 불러오세요. v1.2–v1.4 스키마를 지원합니다.">
+      Load a Claude Threat Scan JSON file. Supports v1.2–v1.4 schema.
     </div>
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <div class="drop-zone-text">
@@ -382,7 +382,7 @@ var S = {
     evidence:'Evidence',registryField:'Registry Field',component:'Component',
     packageManager:'Package Manager',lockfile:'Lockfile Version',prodPkgs:'Production',devPkgs:'Dev',
     directDeps:'Direct Dependencies',transitiveDeps:'Notable Transitive Dependencies',
-    integrity:'Integrity Check',knownVulns:'Known Vulnerabilities',supplyChainRisk:'Supply Chain Risk',
+    summary:'Summary',integrity:'Integrity Check',knownVulns:'Known Vulnerabilities',supplyChainRisk:'Supply Chain Risk',
     licenseFindings:'License Findings',risk:'Risk',note:'Note',pkgName:'Package',pkgVersion:'Version',license:'License',
     cveLookup:'CVE Lookup',
     riskFindings:'Risk Findings',riskDistribution:'Risk Distribution',noData:'No data',repoDescription:'Repository Description',overallAssessment:'Overall Risk',highestConfirmed:'Highest active severity',
@@ -415,7 +415,7 @@ var S = {
     evidence:'근거',registryField:'레지스트리 필드',component:'컴포넌트',
     packageManager:'패키지 매니저',lockfile:'잠금파일 버전',prodPkgs:'프로덕션',devPkgs:'개발',
     directDeps:'직접 의존성',transitiveDeps:'주요 전이 의존성',
-    integrity:'무결성 검사',knownVulns:'알려진 취약점',supplyChainRisk:'공급망 위험',
+    summary:'요약',integrity:'무결성 검사',knownVulns:'알려진 취약점',supplyChainRisk:'공급망 위험',
     licenseFindings:'라이선스 발견',risk:'위험',note:'비고',pkgName:'패키지',pkgVersion:'버전',license:'라이선스',
     cveLookup:'CVE 조회',
     riskFindings:'위험 요소',riskDistribution:'위험 분포',noData:'데이터 없음',repoDescription:'리포지토리 설명',overallAssessment:'종합 위험도',highestConfirmed:'유효 발견 중 최고 심각도',
@@ -785,7 +785,7 @@ function renderSummary(report){
   var gv=rs.graph_verdict||{};
   var worstComp=gv.worst_component||'';
   var worstVerdict=gv.security_verdict||gv.verdict||'';
-  var worstRationale=gv.rationale||gv.summary||gv.description||'';
+  var worstRationale=gv.rationale||gv.summary||gv.description||gv.propagation_summary||'';
 
   var segs=[{n:c,col:'#C41230',cls:'cnt-c',lbl:t('critical')},{n:h,col:'#C84B2A',cls:'cnt-h',lbl:t('high')},{n:m,col:'#A85C00',cls:'cnt-m',lbl:t('medium')},{n:l,col:'#157A3A',cls:'cnt-l',lbl:t('low')}];
   var legend=segs.map(function(s){
@@ -848,7 +848,7 @@ function renderGraphVerdictCard(gv){
   if(!v) return '';
   var icons={install_ok:'✅',review:'⚠️',disable:'🔶',remove:'🔴'};
   var icon=icons[String(v).toLowerCase()]||'📊';
-  var sub=gv.rationale||gv.summary||gv.description;
+  var sub=gv.rationale||gv.summary||gv.description||gv.propagation_summary;
   return '<div class="graph-verdict-card">'+
     '<div style="font-size:36px">'+icon+'</div>'+
     '<div>'+
@@ -1027,7 +1027,14 @@ function codeBlock(label, code, lang, kind){
 }
 
 // Render a deep-dive code_fix object: before(취약)/after(수정)/note. All values are JSON strings.
+// 읽기측 폴백(v2.5.1): 레거시 Desktop 리포트의 문자열 code_fix를 단일 블록으로 구제.
 function codeFixBlock(cf){
+  if(typeof cf==='string'){
+    if(cf==='') return '';
+    return '<div class="code-fix"><div class="finding-detail-title">'+t('codeFix')+'</div>'+
+      codeBlock(t('after'),cf,'','cf-after')+
+    '</div>';
+  }
   if(!cf||typeof cf!=='object') return '';
   var lang=cf.language||'';
   return '<div class="code-fix"><div class="finding-detail-title">'+t('codeFix')+'</div>'+
@@ -1146,10 +1153,11 @@ function renderSbom(sbom){
   var ov=sbom.overview||{};
   var matrix=sbom.risk_matrix||{};
   var pa=sbom.priority_actions||[];
-  var vf=sbom.vulnerability_findings||[];
-  var lf=sbom.license_findings||[];
-  var vrf=sbom.version_risk_findings||[];
-  var scf=sbom.supply_chain_findings||[];
+  // 정본 배열명 우선, 레거시 Desktop 별칭은 읽기측 폴백(v2.5.1)
+  var vf=sbom.vulnerability_findings||sbom.vulnerabilities||[];
+  var lf=sbom.license_findings||sbom.license_issues||[];
+  var vrf=sbom.version_risk_findings||sbom.version_risks||[];
+  var scf=sbom.supply_chain_findings||sbom.supply_chain_risks||[];
   var dd=sbom.direct_dependencies||[];
   var td=sbom.notable_transitive_dependencies||[];
 
@@ -1196,6 +1204,7 @@ function renderSbom(sbom){
   }
 
   // Text summary fields
+  if(sbom.summary) body+=detail(t('summary'),sbom.summary);
   if(sbom.integrity_check) body+=detail(t('integrity'),sbom.integrity_check);
   if(sbom.known_vulnerabilities) body+=detail(t('knownVulns'),sbom.known_vulnerabilities);
   if(sbom.supply_chain_risk) body+=detail(t('supplyChainRisk'),sbom.supply_chain_risk);
@@ -1289,19 +1298,21 @@ function renderRecs(arr){
       (r.rank!==undefined&&r.rank!==null&&r.rank!==''?'<span class="rec-rank">#'+esc(String(r.rank))+'</span>':'')+
       (r.priority!==undefined&&r.priority!==null&&r.priority!==''?'<span class="rec-prio-badge sev-'+esc(pc)+'">'+t('priority')+': '+esc(canonEnum(r.priority))+'</span>':'')+
     '</div>';
-    // finding_ids → clickable chips that jump to the referenced finding card
+    // finding_ids → clickable chips; 레거시 Desktop 별칭 references는 읽기측 폴백(v2.5.1)
+    var fids=(r.finding_ids&&r.finding_ids.length)?r.finding_ids:(r.references||[]);
     var refs='';
-    if(r.finding_ids&&r.finding_ids.length){
+    if(fids&&fids.length){
       refs='<div class="rec-refs"><span class="rec-refs-label">'+t('relatedFindings')+':</span>'+
-        r.finding_ids.map(function(fid){
+        fids.map(function(fid){
           return '<button class="finding-ref" onclick="scrollToFinding(\''+esc(String(fid))+'\')" title="'+t('relatedFindings')+'">'+esc(String(fid))+'</button>';
         }).join('')+
       '</div>';
     }
+    // action/rationale 정본 우선, title/description은 레거시 Desktop 별칭 폴백
     return '<div class="rec-card p-'+esc(pc)+'">'+
       head+
-      '<div class="rec-action">'+esc(r.action||'')+'</div>'+
-      '<div class="rec-rationale">'+esc(r.rationale||'')+'</div>'+
+      '<div class="rec-action">'+esc(r.action||r.title||'')+'</div>'+
+      '<div class="rec-rationale">'+esc(r.rationale||r.description||'')+'</div>'+
       refs+
       (r.affected_files&&r.affected_files.length?'<div class="rec-files">'+t('affectedFiles')+': '+r.affected_files.map(esc).join(', ')+'</div>':'')+
     '</div>';
@@ -1383,14 +1394,35 @@ function toggleSection(id){
   if(el) el.classList.toggle('collapsed');
 }
 
+// V1.4 신규 필드(compliance_tags / ai_agent_scope) 존재 여부로 스키마 버전 추정.
+function detectSchemaVer(report){
+  var d=getData(report)||{};
+  var rs=d.repository_summary||{};
+  if(rs.ai_agent_scope!==undefined) return 'V1.4';
+  var arrs=['static_code_findings','binary_analysis_findings','skill_risk_findings',
+    'agent_policy_findings','sensitive_patterns','relationship_findings',
+    'model_validity_findings','recommendations'];
+  for(var i=0;i<arrs.length;i++){
+    var a=d[arrs[i]];
+    if(a&&a.length){
+      for(var j=0;j<a.length;j++){
+        if(a[j]&&a[j].compliance_tags&&a[j].compliance_tags.length) return 'V1.4';
+      }
+    }
+  }
+  return 'V1.3';
+}
+
 function renderFooter(report){
   var el=document.getElementById('reportFooter');
   if(!el) return;
   var meta=report.scan_metadata||{};
   var repoUrl='https://github.com/bosong2/Threat-Scan-Security';
+  // Schema 버전 동적 표기(v2.5.1): compliance_tags/ai_agent_scope(V1.4 신규 필드) 존재 시 V1.4.
+  var schemaVerVal=detectSchemaVer(report);
   var items=[
     {label:t('reportVer'),val:esc(meta.scanner_version||'-')},
-    {label:t('schemaVer'),val:'V1.3'},
+    {label:t('schemaVer'),val:schemaVerVal},
     {label:t('footerAuthor'),val:'Bosung Hong (bosong2)'}
   ];
   if(meta.scanner_model) items.splice(2,0,{label:t('scannerModel'),val:esc(meta.scanner_model)});
