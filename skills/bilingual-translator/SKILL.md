@@ -112,7 +112,12 @@ dictionary/security-terms-en-ko.json
 - rationale: 근거
 - analysis: 분석 결과
 - detail: 상세 내용
+- deep_dive_result: 심층 분석 서술
 ```
+
+> **⚠️ 완역 의무 (v2.5.1):** 위 서술 필드의 **부분 번역·생략은 실패로 간주**한다. 영문 문장이
+> `korean_report`에 잔존하면 안 된다. 출력이 길면 카테고리별로 나눠서라도 **전량 번역**한다
+> (Desktop 단일 컨텍스트에서 특히 주의 — 통째 출력하려다 서술을 빠뜨리지 말 것).
 
 ### 3. 용어 표준화
 

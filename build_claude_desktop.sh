@@ -101,19 +101,29 @@ cat >> "${SKILL_DIR}/SKILL.md" << 'APPENDEOF'
 
 ## 스키마 및 문서 참조
 
-보고서 생성 시 다음 스키마/문서 파일을 참조합니다:
-- `references/docs/SCHEMA_V1.3_ENFORCEMENT.md` — Schema V1.3 엄격 준수 규칙 (v1.2 포함)
-- `references/docs/claude-threat-scan-json-schema-v1.3.md` — JSON Schema V1.3 정의
-- `references/docs/SCHEMA_V1.2_ENFORCEMENT.md` — Schema V1.2 엄격 준수 규칙 (하위 호환 참조)
-- `references/docs/claude-threat-scan-json-schema-v1.2.md` — JSON Schema V1.2 정의 (하위 호환 참조)
+보고서 생성 시 다음 스키마/문서 파일을 참조합니다(V1.4가 정본):
+- `references/docs/SCHEMA_V1.4_ENFORCEMENT.md` — **Schema V1.4 엄격 준수 규칙 (정본)**
+- `references/docs/claude-threat-scan-json-schema-v1.4.md` — **JSON Schema V1.4 정의 (정본)**
+- `references/docs/compliance-tagmap-distilled.md` — CTID-D (단계 1–8 compliance_tags 방출 규칙)
+- `references/docs/compliance-tagging-deepdive.md` — CTID-V (단계 8.5 태그 검증)
+- `references/docs/SCHEMA_V1.3_ENFORCEMENT.md` — Schema V1.3 (legacy 참조)
+- `references/docs/claude-threat-scan-json-schema-v1.3.md` — JSON Schema V1.3 (legacy 참조)
+- `references/docs/SCHEMA_V1.2_ENFORCEMENT.md` — Schema V1.2 (legacy 참조)
+- `references/docs/claude-threat-scan-json-schema-v1.2.md` — JSON Schema V1.2 (legacy 참조)
 - `references/docs/claude_threat_scan_prompt_v_2.md` — Threat Scan 프롬프트 V2
 
 ## 번역 참조
 
 한글 보고서 생성 시 다음 파일을 참조합니다:
-- `references/dictionary/security-terms-en-ko.json` — 보안 용어 영한 사전 (verdict/model_effectiveness 포함)
+- `references/dictionary/security-terms-en-ko.json` — 보안 용어 영한 사전 (+ compliance_controls 제어명)
 - `references/dictionary/translation-rules-ko.json` — 한글 번역 규칙
 - `references/dictionary/model-capabilities.json` — 모델 능력 레지스트리 (v2.1.0+)
+
+> **번역 필수 규칙 (v2.5.1):** enum 13종(severity·status·verdict·security_verdict·priority·
+> confidence·model_effectiveness·edge_type·component_type·target_type·pattern_type·risk_level·
+> gitignore_status)과 compliance_tags·ID·경로·코드는 **원형 유지**(번역 금지). 반대로
+> description·recommendation·deep_dive_result·detail·issue 등 **서술 필드는 반드시 완역**한다
+> (영문 문장 잔존 = 실패). 출력이 길면 카테고리별로 나눠서라도 전량 번역한다.
 
 ## HTML 리포트 생성 참조 (단계 11, v2.2.0+)
 

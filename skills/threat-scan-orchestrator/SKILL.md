@@ -509,6 +509,25 @@ python3 references/scripts/enumerate_tree.py <대상경로> --out file-manifest.
 > Desktop은 샌드박스라 자동 권한 셋업(Code의 Phase 0'')이 필요 없다 — 파일 생성·셸 실행을
 > 하지 않으므로 권한 게이트 자체가 없다.
 
+### 단계별 재독 + 자기검증 (v2.5.1 — 드리프트 방지, 필수)
+
+긴 단일 컨텍스트 스캔에서 앞서 읽은 규칙에 의존하면 출력 스키마가 드리프트한다(ID prefix·필드명·
+enum 번역 오류). 이를 막기 위해:
+
+- **재독 의무:** 각 단계를 시작할 때 해당 `references/sub-skills/<name>.md`를 **다시 읽는다**.
+  기억에 의존하지 않는다.
+- **자기검증 3줄:** 각 단계 산출 직후 확인 — ① finding ID prefix가 **단계별 출력 계약 카드**
+  (위 `## 출력 형식`)와 일치하는가, ② 필수 필드(예: recommendations는 action/rationale/finding_ids,
+  code_fix는 객체)가 존재하는가, ③ enum 값이 영문 정본인가. 불일치 시 즉시 교정 후 다음 단계로.
+
+### 단계 10 — 번역 (v2.5.1, 완역 필수)
+
+- 모든 finding의 `description`/`recommendation`/`deep_dive_result`/`detail`/`issue`와
+  repository_summary·graph_verdict의 서술 필드를 한국어로 **완역**한다. **영문 문장 잔존 = 실패.**
+- enum 13종·`compliance_tags`·ID·파일 경로·코드·CVE는 **원형 유지**(번역 금지).
+- **카테고리 단위 순차 번역:** `english_report`의 최상위 카테고리를 하나씩 — 한 카테고리를 완역해
+  `korean_report`에 기록한 뒤 다음 카테고리로 진행한다. 전체를 한 번에 출력하려다 서술을 생략하지 않는다.
+
 ### Compliance Tagging (Schema V1.4)
 
 단계 1–8이 각 finding에 `compliance_tags`(KISA·AILLM·TA)를 부여하고(CTID-D 규칙,
@@ -571,17 +590,39 @@ Deep Dive 수행 기준:
 
 ## 출력 형식
 
-### ⚠️ 필수: Schema V1.3 엄격 준수
+### ⚠️ 필수: Schema V1.4 엄격 준수
 
 **임의로 필드를 추가/변경/제거하면 뷰어 호환성이 깨집니다.**
-**참조**: `references/docs/SCHEMA_V1.3_ENFORCEMENT.md`, `references/docs/claude-threat-scan-json-schema-v1.3.md`
+**참조(정본)**: `references/docs/SCHEMA_V1.4_ENFORCEMENT.md`, `references/docs/claude-threat-scan-json-schema-v1.4.md`
+(v1.3/v1.2 문서는 legacy 참조. V1.4 = V1.3 strict superset — `compliance_tags`·`ai_agent_scope`가 유일한 추가 optional 필드)
+
+### 단계별 출력 계약 (요약 카드 — 산출 직전 반드시 대조, v2.5.1)
+
+각 단계 산출물은 아래 ID prefix·필수 구조를 정확히 따른다. **비정본 별칭·발명 값·enum 번역은 스키마 위반이다.**
+
+| 단계 | ID prefix | 필수 구조·규칙 |
+|------|-----------|----------------|
+| 2 정적 | `STATIC-` | severity/status 영문. `code_fix`는 **객체** `{language,before,after,note}` (문자열 금지) |
+| 3 바이너리 | `BIN-` | 〃 |
+| 4 스킬 | `SKILL-` | finding `verdict` ∈ {INSTALL_OK,REVIEW,DISABLE,REMOVE} |
+| 4.5 그래프 | `REL-` | `graph_verdict{security_verdict,worst_component,rationale}` (verdict/propagation_summary 아님) |
+| 4.6 모델 | `MODEL-` | `model_effectiveness` ∈ {VALID,DEGRADED,OBSOLETE,MODEL_LOCKED}. 스킬/에이전트 모델 pin 검사(ML 가중치 아님) |
+| 5 민감 | `SENS-` | `masked_value`만. verdict 4종만(**MASK 금지**) |
+| 6 정책 | `AGENT-` | — |
+| 7 프롬프트 | `OPT-` | compliance_tags 금지 |
+| 8 SBOM | `VULN-`/`LIC-`/`VER-`/`SUPPLY-` | 배열명 정본: `vulnerability_findings`/`license_findings`/`version_risk_findings`/`supply_chain_findings`. sbom verdict 발명 금지(**APPROVE 등 금지**) |
+| 9 병합 | `REC-` | `recommendations{action,rationale,finding_ids,rank,priority}` — **title/description/references 금지** |
+| 10 번역 | — | enum 13종·compliance_tags·ID·경로·코드 원형 유지, 서술 필드 **완역** |
+
+**enum 13종(EN/KO 동일·번역 금지):** severity, status, verdict, security_verdict, priority, confidence,
+model_effectiveness, edge_type, component_type, target_type, pattern_type, risk_level, gitignore_status.
 
 ### 파일명 규칙
 ```
 scanreport-YYYYMMDDhhmmss.json
 ```
 
-### JSON 구조 (V1.3 — v1.2 완전 호환)
+### JSON 구조 (V1.4 — v1.3/v1.2 완전 호환)
 ```json
 {
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",
