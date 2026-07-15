@@ -9,6 +9,7 @@ description: Show Claude Threat Scan usage, pipeline steps, verdicts, and migrat
 | 커맨드 | 설명 |
 |--------|------|
 | `/threat-scan <target>` | 전체 보안 스캔 (경로 / GitHub URL / ZIP) → JSON + KO HTML |
+| `/threat-scan-setup` | 권한 사전등록 (선택 — 첫 스캔 시 자동 수행됨) |
 | `/threat-scan-html <json> [ko\|en]` | 기존 JSON → HTML 재생성 |
 | `/threat-scan-help` | 이 안내 |
 

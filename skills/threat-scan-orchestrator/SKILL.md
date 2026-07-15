@@ -86,6 +86,50 @@ writable=OK git=OK python3=OK
 `writable`/`git`/`python3` 중 하나라도 `FAIL`이면 원인을 보고하고 **중단**한다.
 이후 모든 경로에는 `$SCAN_TMP` 변수가 아닌 `/var/folders/.../tss.a1b2c3d4`처럼 **실제값**을 대입한다.
 
+### Phase 0'' — 권한 자동 셋업 (무정지 진행 보장, v2.5.0)
+
+> **목적:** 사용자가 `/threat-scan-setup`을 직접 호출하지 않아도, 권한 규칙이 없으면
+> 오케스트레이터가 자동으로 프로젝트 `.claude/settings.local.json`에 규칙을 등록한다.
+> 이 Write가 **사용자 확인·승인 1회**로 작동하고, 승인 후 전 과정이 무정지로 진행된다.
+> (오케스트레이터는 메인 루프 스킬이라 권한 프롬프트에 사용자가 응답 가능 — 서브에이전트와 달리 hang 없음.)
+
+**(1) 감지 (결정론 Bash — 프롬프트 없음):**
+
+```bash
+grep -q 'tss\.\*' .claude/settings.local.json 2>/dev/null && echo "PERMS OK" || echo "PERMS MISSING"
+```
+
+- **`PERMS OK` → 무동작 통과** (이미 셋업된 프로젝트·재스캔은 프롬프트 0회).
+- **`PERMS MISSING` → 인라인 셋업 수행:**
+  1. `.claude/settings.local.json`을 Read(없으면 `{"permissions":{"allow":[]}}` 신규 구조).
+  2. `permissions.allow`에 아래 규칙을 **병합**(기존 항목 보존·중복 제거·덮어쓰기 금지) 후
+     Write 도구로 저장한다. **이 Write가 사용자 승인 1회를 발생시킨다.**
+  3. Write 성공 → "권한 규칙 N건 등록 — 이후 무정지 진행" 1줄 보고 후 계속.
+  4. Write 거부 → 등록 없이 진행하되 "이후 각 단계에서 개별 권한 프롬프트가 뜰 수 있음" 1줄 안내
+     (중단하지 않음 — 승인 여부는 사용자 선택).
+
+**등록 규칙 (정본 — `/threat-scan-setup` 커맨드도 이 목록을 공유):**
+
+```json
+[
+  "Write(/tmp/tss.*/**)",
+  "Write(//var/folders/**/tss.*/**)",
+  "Write(//private/var/folders/**/tss.*/**)",
+  "Write(*/scanreport-*.json)",
+  "Write(*/scanreport-*.html)",
+  "Bash(mktemp:*)",
+  "Bash(git clone:*)",
+  "Bash(python3:*)",
+  "Bash(ls:*)",
+  "Bash(test:*)",
+  "Bash(wc:*)",
+  "Bash(rm -rf /tmp/tss.*)"
+]
+```
+
+> 효력 검증은 아래 Phase 0(b) Write 프로브가 담당한다. 셋업 직후에도 PROBE FAIL이면(신규 allow
+> 규칙이 세션 재시작을 요구하는 런타임) "설정은 등록됨 — 새 세션에서 /threat-scan 재실행" 안내 후 중단.
+
 ### Phase 0 — 소스 준비 + 서브에이전트 Write 프로브 (단계 0 → 1)
 
 **(a) 소스 준비:** `tss-source-handler` 에이전트를 호출한다.
@@ -114,10 +158,9 @@ OUTPUT_PATH: /var/folders/.../tss.a1b2c3d4/step1-repo-indexer.json
 if [ -f "/var/folders/.../tss.a1b2c3d4/step1-repo-indexer.json" ]; then
   echo "PROBE OK: 서브에이전트 Write 정상 — 병렬 배치 진행"
 else
-  echo "PROBE FAIL: 서브에이전트가 파일을 쓰지 못함 (권한 미설정 가능성)"
-  echo "→ .claude/settings.json 의 permissions.allow 에 다음을 추가해야 합니다:"
-  echo '   "Write('"/var/folders/.../tss.a1b2c3d4"'/**)"'
-  echo "   (또는 docs/INSTALLATION.md 의 allow-rule 안내 참조)"
+  echo "PROBE FAIL: 서브에이전트가 파일을 쓰지 못함 (권한 규칙 미적용)"
+  echo "→ Phase 0''에서 규칙을 등록했다면 새 세션에서 /threat-scan 재실행이 필요할 수 있습니다."
+  echo "→ 규칙 미등록 상태라면 /threat-scan-setup 실행 후 재시도하세요."
 fi
 ```
 
@@ -411,6 +454,23 @@ rm -rf "/var/folders/.../tss.a1b2c3d4"   # 실제 SCAN_TMP 값 대입
 
 Claude Desktop에서는 아래 **스캔 순서** 표에 따라 각 `@sub-skill` 을 순서대로 호출한다.
 모든 finding 산출 후 단계 9(병합) → 10(번역) → 11(HTML) 순으로 완주한다.
+
+### AI 에이전트 구성요소 스캔 범위 확인 (단계 1 인덱싱 직후, 1회)
+
+대상 폴더에 AI 에이전트/도구 구성요소(예: `.claude/`, `.cursor/`, `AGENTS.md`, `SKILL.md`,
+`.mcp.json`, `agents/`, `prompts/`, `copilot-instructions.md`)가 있는지 인덱싱 결과에서 확인한다.
+이 항목들은 애플리케이션 소스가 아니라 AI 도구 설정·프롬프트·권한 구성일 수 있어, 스캔 포함
+여부는 사용자가 결정할 사안이다.
+
+- **발견되지 않으면** 아무 질문 없이 그대로 진행한다.
+- **하나 이상 발견되면**, 나머지 분석을 시작하기 전에 사용자에게 대화로 **정확히 1회** 묻는다:
+  "대상에서 AI 에이전트 관련 구성요소(`<발견 목록>`)가 발견되었습니다. 스캔 범위에 포함할까요?
+  (포함 권장 / 제외)". 답을 받은 뒤에는 다시 묻지 않고 완주한다.
+- **제외**를 선택하면 해당 경로의 내용을 분석하지 않고(존재만 인지), 최종 리포트
+  `repository_summary.ai_agent_scope`에 `"excluded"`를, **포함** 시 `"included"`를 기록한다.
+
+> Desktop은 샌드박스라 자동 권한 셋업(Code의 Phase 0'')이 필요 없다 — 파일 생성·셸 실행을
+> 하지 않으므로 권한 게이트 자체가 없다.
 
 ---
 
