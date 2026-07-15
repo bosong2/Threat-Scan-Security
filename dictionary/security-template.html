@@ -119,10 +119,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .code-fix-label{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .cf-before .code-fix-label{color:var(--sev-c-text)}
 .cf-after .code-fix-label{color:var(--sev-l-text)}
-.code-lang{font-family:'SF Mono',Consolas,monospace;font-size:9px;font-weight:600;text-transform:none;letter-spacing:0;background:var(--bg-tertiary);color:var(--text-muted);padding:1px 6px;border-radius:4px}
-.code-block{font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:12px;line-height:1.5;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:pre;color:var(--text-primary);margin:0}
+.code-lang{font-family:'SF Mono',Consolas,monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;background:#252526;color:#9cdcfe;padding:1px 7px;border-radius:4px;border:1px solid #3a3a3a}
+/* v1.4.2: professional dark code-view (VS Code Dark+ palette), smaller font, per-language highlight */
+.code-block{font-family:'JetBrains Mono','SF Mono','Fira Code',Consolas,'Liberation Mono',monospace;font-size:10.5px;line-height:1.55;background:#1e1e1e;border:1px solid #30363d;border-radius:6px;padding:11px 13px;overflow-x:auto;white-space:pre;color:#d4d4d4;margin:0;-moz-tab-size:2;tab-size:2;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+.code-block code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit}
 .cf-before .code-block{border-left:3px solid var(--sev-c-text)}
 .cf-after .code-block{border-left:3px solid var(--sev-l-text)}
+.code-block .tk-key{color:#569cd6}
+.code-block .tk-str{color:#ce9178}
+.code-block .tk-com{color:#6a9955;font-style:italic}
+.code-block .tk-num{color:#b5cea8}
+.code-block .tk-fn{color:#dcdcaa}
+.code-block .tk-prop{color:#9cdcfe}
+.code-block .tk-bool{color:#4fc1ff}
+.code-block .tk-punc{color:#808080}
 .code-fix-note{font-size:12px;color:var(--text-secondary);line-height:1.6;margin-top:6px}
 
 /* BADGES */
@@ -138,6 +148,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .verd-review{background:#FFFBF0;color:#A85C00;border:1px solid #FFE0A0}
 .verd-disable{background:#FFF3EE;color:#C84B2A;border:1px solid #FFD0C0}
 .verd-remove{background:#FFF0F1;color:#C41230;border:1px solid #FFCDD2}
+.verd-unknown{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border)}
 .verdict-badge-lg{font-size:14px!important;padding:5px 16px!important;border-radius:14px!important;letter-spacing:.8px!important}
 .sev-badge-lg{font-size:14px!important;padding:5px 16px!important;border-radius:14px!important;letter-spacing:.6px!important}
 .risk-overall{margin-top:12px;padding:10px 12px;background:var(--bg-primary);border-radius:8px;border:1px solid var(--border-light)}
@@ -185,6 +196,12 @@ button.vuln-link:disabled{opacity:.55;cursor:wait}
 .osv-modal-link:hover{text-decoration:underline}
 @media(max-width:480px){.osv-modal{max-width:100%;max-height:90vh}.osv-modal-item{flex-direction:column;align-items:flex-start;gap:4px}.osv-modal-link{margin-left:0}}
 .status-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border)}
+.ctag-row{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 2px}
+.ctag{display:inline-flex;align-items:center;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;cursor:default;color:#fff}
+.ctag-kisa{background:#3a7bd5}
+.ctag-ai{background:#8a5cd6}
+.ctag-ta{background:#2ea860}
+.ctag-unknown{background:#5a6173}
 .cve-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 
 /* REPO SUMMARY */
@@ -425,6 +442,41 @@ function sevClass(s){
   return 'info';
 }
 
+// v2.5.0: display-normalize legacy Korean / invented enum values → canonical English.
+// enum 값은 스키마상 영문 원문이 정본이나, 구버전 리포트엔 한글 enum이 섞여 있다.
+// 표시 계층에서 정규화해 어떤 데이터가 와도 항상 동일 표기·스타일로 렌더한다(하위호환).
+var ENUM_DISPLAY={
+  '심각':'Critical','높음':'High','중간':'Medium','낮음':'Low','정보':'Info',
+  '확인됨':'Confirmed','완화됨':'Mitigated','미확인':'Unconfirmed','미해결':'Unresolved',
+  '거짓 양성':'False Positive','오탐':'False Positive','검증 필요':'Needs Verification',
+  '잠재적 위험':'Potential Risk',
+  '제거':'REMOVE','비활성화':'DISABLE','검토':'REVIEW','검토_필요':'REVIEW','검토 필요':'REVIEW',
+  '설치_가능':'INSTALL_OK','설치 가능':'INSTALL_OK'
+};
+function canonEnum(v){
+  if(v===null||v===undefined) return v;
+  var s=String(v).trim();
+  return ENUM_DISPLAY[s]||s;
+}
+
+// v2.5.0 compliance tag badges — namespace-colored, tooltip = control name in report language.
+var COMPLIANCE_CONTROLS={"#KISA-1_1":{"en":"SQL Injection","ko":"SQL 삽입"},"#KISA-1_2":{"en":"Code Injection","ko":"코드 삽입"},"#KISA-1_3":{"en":"Path Traversal / Resource Injection","ko":"경로 조작 및 자원 삽입"},"#KISA-1_4":{"en":"Cross-Site Scripting","ko":"크로스사이트 스크립트"},"#KISA-1_5":{"en":"OS Command Injection","ko":"운영체제 명령어 삽입"},"#KISA-1_6":{"en":"Dangerous File Upload","ko":"위험한 형식 파일 업로드"},"#KISA-1_7":{"en":"Open Redirect","ko":"신뢰되지 않는 URL 주소로 자동접속 연결"},"#KISA-1_8":{"en":"XML External Entity (XXE)","ko":"XML 외부 개체(XXE)"},"#KISA-1_9":{"en":"XPath/XQuery Injection","ko":"XPath/XQuery 삽입"},"#KISA-1_10":{"en":"LDAP Injection","ko":"LDAP 삽입"},"#KISA-1_11":{"en":"Cross-Site Request Forgery","ko":"크로스사이트 요청 위조(CSRF)"},"#KISA-1_12":{"en":"Server-Side Request Forgery","ko":"서버사이드 요청 위조(SSRF)"},"#KISA-1_13":{"en":"HTTP Response Splitting","ko":"HTTP 응답 분할"},"#KISA-1_14":{"en":"Integer Overflow","ko":"정수형 오버플로우"},"#KISA-1_15":{"en":"Security Decision on Untrusted Input","ko":"신뢰되지 않는 입력값에 의존한 보안 결정"},"#KISA-1_16":{"en":"Buffer Overflow","ko":"포맷 스트링/버퍼 오버플로우"},"#KISA-1_17":{"en":"Format String","ko":"포맷 스트링 삽입"},"#KISA-2_1":{"en":"Missing Authentication for Critical Function","ko":"적절한 인증 없는 중요기능 허용"},"#KISA-2_2":{"en":"Improper Authorization (IDOR)","ko":"부적절한 인가(접근권한 미검증)"},"#KISA-2_3":{"en":"Improper Permission Assignment","ko":"부적절한 권한 설정"},"#KISA-2_4":{"en":"Use of Weak Cryptographic Algorithm","ko":"취약한 암호화 알고리즘 사용"},"#KISA-2_5":{"en":"Cleartext Storage/Transmission of Sensitive Data","ko":"중요정보 평문 저장/전송"},"#KISA-2_6":{"en":"Use of Hardcoded Credentials","ko":"하드코딩된 중요정보"},"#KISA-2_7":{"en":"Inadequate Encryption Strength","ko":"충분하지 않은 키 길이 사용"},"#KISA-2_8":{"en":"Use of Insufficiently Random Values","ko":"적절하지 않은 난수값 사용"},"#KISA-2_9":{"en":"Weak Password Requirements","ko":"취약한 비밀번호 허용"},"#KISA-2_10":{"en":"Improper Verification of Signature","ko":"부적절한 전자서명 검증"},"#KISA-2_11":{"en":"Improper Certificate Validation","ko":"부적절한 인증서 유효성 검증"},"#KISA-2_12":{"en":"Sensitive Data in Readable Cookie","ko":"쿠키를 통한 정보 노출"},"#KISA-2_13":{"en":"Sensitive Information in Comments","ko":"주석문 안에 포함된 중요정보"},"#KISA-2_14":{"en":"Use of Unsalted/Fast Hash","ko":"솔트 없이 일방향 해시함수 사용"},"#KISA-2_15":{"en":"Download of Code Without Integrity Check","ko":"무결성 검사 없는 코드 다운로드"},"#KISA-2_16":{"en":"Missing Brute-Force Protection","ko":"반복된 인증시도 제한 기능 부재"},"#KISA-3_1":{"en":"Race Condition (TOCTOU)","ko":"경쟁조건(TOCTOU)"},"#KISA-3_2":{"en":"Uncontrolled Resource Consumption (ReDoS)","ko":"제어되지 않는 자원 소비(ReDoS)"},"#KISA-4_1":{"en":"Information Exposure Through Error Message","ko":"오류 메시지를 통한 정보 노출"},"#KISA-4_2":{"en":"Improper Check of Return Value","ko":"오류 상황 대응 부재(반환값 미확인)"},"#KISA-4_3":{"en":"Improper Exception Handling","ko":"부적절한 예외 처리"},"#KISA-5_1":{"en":"Null Pointer Dereference","ko":"널 포인터 역참조"},"#KISA-5_2":{"en":"Resource Leak","ko":"부적절한 자원 해제"},"#KISA-5_3":{"en":"Use After Free","ko":"해제 후 사용"},"#KISA-5_4":{"en":"Use of Uninitialized Variable","ko":"초기화되지 않은 변수 사용"},"#KISA-5_5":{"en":"Deserialization of Untrusted Data","ko":"신뢰되지 않는 데이터 역직렬화"},"#KISA-6_1":{"en":"Sensitive Data Leak Between Sessions","ko":"세션 간 정보 노출"},"#KISA-6_2":{"en":"Debug/Test Code Left in Production","ko":"제거되지 않은 디버그 코드"},"#KISA-6_3":{"en":"Exposure of Internal Mutable Reference","ko":"Private 배열/참조 노출"},"#KISA-6_4":{"en":"Storing External Mutable Reference","ko":"외부 참조 내부 저장"},"#KISA-7_1":{"en":"Reliance on DNS/Hostname for Security","ko":"DNS lookup을 통한 보안결정"},"#KISA-7_2":{"en":"Use of Deprecated/Vulnerable API or Dependency","ko":"취약한 API/의존성 사용"},"#AILLM-8_1":{"en":"Prompt Injection (Direct)","ko":"프롬프트 인젝션(직접)"},"#AILLM-8_2":{"en":"Indirect Prompt Injection","ko":"간접 프롬프트 인젝션"},"#AILLM-8_3":{"en":"Trusting LLM Output","ko":"LLM 출력 무검증 신뢰"},"#AILLM-8_4":{"en":"Sensitive Data in Context","ko":"컨텍스트 내 민감정보 노출"},"#AILLM-8_5":{"en":"Unbounded Output / Cost DoS","ko":"무제한 출력/비용 DoS"},"#AILLM-8_6":{"en":"Missing LLM Audit Logging","ko":"LLM 감사 로깅 부재"},"#AILLM-8_7":{"en":"Excessive Agency","ko":"과도한 에이전트 권한"},"#AILLM-8_8":{"en":"Vector & Embedding Weaknesses","ko":"벡터/임베딩 취약점"},"#AILLM-8_9":{"en":"AI Supply Chain","ko":"AI 공급망 위험"},"#TA-T_A1":{"en":"Network Segmentation / Least-Privilege Firewall","ko":"네트워크 분리/최소권한 방화벽"},"#TA-T_C3":{"en":"Config Change Tracked via IaC","ko":"IaC 기반 형상관리"},"#TA-T_D1":{"en":"TLS >= 1.2, Weak Ciphers Disabled","ko":"TLS 1.2+ / 취약 암호 비활성화"},"#TA-T_D2":{"en":"Encryption at Rest","ko":"저장 데이터 암호화"},"#TA-T_D3":{"en":"KMS / Secret Manager Usage","ko":"KMS/시크릿 매니저 사용"},"#TA-T_E1":{"en":"Security Event Logging & Tamper Protection","ko":"보안 이벤트 로깅/변조 방지"},"#TA-T_I1":{"en":"Prod/Dev Account Separation","ko":"운영/개발 계정 분리"},"#TA-T_I2":{"en":"Container Image Signing/Scanning, Runtime Least Privilege","ko":"컨테이너 이미지 서명/스캔·최소권한"},"#TA-T_I3":{"en":"Public Buckets / Over-Permissive Policies","ko":"공개 버킷/과도한 권한 정책"},"#TA-A_B1":{"en":"OSS/Third-Party SCA Management","ko":"OSS/서드파티 SCA 관리"}};
+function complianceBadges(f){
+  var tags=f && f.compliance_tags;
+  if(!Array.isArray(tags)||!tags.length) return '';   // 부재·빈배열 → 배지 행 없음
+  var lang=(typeof currentLang!=='undefined'&&currentLang==='ko')?'ko':'en';
+  var out=tags.map(function(t){
+    var s=String(t);
+    var ns=(s.match(/^#(KISA|AILLM|TA)-/)||[])[1]||'';
+    var cls={KISA:'ctag-kisa',AILLM:'ctag-ai',TA:'ctag-ta'}[ns]||'ctag-unknown';
+    var meta=COMPLIANCE_CONTROLS[s];
+    var title=meta?(meta[lang]||meta.en||''):'';
+    return '<span class="ctag '+cls+'"'+(title?' title="'+esc(title)+'"':'')+'>'+esc(s)+'</span>';
+  }).join('');
+  return '<div class="ctag-row">'+out+'</div>';
+}
+
+
 function sevColor(s){
   var c=sevClass(s);
   var m={critical:'#C41230',high:'#C84B2A',medium:'#A85C00',low:'#157A3A',info:'#1E67C6'};
@@ -566,13 +618,17 @@ function cveLink(cve){
 
 function sevBadge(s){
   if(!s) return '';
-  return '<span class="severity-badge sev-'+esc(sevClass(s))+'">'+esc(s)+'</span>';
+  var d=canonEnum(s);
+  return '<span class="severity-badge sev-'+esc(sevClass(s))+'">'+esc(d)+'</span>';
 }
 
 function verdictBadge(v,extraCls){
   if(v===null||v===undefined||v==='') return '';
-  var cls=String(v).toLowerCase();
-  return '<span class="verdict-badge verd-'+esc(cls)+(extraCls?' '+extraCls:'')+'">'+esc(v)+'</span>';
+  var d=canonEnum(v);
+  var known={'install_ok':1,'review':1,'disable':1,'remove':1};
+  var cls=String(d).toLowerCase();
+  if(!known[cls]) cls='unknown';   // v2.5.0: 미지 verdict도 배지 스타일 누락 없이 렌더
+  return '<span class="verdict-badge verd-'+esc(cls)+(extraCls?' '+extraCls:'')+'">'+esc(d)+'</span>';
 }
 
 function meffBadge(e){
@@ -879,8 +935,9 @@ function findingCard(f, extraMeta, extraBody){
       '<span class="finding-title">'+esc(f.issue||f.title||'')+'</span>'+
       sevBadge(f.severity)+
       verdictBadge(f.verdict)+
-      (f.status?'<span class="status-badge">'+esc(f.status)+'</span>':'')+
+      (f.status?'<span class="status-badge">'+esc(canonEnum(f.status))+'</span>':'')+
     '</div>'+
+    complianceBadges(f)+
     '<div class="finding-meta">'+
       (f.file?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('file')+':</span><code>'+esc(f.file)+'</code></div>':'')+
       (f.line?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('line')+':</span><code>'+esc(String(f.line))+'</code></div>':'')+
@@ -911,13 +968,61 @@ function detailPre(title, content){
   return '<div class="finding-detail"><div class="finding-detail-title">'+esc(title)+'</div><div class="finding-detail-content dd-pre">'+esc(content)+'</div></div>';
 }
 
-// Render a single labeled code block. Code is esc()'d so quotes/<>/& are safe.
+// v1.4.2: self-contained, dependency-free syntax highlighter (offline/deterministic).
+// Emits token <span>s; falls back to plain-escaped text for unknown languages.
+// NOTE: highlighting only — never reformats/reindents the code (the fix must stay verbatim).
+function hlEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+var HL_KW={
+  js:{'const':1,'let':1,'var':1,'function':1,'return':1,'if':1,'else':1,'for':1,'while':1,'do':1,'switch':1,'case':1,'break':1,'continue':1,'new':1,'class':1,'extends':1,'super':1,'this':1,'typeof':1,'instanceof':1,'in':1,'of':1,'await':1,'async':1,'yield':1,'try':1,'catch':1,'finally':1,'throw':1,'import':1,'from':1,'export':1,'default':1,'delete':1,'void':1,'static':1,'get':1,'set':1,'public':1,'private':1,'protected':1,'readonly':1,'interface':1,'type':1,'enum':1,'implements':1,'as':1,'namespace':1,'declare':1,'abstract':1,'satisfies':1,'keyof':1,'infer':1},
+  py:{'def':1,'return':1,'if':1,'elif':1,'else':1,'for':1,'while':1,'break':1,'continue':1,'class':1,'import':1,'from':1,'as':1,'with':1,'try':1,'except':1,'finally':1,'raise':1,'pass':1,'lambda':1,'yield':1,'global':1,'nonlocal':1,'assert':1,'del':1,'in':1,'is':1,'not':1,'and':1,'or':1,'async':1,'await':1,'self':1},
+  sh:{'if':1,'then':1,'else':1,'elif':1,'fi':1,'for':1,'while':1,'do':1,'done':1,'case':1,'esac':1,'function':1,'return':1,'local':1,'export':1,'in':1,'set':1,'unset':1,'echo':1,'source':1,'exit':1}
+};
+var HL_LIT={'true':1,'false':1,'null':1,'undefined':1,'NaN':1,'Infinity':1,'None':1,'True':1,'False':1};
+function hlLang(lang){
+  var l=String(lang||'').toLowerCase();
+  if(/^(ts|tsx|js|jsx|javascript|typescript|json|jsonc|node)/.test(l)) return 'js';
+  if(/^(py|python)/.test(l)) return 'py';
+  if(/^(sh|bash|shell|zsh|console|shellscript)/.test(l)) return 'sh';
+  return '';
+}
+function highlightCode(raw, lang){
+  var lk=hlLang(lang);
+  if(lk==='') return hlEsc(raw); // unknown language: dark theme, no tokenization
+  var kw=HL_KW[lk]||{};
+  var reStr = (lk==='js')
+    ? "(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*)|(`(?:\\\\.|[^`\\\\])*`|\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*')|(\\b0[xX][0-9a-fA-F]+\\b|\\b\\d[\\d_]*(?:\\.\\d+)?\\b)|([A-Za-z_$][\\w$]*)|(\\s+)|([\\s\\S])"
+    : "(#[^\\n]*)|(\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*')|(\\b\\d[\\d_]*(?:\\.\\d+)?\\b)|([A-Za-z_$][\\w$]*)|(\\s+)|([\\s\\S])";
+  var re=new RegExp(reStr,'g'), out='', m, lastNonSpace='';
+  while((m=re.exec(raw))!==null){
+    var tok=m[0];
+    var gCom=m[1], gStr=m[2], gNum=m[3], gId=m[4], gWs=m[5];
+    if(gCom){ out+='<span class="tk-com">'+hlEsc(tok)+'</span>'; }
+    else if(gStr){ out+='<span class="tk-str">'+hlEsc(tok)+'</span>'; }
+    else if(gNum){ out+='<span class="tk-num">'+hlEsc(tok)+'</span>'; }
+    else if(gId){
+      var isProp=(lastNonSpace==='.');
+      var isCall=/^\s*\(/.test(raw.slice(re.lastIndex));
+      if(kw[tok] && !isProp) out+='<span class="tk-key">'+hlEsc(tok)+'</span>';
+      else if(HL_LIT[tok] && !isProp) out+='<span class="tk-bool">'+hlEsc(tok)+'</span>';
+      else if(isCall) out+='<span class="tk-fn">'+hlEsc(tok)+'</span>';
+      else if(isProp) out+='<span class="tk-prop">'+hlEsc(tok)+'</span>';
+      else out+=hlEsc(tok);
+    }
+    else if(gWs){ out+=tok; }
+    else { out+='<span class="tk-punc">'+hlEsc(tok)+'</span>'; }
+    if(!gWs && tok) lastNonSpace=tok.charAt(tok.length-1);
+    if(re.lastIndex===m.index) re.lastIndex++; // zero-width safety
+  }
+  return out;
+}
+
+// Render a single labeled code block. Code is syntax-highlighted (values HTML-escaped inside).
 function codeBlock(label, code, lang, kind){
   if(code===undefined||code===null||code==='') return '';
   var tag=(lang?'<span class="code-lang">'+esc(lang)+'</span>':'');
   return '<div class="code-fix-block '+(kind||'')+'">'+
     '<div class="code-fix-label">'+esc(label)+tag+'</div>'+
-    '<pre class="code-block"><code>'+esc(code)+'</code></pre>'+
+    '<pre class="code-block"><code>'+highlightCode(code,lang)+'</code></pre>'+
   '</div>';
 }
 
@@ -1003,6 +1108,7 @@ function renderRelationship(arr){
         sevBadge(f.severity)+
         verdictBadge(f.verdict)+
       '</div>'+
+      complianceBadges(f)+
       ((src||tgt)?
       '<div class="edge-path">'+
         srcChip+
@@ -1100,16 +1206,16 @@ function renderSbom(sbom){
     body+='<table class="risk-matrix">'+
       '<thead><tr><th></th><th style="color:var(--sev-c-text)">'+t('critical')+'</th><th style="color:var(--sev-h-text)">'+t('high')+'</th><th style="color:var(--sev-m-text)">'+t('medium')+'</th><th style="color:var(--sev-l-text)">'+t('low')+'</th></tr></thead>'+
       '<tbody>'+
-      (matrix.vulnerabilities?mrow(t('vulns'),matrix.vulnerabilities):'')+
-      (matrix.license_issues?mrow(t('licenseIssues'),matrix.license_issues):'')+
-      (matrix.version_risks?mrow(t('versionRisks'),matrix.version_risks):'')+
-      (matrix.supply_chain?mrow(t('supplyChain'),matrix.supply_chain):'')+
+      (matrix.vulnerabilities?mrow('Vulnerabilities',matrix.vulnerabilities):'')+
+      (matrix.license_issues?mrow('License Issues',matrix.license_issues):'')+
+      (matrix.version_risks?mrow('Version Risks',matrix.version_risks):'')+
+      (matrix.supply_chain?mrow('Supply Chain Risks',matrix.supply_chain):'')+
       '</tbody></table>';
   }
 
   // Priority actions
   if(pa.length){
-    body+='<div style="font-weight:700;font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:0 0 8px">🎯 '+t('priorityActions')+'</div>'+
+    body+='<div style="font-weight:700;font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:0 0 8px">🎯 '+'Priority Actions'+'</div>'+
     pa.map(function(a){
       return '<div class="priority-action">'+
         '<div class="priority-rank">'+esc(String(a.rank||'?'))+'</div>'+
@@ -1127,9 +1233,10 @@ function renderSbom(sbom){
   }
 
   // Sub-findings
-  if(vf.length) body+=subSection('🔓',t('vulns'),vf.length)+vf.map(function(f){
+  if(vf.length) body+=subSection('🔓','Vulnerabilities',vf.length)+vf.map(function(f){
     return '<div class="finding-card">'+
-      '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+'@'+esc(f.version||'')+'</span>'+sevBadge(f.severity)+(f.confidence?'<span class="status-badge">'+esc(f.confidence)+'</span>':'')+'</div>'+
+      '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+'@'+esc(f.version||'')+'</span>'+sevBadge(f.severity)+(f.confidence?'<span class="status-badge">'+esc(canonEnum(f.confidence))+'</span>':'')+'</div>'+
+      complianceBadges(f)+
       '<div class="finding-meta">'+
         (f.file?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('file')+':</span><code>'+esc(f.file)+'</code></div>':'')+
         (f.fixed_version?'<div class="finding-meta-item"><span class="finding-meta-label">'+t('fixedVer')+':</span><code style="color:var(--accent)">'+esc(f.fixed_version)+'</code></div>':'')+
@@ -1141,7 +1248,7 @@ function renderSbom(sbom){
     '</div>';
   }).join('');
 
-  if(lf.length) body+=subSection('⚖️',t('licenseIssues'),lf.length)+lf.map(function(f){
+  if(lf.length) body+=subSection('⚖️','License Issues',lf.length)+lf.map(function(f){
     return '<div class="finding-card">'+
       '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+' — '+esc(f.license||'')+'</span>'+sevBadge(f.severity)+'</div>'+
       (f.issue?'<div class="finding-description">'+esc(f.issue)+'</div>':'')+
@@ -1149,7 +1256,7 @@ function renderSbom(sbom){
     '</div>';
   }).join('');
 
-  if(vrf.length) body+=subSection('📌',t('versionRisks'),vrf.length)+vrf.map(function(f){
+  if(vrf.length) body+=subSection('📌','Version Risks',vrf.length)+vrf.map(function(f){
     return '<div class="finding-card">'+
       '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+' — '+esc(f.issue||'')+'</span>'+sevBadge(f.severity)+'</div>'+
       (f.current_version?'<div class="finding-meta"><div class="finding-meta-item"><span class="finding-meta-label">'+t('currentVer')+':</span><code>'+esc(f.current_version)+'</code></div></div>':'')+
@@ -1157,7 +1264,7 @@ function renderSbom(sbom){
     '</div>';
   }).join('');
 
-  if(scf.length) body+=subSection('🔗',t('supplyChain'),scf.length)+scf.map(function(f){
+  if(scf.length) body+=subSection('🔗','Supply Chain Risks',scf.length)+scf.map(function(f){
     return '<div class="finding-card">'+
       '<div class="finding-header"><span class="finding-id">'+esc(f.id||'')+'</span><span class="finding-title">'+esc(f.package||'')+' — '+esc(f.risk_type||'')+'</span>'+sevBadge(f.severity)+'</div>'+
       (f.detail?'<div class="finding-description">'+esc(f.detail)+'</div>':'')+
@@ -1180,7 +1287,7 @@ function renderRecs(arr){
     var head='<div class="rec-head">'+
       (r.id?'<span class="rec-id">'+esc(r.id)+'</span>':'')+
       (r.rank!==undefined&&r.rank!==null&&r.rank!==''?'<span class="rec-rank">#'+esc(String(r.rank))+'</span>':'')+
-      (r.priority!==undefined&&r.priority!==null&&r.priority!==''?'<span class="rec-prio-badge sev-'+esc(pc)+'">'+t('priority')+': '+esc(String(r.priority))+'</span>':'')+
+      (r.priority!==undefined&&r.priority!==null&&r.priority!==''?'<span class="rec-prio-badge sev-'+esc(pc)+'">'+t('priority')+': '+esc(canonEnum(r.priority))+'</span>':'')+
     '</div>';
     // finding_ids → clickable chips that jump to the referenced finding card
     var refs='';
@@ -1315,6 +1422,7 @@ function renderReport(report){
     renderScanMeta(meta)+
     renderSummary(report)+
     renderRepoSummary(data.repository_summary)+
+    renderRecs(data.recommendations)+          /* v2.5.0: 권장 조치를 리포지토리 요약 직후로 */
     renderStatic(data.static_code_findings)+
     renderBinary(data.binary_analysis_findings)+
     renderSkill(data.skill_risk_findings)+
@@ -1323,8 +1431,7 @@ function renderReport(report){
     renderPrompt(data.prompt_optimization)+
     renderSbom(data.sbom_analysis)+
     renderRelationship(data.relationship_findings)+
-    renderModelValidity(data.model_validity_findings)+
-    renderRecs(data.recommendations);
+    renderModelValidity(data.model_validity_findings);
   document.getElementById('reportContent').style.display='block';
   document.getElementById('emptyState').style.display='none';
   document.getElementById('printBtn').style.display='flex';

@@ -130,6 +130,8 @@ def main(argv=None):
                    help="템플릿 파일 직접 지정 (--profile 무시)")
     p.add_argument("--out", default=None,
                    help="출력 HTML 경로 (기본: 입력과 같은 디렉토리의 <basename>.html)")
+    p.add_argument("--coverage", action="store_true",
+                   help="태그 기반 KISA 카테고리 커버리지 요약을 stdout에 출력 (JSON 미기록)")
     args = p.parse_args(argv)
 
     if not os.path.isfile(args.report):
@@ -159,7 +161,39 @@ def main(argv=None):
     # 오케스트레이터/사용자 안내용 (stdout)
     print("[OK] HTML 리포트 생성: %s (lang=%s, profile=%s, template=%s)"
           % (out_path, args.lang, args.profile, os.path.basename(template_path)))
+
+    if args.coverage:
+        _print_kisa_coverage(report)
     return 0
+
+
+def _print_kisa_coverage(report):
+    """태그에서 KISA §1–§7 카테고리 커버리지를 산출해 stdout에 출력. JSON 미기록."""
+    import re
+    er = report.get("english_report", report)
+    arrays = ["static_code_findings", "binary_analysis_findings", "skill_risk_findings",
+              "agent_policy_findings", "sensitive_patterns", "relationship_findings",
+              "model_validity_findings"]
+    cats = {str(i): 0 for i in range(1, 8)}
+    sbom = er.get("sbom_analysis") or {}
+    pools = [er.get(a, []) or [] for a in arrays]
+    for arr in ("vulnerabilities", "version_risk_findings", "license_issues",
+                "supply_chain_risks", "findings"):
+        pools.append(sbom.get(arr, []) or [])
+    for pool in pools:
+        for f in pool:
+            if not isinstance(f, dict):
+                continue
+            for t in f.get("compliance_tags", []) or []:
+                m = re.match(r"^#KISA-(\d+)_", str(t))
+                if m and m.group(1) in cats:
+                    cats[m.group(1)] += 1
+    names = {"1": "입력 검증", "2": "보안 기능", "3": "시간·상태", "4": "에러 처리",
+             "5": "코드 품질", "6": "캡슐화", "7": "API 오용"}
+    print("\n[KISA Coverage] (태그 기반, 렌더 타임 산출 — JSON 미기록)")
+    for k in sorted(cats):
+        mark = "●" if cats[k] else "○"
+        print("  %s §%s %s: %d findings" % (mark, k, names[k], cats[k]))
 
 
 if __name__ == "__main__":

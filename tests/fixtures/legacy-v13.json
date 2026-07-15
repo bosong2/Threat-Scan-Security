@@ -1,0 +1,11 @@
+{
+  "scan_metadata": {"scanner_version": "Claude Threat Scan V2.3", "repository": "legacy"},
+  "english_report": {
+    "static_code_findings": [
+      {"id": "STATIC-001", "issue": "SQL Injection", "severity": "High", "status": "Confirmed"}
+    ],
+    "recommendations": [
+      {"id": "REC-001", "action": "Use parameterized queries", "priority": "High", "finding_ids": ["STATIC-001"]}
+    ]
+  }
+}

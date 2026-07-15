@@ -1,0 +1,20 @@
+{
+  "scan_metadata": {"scanner_version": "Claude Threat Scan V2.5"},
+  "english_report": {
+    "static_code_findings": [
+      {"id": "STATIC-001", "severity": "High", "compliance_tags": ["#kisa-1_1"]},
+      {"id": "STATIC-002", "severity": "High", "compliance_tags": ["#KISA-1_1", "#KISA-1_1"]},
+      {"id": "STATIC-003", "severity": "High", "compliance_tags": ["#KISA-1_1","#KISA-1_2","#KISA-1_3","#KISA-1_4","#KISA-1_5"]},
+      {"id": "STATIC-004", "severity": "High", "tags": ["#KISA-1_1"]},
+      {"id": "STATIC-005", "severity": "High", "compliance_tags": ["#KISA-9_9"]}
+    ],
+    "recommendations": [
+      {"id": "REC-001", "action": "x", "compliance_tags": ["#KISA-1_1"]}
+    ]
+  },
+  "korean_report": {
+    "static_code_findings": [
+      {"id": "STATIC-001", "severity": "High", "compliance_tags": ["#KISA-2_2"]}
+    ]
+  }
+}

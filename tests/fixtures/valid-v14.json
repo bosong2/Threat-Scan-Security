@@ -1,0 +1,25 @@
+{
+  "scan_metadata": {"scanner_version": "Claude Threat Scan V2.5", "repository": "valid"},
+  "english_report": {
+    "static_code_findings": [
+      {"id": "STATIC-001", "issue": "SQL Injection", "severity": "High", "status": "Confirmed", "compliance_tags": ["#KISA-1_1"]}
+    ],
+    "sensitive_patterns": [
+      {"id": "SENS-001", "masked_value": "AKIA****", "severity": "Critical", "status": "Confirmed", "compliance_tags": ["#KISA-2_6", "#KISA-2_5"]}
+    ],
+    "sbom_analysis": {"version_risk_findings": [
+      {"id": "VULN-001", "package": "lodash", "severity": "High", "compliance_tags": ["#KISA-7_2", "#TA-A_B1"]}
+    ]}
+  },
+  "korean_report": {
+    "static_code_findings": [
+      {"id": "STATIC-001", "issue": "SQL 삽입", "severity": "High", "status": "Confirmed", "compliance_tags": ["#KISA-1_1"]}
+    ],
+    "sensitive_patterns": [
+      {"id": "SENS-001", "masked_value": "AKIA****", "severity": "Critical", "status": "Confirmed", "compliance_tags": ["#KISA-2_6", "#KISA-2_5"]}
+    ],
+    "sbom_analysis": {"version_risk_findings": [
+      {"id": "VULN-001", "package": "lodash", "severity": "High", "compliance_tags": ["#KISA-7_2", "#TA-A_B1"]}
+    ]}
+  }
+}

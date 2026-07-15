@@ -11,7 +11,10 @@
       "OWASP",
       "KISA 정보보호 용어"
     ],
-    "supported_languages": ["en", "ko"],
+    "supported_languages": [
+      "en",
+      "ko"
+    ],
     "total_terms": 250
   },
   "categories": {
@@ -1175,5 +1178,279 @@
       },
       "source": "Threat-scan-security v2.1.0"
     }
-  ]
+  ],
+  "compliance_controls": {
+    "#KISA-1_1": {
+      "en": "SQL Injection",
+      "ko": "SQL 삽입"
+    },
+    "#KISA-1_2": {
+      "en": "Code Injection",
+      "ko": "코드 삽입"
+    },
+    "#KISA-1_3": {
+      "en": "Path Traversal / Resource Injection",
+      "ko": "경로 조작 및 자원 삽입"
+    },
+    "#KISA-1_4": {
+      "en": "Cross-Site Scripting",
+      "ko": "크로스사이트 스크립트"
+    },
+    "#KISA-1_5": {
+      "en": "OS Command Injection",
+      "ko": "운영체제 명령어 삽입"
+    },
+    "#KISA-1_6": {
+      "en": "Dangerous File Upload",
+      "ko": "위험한 형식 파일 업로드"
+    },
+    "#KISA-1_7": {
+      "en": "Open Redirect",
+      "ko": "신뢰되지 않는 URL 주소로 자동접속 연결"
+    },
+    "#KISA-1_8": {
+      "en": "XML External Entity (XXE)",
+      "ko": "XML 외부 개체(XXE)"
+    },
+    "#KISA-1_9": {
+      "en": "XPath/XQuery Injection",
+      "ko": "XPath/XQuery 삽입"
+    },
+    "#KISA-1_10": {
+      "en": "LDAP Injection",
+      "ko": "LDAP 삽입"
+    },
+    "#KISA-1_11": {
+      "en": "Cross-Site Request Forgery",
+      "ko": "크로스사이트 요청 위조(CSRF)"
+    },
+    "#KISA-1_12": {
+      "en": "Server-Side Request Forgery",
+      "ko": "서버사이드 요청 위조(SSRF)"
+    },
+    "#KISA-1_13": {
+      "en": "HTTP Response Splitting",
+      "ko": "HTTP 응답 분할"
+    },
+    "#KISA-1_14": {
+      "en": "Integer Overflow",
+      "ko": "정수형 오버플로우"
+    },
+    "#KISA-1_15": {
+      "en": "Security Decision on Untrusted Input",
+      "ko": "신뢰되지 않는 입력값에 의존한 보안 결정"
+    },
+    "#KISA-1_16": {
+      "en": "Buffer Overflow",
+      "ko": "포맷 스트링/버퍼 오버플로우"
+    },
+    "#KISA-1_17": {
+      "en": "Format String",
+      "ko": "포맷 스트링 삽입"
+    },
+    "#KISA-2_1": {
+      "en": "Missing Authentication for Critical Function",
+      "ko": "적절한 인증 없는 중요기능 허용"
+    },
+    "#KISA-2_2": {
+      "en": "Improper Authorization (IDOR)",
+      "ko": "부적절한 인가(접근권한 미검증)"
+    },
+    "#KISA-2_3": {
+      "en": "Improper Permission Assignment",
+      "ko": "부적절한 권한 설정"
+    },
+    "#KISA-2_4": {
+      "en": "Use of Weak Cryptographic Algorithm",
+      "ko": "취약한 암호화 알고리즘 사용"
+    },
+    "#KISA-2_5": {
+      "en": "Cleartext Storage/Transmission of Sensitive Data",
+      "ko": "중요정보 평문 저장/전송"
+    },
+    "#KISA-2_6": {
+      "en": "Use of Hardcoded Credentials",
+      "ko": "하드코딩된 중요정보"
+    },
+    "#KISA-2_7": {
+      "en": "Inadequate Encryption Strength",
+      "ko": "충분하지 않은 키 길이 사용"
+    },
+    "#KISA-2_8": {
+      "en": "Use of Insufficiently Random Values",
+      "ko": "적절하지 않은 난수값 사용"
+    },
+    "#KISA-2_9": {
+      "en": "Weak Password Requirements",
+      "ko": "취약한 비밀번호 허용"
+    },
+    "#KISA-2_10": {
+      "en": "Improper Verification of Signature",
+      "ko": "부적절한 전자서명 검증"
+    },
+    "#KISA-2_11": {
+      "en": "Improper Certificate Validation",
+      "ko": "부적절한 인증서 유효성 검증"
+    },
+    "#KISA-2_12": {
+      "en": "Sensitive Data in Readable Cookie",
+      "ko": "쿠키를 통한 정보 노출"
+    },
+    "#KISA-2_13": {
+      "en": "Sensitive Information in Comments",
+      "ko": "주석문 안에 포함된 중요정보"
+    },
+    "#KISA-2_14": {
+      "en": "Use of Unsalted/Fast Hash",
+      "ko": "솔트 없이 일방향 해시함수 사용"
+    },
+    "#KISA-2_15": {
+      "en": "Download of Code Without Integrity Check",
+      "ko": "무결성 검사 없는 코드 다운로드"
+    },
+    "#KISA-2_16": {
+      "en": "Missing Brute-Force Protection",
+      "ko": "반복된 인증시도 제한 기능 부재"
+    },
+    "#KISA-3_1": {
+      "en": "Race Condition (TOCTOU)",
+      "ko": "경쟁조건(TOCTOU)"
+    },
+    "#KISA-3_2": {
+      "en": "Uncontrolled Resource Consumption (ReDoS)",
+      "ko": "제어되지 않는 자원 소비(ReDoS)"
+    },
+    "#KISA-4_1": {
+      "en": "Information Exposure Through Error Message",
+      "ko": "오류 메시지를 통한 정보 노출"
+    },
+    "#KISA-4_2": {
+      "en": "Improper Check of Return Value",
+      "ko": "오류 상황 대응 부재(반환값 미확인)"
+    },
+    "#KISA-4_3": {
+      "en": "Improper Exception Handling",
+      "ko": "부적절한 예외 처리"
+    },
+    "#KISA-5_1": {
+      "en": "Null Pointer Dereference",
+      "ko": "널 포인터 역참조"
+    },
+    "#KISA-5_2": {
+      "en": "Resource Leak",
+      "ko": "부적절한 자원 해제"
+    },
+    "#KISA-5_3": {
+      "en": "Use After Free",
+      "ko": "해제 후 사용"
+    },
+    "#KISA-5_4": {
+      "en": "Use of Uninitialized Variable",
+      "ko": "초기화되지 않은 변수 사용"
+    },
+    "#KISA-5_5": {
+      "en": "Deserialization of Untrusted Data",
+      "ko": "신뢰되지 않는 데이터 역직렬화"
+    },
+    "#KISA-6_1": {
+      "en": "Sensitive Data Leak Between Sessions",
+      "ko": "세션 간 정보 노출"
+    },
+    "#KISA-6_2": {
+      "en": "Debug/Test Code Left in Production",
+      "ko": "제거되지 않은 디버그 코드"
+    },
+    "#KISA-6_3": {
+      "en": "Exposure of Internal Mutable Reference",
+      "ko": "Private 배열/참조 노출"
+    },
+    "#KISA-6_4": {
+      "en": "Storing External Mutable Reference",
+      "ko": "외부 참조 내부 저장"
+    },
+    "#KISA-7_1": {
+      "en": "Reliance on DNS/Hostname for Security",
+      "ko": "DNS lookup을 통한 보안결정"
+    },
+    "#KISA-7_2": {
+      "en": "Use of Deprecated/Vulnerable API or Dependency",
+      "ko": "취약한 API/의존성 사용"
+    },
+    "#AILLM-8_1": {
+      "en": "Prompt Injection (Direct)",
+      "ko": "프롬프트 인젝션(직접)"
+    },
+    "#AILLM-8_2": {
+      "en": "Indirect Prompt Injection",
+      "ko": "간접 프롬프트 인젝션"
+    },
+    "#AILLM-8_3": {
+      "en": "Trusting LLM Output",
+      "ko": "LLM 출력 무검증 신뢰"
+    },
+    "#AILLM-8_4": {
+      "en": "Sensitive Data in Context",
+      "ko": "컨텍스트 내 민감정보 노출"
+    },
+    "#AILLM-8_5": {
+      "en": "Unbounded Output / Cost DoS",
+      "ko": "무제한 출력/비용 DoS"
+    },
+    "#AILLM-8_6": {
+      "en": "Missing LLM Audit Logging",
+      "ko": "LLM 감사 로깅 부재"
+    },
+    "#AILLM-8_7": {
+      "en": "Excessive Agency",
+      "ko": "과도한 에이전트 권한"
+    },
+    "#AILLM-8_8": {
+      "en": "Vector & Embedding Weaknesses",
+      "ko": "벡터/임베딩 취약점"
+    },
+    "#AILLM-8_9": {
+      "en": "AI Supply Chain",
+      "ko": "AI 공급망 위험"
+    },
+    "#TA-T_A1": {
+      "en": "Network Segmentation / Least-Privilege Firewall",
+      "ko": "네트워크 분리/최소권한 방화벽"
+    },
+    "#TA-T_C3": {
+      "en": "Config Change Tracked via IaC",
+      "ko": "IaC 기반 형상관리"
+    },
+    "#TA-T_D1": {
+      "en": "TLS >= 1.2, Weak Ciphers Disabled",
+      "ko": "TLS 1.2+ / 취약 암호 비활성화"
+    },
+    "#TA-T_D2": {
+      "en": "Encryption at Rest",
+      "ko": "저장 데이터 암호화"
+    },
+    "#TA-T_D3": {
+      "en": "KMS / Secret Manager Usage",
+      "ko": "KMS/시크릿 매니저 사용"
+    },
+    "#TA-T_E1": {
+      "en": "Security Event Logging & Tamper Protection",
+      "ko": "보안 이벤트 로깅/변조 방지"
+    },
+    "#TA-T_I1": {
+      "en": "Prod/Dev Account Separation",
+      "ko": "운영/개발 계정 분리"
+    },
+    "#TA-T_I2": {
+      "en": "Container Image Signing/Scanning, Runtime Least Privilege",
+      "ko": "컨테이너 이미지 서명/스캔·최소권한"
+    },
+    "#TA-T_I3": {
+      "en": "Public Buckets / Over-Permissive Policies",
+      "ko": "공개 버킷/과도한 권한 정책"
+    },
+    "#TA-A_B1": {
+      "en": "OSS/Third-Party SCA Management",
+      "ko": "OSS/서드파티 SCA 관리"
+    }
+  }
 }
