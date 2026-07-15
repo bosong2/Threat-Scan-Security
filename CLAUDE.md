@@ -54,6 +54,8 @@ scripts/                   ← generate_html_report.py (양 모드 공유)
 
 Code Plugin 섹션을 수정할 때 Desktop 섹션을 오염시키면 **BUG-02(Dual-mode 교차 오염)**가 재발한다. 두 섹션의 경계를 지킬 것.
 
+**Desktop parity (v2.5.1 — TS-2.5.1 재발 방지):** Desktop은 결정론 강제를 단계 0(`enumerate_tree.py` 파일 열거)과 단계 11(`validate_report_schema.py` + `validate_compliance_tags.py` 게이트)에서 수행한다. 스키마·계약을 바꿀 때는 오케스트레이터 **공유부의 단계별 출력 계약 카드와 스키마 참조 목록을 반드시 함께 갱신**할 것 — v2.5.0에서 Code만 강화하고 Desktop 앵커(스키마 V1.3 잔존·번역 규칙 역전)를 갱신하지 않아 Desktop 품질 회귀(TS-2.5.1)가 발생했다. Code 한쪽만 강화하면 Desktop이 조용히 드리프트한다.
+
 **오케스트레이터가 에이전트(Agent)가 아니라 스킬(Skill)인 이유:** Claude Code에서 서브에이전트는 다른 서브에이전트를 호출할 수 없다. 오케스트레이터를 스킬로 두고 `allowed-tools: Agent(tss-*)` frontmatter로 워커를 구동하는 패턴이 올바르다.
 
 ### 장애 방어 모델 (v2.4.0 / v2.5.0 — 반드시 이해할 것)

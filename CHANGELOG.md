@@ -2,6 +2,24 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.5.1] — 2026-07-16
+
+### Fixed
+
+- **Desktop 품질 회귀 (TS-2.5.1)** — v2.5.0에서 Code 파이프라인을 강화하며 Desktop 앵커를 함께 갱신하지 않아 발생한 회귀를 복구. 증상: 스키마 드리프트(finding ID prefix 이탈·recommendations 비정본 필드 `title`/`description`/`references`·문자열 `code_fix`·sbom 배열명 별칭·발명 verdict `APPROVE`/`MASK`·`graph_verdict` 비정본 필드), 번역 역전(enum 한글 번역 + 서술 필드 미번역), 파일 커버리지 붕괴.
+
+### Added
+
+- **`scripts/enumerate_tree.py`** (D1) — 단계 0 결정론 파일 열거기(stdlib). 대상 트리를 완전 열거해 `repository_summary.file_statistics` 정본(카테고리 합 + other == total_files 정합 보장)·code_files·sensitive_candidates·manifest_files·ai_agent_paths를 산출(LLM 산수 제거). Desktop의 파일 열거 도구 부재를 해소, Code는 Glob 커버리지 검증 보조.
+- **`scripts/validate_report_schema.py`** (D3) — 단계 11 직전 리포트 전체 스키마 결정론 게이트(stdlib). ID prefix·recommendations 필드/별칭·`code_fix` 객체 구조·sbom 정본 배열명·verdict 화이트리스트(4종)·`graph_verdict` 정본 필드·enum 13종 EN/KO 동일·korean_report 서술 완역(한글 비율 휴리스틱)을 검사. exit 0/1/2, `--json`. 픽스처 `schema-valid`/`schema-violations`.
+- **Desktop 단계별 출력 계약** (D2) — 오케스트레이터 공유부에 단계 2–10 ID prefix·필수 구조 계약 카드, Desktop 섹션에 단계별 재독 + 자기검증 의무 추가.
+
+### Changed
+
+- **번역 안정화** (D4) — Desktop 단계 10을 카테고리 순차 완역으로 개정, enum 13종 영문 원형 유지 + 서술 필드 완역 의무 명문화(bilingual-translator SKILL 포함). v2.4.1 품질 수준 복원.
+- **오케스트레이터 공유부** — 스키마 참조 V1.3 → V1.4 앵커 갱신, 단계 11에 schema+compliance 이중 검증 배선(Code·Desktop 양 섹션, 오류 시 교정→1회 재검증→재실패 중단).
+- **HTML 템플릿 읽기측 폴백** (D5, `dictionary/security-template.html`) — 레거시 Desktop 리포트 구제: `renderRecs`(action‖title·rationale‖description·finding_ids‖references), `codeFixBlock`(문자열 code_fix→단일 블록), `renderSbom`(배열명 별칭 4종 + summary), `graph_verdict` rationale 폴백 체인에 propagation_summary, `renderFooter` schemaVer 동적 표기(compliance_tags/ai_agent_scope→V1.4), empty-state "v1.2–v1.4". 정본 필드 우선 — 폴백은 하위호환 표시 장치.
+
 ## [2.5.0] — 2026-07-15
 
 ### Added
