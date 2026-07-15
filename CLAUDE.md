@@ -134,9 +134,11 @@ tools: Read, Write, Glob, Grep   # 분석 워커는 읽기전용 탐색(Glob/Gre
 
 Deprecated 스킬은 삭제하지 않고 유지 중(하위 호환).
 
-## Schema V1.3 불변 규칙
+## Schema V1.4 불변 규칙 (정본)
 
-출력 JSON은 `docs/SCHEMA_V1.3_ENFORCEMENT.md`와 `docs/claude-threat-scan-json-schema-v1.3.md`를 따른다. **임의 필드 추가 금지** — `findings_summary`, `executive_summary`, `code_snippet`, 소문자 severity/verdict 등은 스키마 위반이다. 신규 optional 필드를 추가할 때는 enforcement 문서도 함께 갱신한다.
+출력 JSON은 `docs/SCHEMA_V1.4_ENFORCEMENT.md`와 `docs/claude-threat-scan-json-schema-v1.4.md`를 따른다(정본). v1.3/v1.2 문서는 legacy 참조로 보존. **임의 필드 추가 금지** — `findings_summary`, `executive_summary`, `code_snippet`, 소문자 severity/verdict, 태그 금지 변형(`tags`/`kisa_tags`/`control_mapping` 등)은 스키마 위반이다.
+
+**V1.4 추가(유일):** finding에 optional `compliance_tags`(KISA·AILLM·TA, regex `^#(KISA|AILLM|TA)-[A-Z0-9]+(_[A-Z0-9]+)*$`, 0–4개, primary-first, EN/KO byte-identical) + `repository_summary.ai_agent_scope`(optional). 방출은 `docs/compliance-tagmap-distilled.md`(CTID-D), 검증은 `docs/compliance-tagging-deepdive.md`(CTID-V). enum 값(severity 등 13종)은 EN/KO 모두 영문 — 번역 금지(§9). 신규 optional 필드 추가 시 enforcement 문서도 함께 갱신한다.
 
 ## LLM·셸 실행 경계
 

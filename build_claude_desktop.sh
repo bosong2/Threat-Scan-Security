@@ -179,6 +179,10 @@ done
 # 6. Docs 파일 복사 (sub-skill에서 참조하는 문서)
 echo "📋 Docs 파일 복사 중..."
 DOCS_FILES=(
+    "SCHEMA_V1.4_ENFORCEMENT.md"
+    "claude-threat-scan-json-schema-v1.4.md"
+    "compliance-tagmap-distilled.md"
+    "compliance-tagging-deepdive.md"
     "SCHEMA_V1.3_ENFORCEMENT.md"
     "claude-threat-scan-json-schema-v1.3.md"
     "SCHEMA_V1.2_ENFORCEMENT.md"
