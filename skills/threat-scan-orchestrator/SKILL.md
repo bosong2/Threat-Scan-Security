@@ -167,19 +167,88 @@ PY
 
 ### Phase 3 — 보고서 생성 (단계 9 → 10, Phase 2 완료 후)
 
-각 호출 복귀 후 OUTPUT_PATH 존재를 Bash로 확인한 뒤 진행한다(파일=진실).
+각 호출 복귀 후 OUTPUT_PATH 파일 존재를 `test -f`로 확인한 뒤 진행한다(파일=진실. sleep 폴링·백그라운드 대기 금지).
 
-1. `tss-report-merger` 프롬프트:
-   - SCAN_TMP 실제값 + 모든 step*.json 경로 목록
-   - OUTPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step9-english.json`
-2. `tss-translator` 프롬프트:
-   - INPUT_PATH: `/var/folders/.../tss.a1b2c3d4/step9-english.json`
-   - OUTPUT_PATH: `/Users/user/my-project/scanreport-20260623150000.json`
-     (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
+**크기 게이트**: 단계 9 산출 후 아래를 측정해 모드를 결정한다.
+
+```bash
+FILE_SIZE=$(wc -c < "$SCAN_TMP/step9-english.json" | tr -d ' ')
+FINDING_COUNT=$(python3 -c "
+import json,sys
+d=json.load(open('$SCAN_TMP/step9-english.json'))
+er=d.get('english_report',d)
+arrs=['static_code_findings','binary_analysis_findings','skill_risk_findings',
+      'agent_policy_findings','sensitive_patterns','prompt_optimization',
+      'relationship_findings','model_validity_findings']
+print(sum(len(er.get(k,[])) for k in arrs))
+")
+# 게이트: 40KB 또는 40 findings 초과 시 분할 모드
+if [ "$FILE_SIZE" -ge 40960 ] || [ "$FINDING_COUNT" -ge 40 ]; then
+  MODE=split
+else
+  MODE=single
+fi
+echo "Phase 3 mode: $MODE (size=${FILE_SIZE}B, findings=$FINDING_COUNT)"
+```
+
+#### 3-A. 단계 9 — 영문 보고서 병합 (tss-report-merger)
+
+`tss-report-merger` 프롬프트:
+- SCAN_TMP 실제값 + 모든 step*.json 경로 목록
+- OUTPUT_PATH: `$SCAN_TMP/step9-english.json`
+
+복귀 후 즉시 `test -f "$SCAN_TMP/step9-english.json"` 확인.
+
+#### 3-B. 단계 10 — 번역 (크기 게이트에 따라 분기)
+
+**단일 모드 (MODE=single)**:
+`tss-translator` 프롬프트:
+- INPUT_PATH: `$SCAN_TMP/step9-english.json`
+- OUTPUT_PATH: `$OUT_DIR/scanreport-$TIMESTAMP.json`
+  (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
+
+**분할 모드 (MODE=split)**: 카테고리 5묶음을 병렬 `tss-translator` 5개로 처리.
+
+각 에이전트 프롬프트에 포함:
+- INPUT_PATH: `$SCAN_TMP/step9-english.json`
+- CATEGORIES: (각 묶음의 카테고리 키 목록)
+- OUTPUT_PATH: `$SCAN_TMP/step10-frag-N.json` (N=1..5)
+- 모드: "Fragment call — Mode B"
+
+카테고리 분할:
+| Fragment | CATEGORIES |
+|----------|-----------|
+| 1 | `repository_summary` |
+| 2 | `static_code_findings,binary_analysis_findings` |
+| 3 | `skill_risk_findings,agent_policy_findings` |
+| 4 | `sensitive_patterns,prompt_optimization,sbom_analysis` |
+| 5 | `relationship_findings,model_validity_findings,recommendations` |
+
+5개 에이전트 모두 복귀 후 체크포인트:
+```bash
+MISSING=""
+for N in 1 2 3 4 5; do
+  test -f "$SCAN_TMP/step10-frag-$N.json" || MISSING="$MISSING frag-$N"
+done
+[ -z "$MISSING" ] && echo "FRAGS OK" || { echo "MISSING:$MISSING"; exit 1; }
+```
+
+#### 3-C. 단계 10.5 — 조립 (분할 모드 한정, 결정론·셸 허용 예외)
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/assemble_bilingual.py" \
+  --english "$SCAN_TMP/step9-english.json" \
+  --frags "$SCAN_TMP/step10-frag-1.json" "$SCAN_TMP/step10-frag-2.json" \
+         "$SCAN_TMP/step10-frag-3.json" "$SCAN_TMP/step10-frag-4.json" \
+         "$SCAN_TMP/step10-frag-5.json" \
+  --out "$OUT_DIR/scanreport-$TIMESTAMP.json"
+```
+
+(env 미설정 시 `scripts/assemble_bilingual.py`로 폴백)
 
 최종 산출 검증:
 ```bash
-test -f "/Users/user/my-project/scanreport-20260623150000.json" \
+test -f "$OUT_DIR/scanreport-$TIMESTAMP.json" \
   && echo "REPORT OK" || echo "FAIL: bilingual report not written"
 ```
 
@@ -230,6 +299,7 @@ Claude Desktop에서는 아래 **스캔 순서** 표에 따라 각 `@sub-skill` 
 
 **단계 4.5–4.6은 단계 4 완료 후 순차 실행. 셸/코드 실행 없이 Claude 추론으로만 수행.**
 **단계 8.5는 단계 1–8의 모든 finding 산출 후, 병합(9) 이전에 수행. 셸/코드 실행 없이 Claude 추론으로만.**
+**단계 10.5(조립)는 분할 모드 한정 결정론·셸 허용 예외 — `assemble_bilingual.py` 실행만. LLM 추론 없음. 단계 0·11과 동일 성격.**
 **단계 11은 단계 10의 bilingual JSON 산출 후 수행. 스크립트 실행이 허용되는 예외 단계(단계 0과 동일 성격)이며, LLM 추론 없이 결정론적 파일 처리만 수행한다. 별도 요구가 없으면 JSON과 KO HTML 리포트를 함께 출력한다.**
 **`references/sub-skills/relationship-graph-analyzer.md`, `references/sub-skills/model-validity-analyzer.md`, `references/sub-skills/securityreports-deepdive.md`, `references/sub-skills/html-report-generator.md` 참조.**
 
@@ -273,7 +343,7 @@ scanreport-YYYYMMDDhhmmss.json
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",
   "scan_metadata": {
     "scan_date": "ISO 8601 format",
-    "scanner_version": "Claude Threat Scan V2.1",
+    "scanner_version": "Claude Threat Scan V2.4",
     "repository": "repo-name",
     "target_repository": "repo-name",
     "total_files_scanned": 0,

@@ -2,6 +2,16 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.4.1] — 2026-06-24
+
+### Fixed
+
+- **① 버전 헤더** — 헤더 배지·타이틀 하드코딩 `V2.1` 제거, `scan_metadata.scanner_version` 동적 렌더. 스킬 리터럴 `V2.4` 동기화.
+- **② 리포지토리 요약 카드** — `overview`/`key_concerns`/`risk_level` 별칭 폴백 추가, `file_statistics` 칩 렌더, `keyConcerns` i18n 추가. 스킬 정본 필드명 준수 지침 강제.
+- **③a OSV CVE 모달** — 5건 초과 시 `+N 더보기` → 반응형 CVE 모달(각 항목 osv.dev 링크, ESC/오버레이 닫기, 모바일 대응).
+- **③b OSV 버전 정규화** — `normalizeVersion()`: `^4.17.0`/`>=8.17.1` 등 스펙 범위 → concrete 버전으로 OSV 질의. 정규화 불가 시 캐비엇 배지.
+- **④ 파이프라인 내구성** — 크기 게이트(≥40KB/40 findings) 분할 번역·병합 + `scripts/assemble_bilingual.py` 결정론 조립. 오케스트레이터 Phase 3 분기 명문화. 단계 10.5 조립을 결정론·셸 예외로 분류. 폴링 루프 제거.
+
 ## [2.4.0] — 2026-06-24
 
 ### Changed

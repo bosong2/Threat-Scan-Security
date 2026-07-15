@@ -37,6 +37,8 @@ description: >
 
 ## 출력 형식
 
+> **필드명 준수 필수**: 출력은 아래 정본 필드명을 반드시 사용한다. `overview`/`key_concerns`/`risk_level` 등 비정본 별칭은 사용하지 않는다.
+
 ```json
 {
   "repository_summary": {

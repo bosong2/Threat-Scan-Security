@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude Threat Scan Report Viewer v2.1</title>
+<title>Claude Threat Scan</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" integrity="sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF" crossorigin="anonymous"></script>
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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">
 <style>
@@ -166,7 +166,24 @@ button.vuln-link{cursor:pointer;font-family:inherit;outline:none;line-height:1.4
 button.vuln-link:disabled{opacity:.55;cursor:wait}
 .osv-result{display:inline-flex;flex-wrap:wrap;gap:3px;align-items:center;margin-left:5px;vertical-align:middle}
 .osv-none{font-size:10px;color:#157A3A;font-weight:600}
-.osv-more{font-size:10px;color:var(--text-muted)}
+.osv-more{font-size:10px;color:var(--accent);background:none;border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-weight:600;vertical-align:middle;cursor:pointer;font-family:inherit}
+.osv-more:hover{background:var(--bg-tertiary)}
+.osv-caveat{font-size:9px;color:var(--text-muted);background:var(--bg-tertiary);border:1px solid var(--border);border-radius:3px;padding:1px 4px;margin-left:3px;vertical-align:middle;cursor:help}
+.osv-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.osv-modal{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.osv-modal-hd{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;gap:8px}
+.osv-modal-hd-info{flex:1}
+.osv-modal-hd-title{font-size:14px;font-weight:700;color:var(--text-primary)}
+.osv-modal-hd-sub{font-size:11px;color:var(--text-muted);margin-top:3px}
+.osv-modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);padding:2px 6px;border-radius:4px;line-height:1;flex-shrink:0}
+.osv-modal-close:hover{background:var(--bg-tertiary)}
+.osv-modal-body{overflow-y:auto;padding:12px 16px;flex:1}
+.osv-modal-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.osv-modal-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-secondary);border-radius:6px;border:1px solid var(--border)}
+.osv-modal-cve{font-size:12px;font-weight:700;color:var(--text-primary)}
+.osv-modal-link{font-size:11px;color:var(--accent);text-decoration:none;flex-shrink:0;margin-left:8px}
+.osv-modal-link:hover{text-decoration:underline}
+@media(max-width:480px){.osv-modal{max-width:100%;max-height:90vh}.osv-modal-item{flex-direction:column;align-items:flex-start;gap:4px}.osv-modal-link{margin-left:0}}
 .status-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border)}
 .cve-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 
@@ -273,7 +290,7 @@ button.vuln-link:disabled{opacity:.55;cursor:wait}
     <div class="logo">
       <div class="logo-icon">CTS</div>
       <span class="logo-text">Claude Threat Scan</span>
-      <span class="version-badge">V2.1</span>
+      <span class="version-badge" id="versionBadge"></span>
     </div>
     <div class="header-controls">
       <div class="lang-toggle">
@@ -353,7 +370,8 @@ var S = {
     cveLookup:'CVE Lookup',
     riskFindings:'Risk Findings',riskDistribution:'Risk Distribution',noData:'No data',repoDescription:'Repository Description',overallAssessment:'Overall Risk',highestConfirmed:'Highest active severity',
     reportVer:'Report Version',schemaVer:'Schema Version',scannerModel:'Scanner Model',
-    footerAuthor:'Author',footerOrg:'Organization',footerGenerated:'Generated'
+    footerAuthor:'Author',footerOrg:'Organization',footerGenerated:'Generated',
+    keyConcerns:'Key Concerns',riskLevel:'Risk Level',fileStatistics:'File Statistics'
   },
   ko:{
     scanDate:'스캔 날짜',version:'버전',repository:'리포지토리',totalFiles:'전체 파일',
@@ -385,7 +403,8 @@ var S = {
     cveLookup:'CVE 조회',
     riskFindings:'위험 요소',riskDistribution:'위험 분포',noData:'데이터 없음',repoDescription:'리포지토리 설명',overallAssessment:'종합 위험도',highestConfirmed:'유효 발견 중 최고 심각도',
     reportVer:'리포트 버전',schemaVer:'스키마 버전',scannerModel:'스캐너 모델',
-    footerAuthor:'작성자',footerOrg:'조직',footerGenerated:'생성일'
+    footerAuthor:'작성자',footerOrg:'조직',footerGenerated:'생성일',
+    keyConcerns:'주요 우려사항',riskLevel:'위험 수준',fileStatistics:'파일 통계'
   }
 };
 
@@ -430,6 +449,25 @@ function osvEcosystem(pm){
   return m[String(pm).toLowerCase()]||'';
 }
 
+// Normalize a package version spec (^1.2.3, ~1.2, >=2.0.0, etc.) to a concrete semver.
+// Returns {version: string|null, exact: boolean}.
+// version=null means range cannot be resolved to a concrete version (*, latest, etc.)
+function normalizeVersion(raw){
+  if(!raw) return {version:null,exact:false};
+  var s=String(raw).trim();
+  if(s===''||s==='*'||s==='latest'||s==='x'||s==='X') return {version:null,exact:false};
+  // Range "A - B" → take lower bound A
+  s=s.split(/\s+-\s+/)[0].trim();
+  // OR-range "^1 || ^2" → take first alternative
+  s=s.split(/\s*\|\|\s*/)[0].trim();
+  // Strip leading range operators and semver prefixes
+  var stripped=s.replace(/^[~^]?\s*(?:>=?|<=?|=)?\s*/,'').trim();
+  var m=stripped.match(/^(\d+(?:\.\d+){0,2}(?:[-+][^\s,]*)?)/);
+  if(!m) return {version:null,exact:false};
+  var isExact=!s.match(/[~^]|>=?|<=?|\*|x|X|\s+-\s+|\|\|/);
+  return {version:m[1],exact:isExact};
+}
+
 // Render a CVE lookup button that calls OSV API live (browser has network; scanner sandbox does not).
 // On click: POST https://api.osv.dev/v1/query with {version, package:{name,ecosystem}}.
 // Results rendered inline: CVE badges or a "no known CVEs" label.
@@ -437,11 +475,14 @@ function osvEcosystem(pm){
 function vulnLinks(name, version, links, ecosystem){
   if(!name) return '';
   var eco=osvEcosystem(ecosystem);
+  var nv=normalizeVersion(version);
   var fallback=(links&&links.osv)?links.osv:
     'https://osv.dev/list?q='+encodeURIComponent(name)+(eco?'&ecosystem='+encodeURIComponent(eco):'');
   return '<button class="vuln-link osv" '+
     'data-pkg="'+esc(name)+'" '+
-    'data-ver="'+esc(version||'')+'" '+
+    'data-ver="'+esc(nv.version||'')+'" '+
+    'data-rawver="'+esc(version||'')+'" '+
+    'data-exact="'+esc(nv.exact?'1':'')+'" '+
     'data-eco="'+esc(eco)+'" '+
     'data-fb="'+esc(fallback)+'" '+
     'onclick="checkOSV(this)" '+
@@ -454,8 +495,10 @@ function checkOSV(btn){
   btn.disabled=true;
   btn.textContent='...';
   var body={package:{name:btn.dataset.pkg}};
+  // Use normalized concrete version (data-ver); show caveat if derived from a range spec
   if(btn.dataset.ver) body.version=btn.dataset.ver;
   if(btn.dataset.eco) body.package.ecosystem=btn.dataset.eco;
+  var isRange=btn.dataset.rawver&&!btn.dataset.exact;
   fetch('https://api.osv.dev/v1/query',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -468,10 +511,12 @@ function checkOSV(btn){
     var cell=btn.parentElement;
     var res=cell.querySelector('.osv-result');
     if(!res){res=document.createElement('span');res.className='osv-result';cell.appendChild(res);}
+    // Caveat badge when version was derived from a range spec
+    var caveat=isRange?'<abbr class="osv-caveat" title="명세 범위('+esc(btn.dataset.rawver)+')에서 추정된 버전 — lock 파일의 확정 버전 권장">≈범위</abbr>':'';
     if(vulns.length===0){
       btn.textContent='✓';
       btn.className='vuln-link osv osv-clean';
-      res.innerHTML='<span class="osv-none">No known CVEs</span>';
+      res.innerHTML='<span class="osv-none">No known CVEs</span>'+caveat;
     } else {
       var ids=[];
       vulns.forEach(function(v){
@@ -480,11 +525,27 @@ function checkOSV(btn){
       });
       // deduplicate
       ids=ids.filter(function(v,i,a){return a.indexOf(v)===i;});
-      btn.textContent=vulns.length+(vulns.length===1?' CVE':' CVEs');
+      btn.textContent=ids.length+(ids.length===1?' CVE':' CVEs');
       btn.className='vuln-link osv osv-hit';
-      var shown=ids.slice(0,4).map(function(c){return cveLink(c);}).join('');
-      var more=ids.length>4?'<span class="osv-more">+'+( ids.length-4)+'</span>':'';
-      res.innerHTML=shown+more;
+      var INLINE_MAX=5;
+      var shown=ids.slice(0,INLINE_MAX).map(function(c){return cveLink(c);}).join('');
+      // Store ids on button for modal reuse
+      btn.dataset.cveIds=JSON.stringify(ids);
+      var more='';
+      if(ids.length>INLINE_MAX){
+        var rest=ids.length-INLINE_MAX;
+        // Keep all untrusted values in data-* attributes only (no JS string interpolation in onclick)
+        more='<button class="osv-more"'+
+          ' data-pkg="'+esc(btn.dataset.pkg)+'"'+
+          ' data-ver="'+esc(btn.dataset.ver||btn.dataset.rawver||'')+'"'+
+          ' data-ids="'+esc(JSON.stringify(ids))+'">+'+rest+' 더보기</button>';
+      }
+      res.innerHTML=shown+more+caveat;
+      // Bind programmatically — data-* attrs are HTML-escaped, JS context is never touched
+      var moreBtn=res.querySelector('.osv-more');
+      if(moreBtn) moreBtn.addEventListener('click',function(){
+        openCveModal(this.dataset.pkg,this.dataset.ver,JSON.parse(this.dataset.ids));
+      });
     }
     btn.disabled=false;
   })
@@ -746,14 +807,18 @@ function renderGraphVerdictCard(gv){
 function renderRepoSummary(s){
   if(!s) return '';
 
-  // Card 1: description + risk_summary only
+  // Field aliases: support schema V1.3 canonical names + legacy/non-conformant aliases
+  var desc=s.description||s.overview||'';
+  var riskSum=s.risk_summary||(s.risk_level?t('riskLevel')+': '+s.risk_level:'')||'';
+
+  // Card 1: description + risk_summary
   var descCard='<div class="repo-card2">'+
     '<div class="repo-card2-hd">📋 '+t('repoDescription')+'</div>'+
-    (s.description?'<div class="repo-card2-desc">'+esc(s.description)+'</div>':'')+
-    (s.risk_summary?'<div class="repo-card2-desc" style="margin-top:8px;border-top:1px solid var(--border-light);padding-top:8px">'+esc(s.risk_summary)+'</div>':'')+
+    (desc?'<div class="repo-card2-desc">'+esc(desc)+'</div>':'')+
+    (riskSum?'<div class="repo-card2-desc" style="margin-top:8px;border-top:1px solid var(--border-light);padding-top:8px">'+esc(riskSum)+'</div>':'')+
   '</div>';
 
-  // Card 2: meta chips + key_components + sensitive_files as sub-cards
+  // Card 2: meta chips + components/concerns + sensitive_files + file_statistics as sub-cards
   var metaFields=[['primaryLang',s.primary_language],['framework',s.framework],['transport',s.transport],['authModel',s.auth_model]].filter(function(p){return p[1];});
   var subcards=[];
   if(metaFields.length){
@@ -765,10 +830,18 @@ function renderRepoSummary(s){
       '</div>'+
     '</div>');
   }
+  // Canonical: key_components (architecture) — render as component tags
   if(s.key_components&&s.key_components.length){
     subcards.push('<div class="repo-subcard2">'+
       '<div class="repo-subcard2-lbl">'+t('keyComponents')+'</div>'+
       '<div class="repo-subcard2-tags">'+s.key_components.map(function(c){return '<span class="comp-tag">'+esc(c)+'</span>';}).join('')+'</div>'+
+    '</div>');
+  }
+  // Alias: key_concerns (security concerns, NOT components) — render with distinct label
+  if(!s.key_components&&s.key_concerns&&s.key_concerns.length){
+    subcards.push('<div class="repo-subcard2">'+
+      '<div class="repo-subcard2-lbl">⚠️ '+t('keyConcerns')+'</div>'+
+      '<div class="repo-subcard2-tags">'+s.key_concerns.map(function(c){return '<span class="sensitive-tag">'+esc(c)+'</span>';}).join('')+'</div>'+
     '</div>');
   }
   if(s.sensitive_files_detected&&s.sensitive_files_detected.length){
@@ -777,8 +850,19 @@ function renderRepoSummary(s){
       '<div class="repo-subcard2-tags">'+s.sensitive_files_detected.map(function(f){return '<span class="sensitive-tag">'+esc(f)+'</span>';}).join('')+'</div>'+
     '</div>');
   }
+  // file_statistics chips — total files and language breakdown
+  if(s.file_statistics){
+    var fs=s.file_statistics;
+    var fsChips=[];
+    if(fs.total_files!=null) fsChips.push('<div class="repo-meta-chip"><span class="repo-meta-chip-lbl">Total</span><span class="repo-meta-chip-val">'+esc(String(fs.total_files))+'</span></div>');
+    [['TypeScript','typescript_tsx'],['JavaScript','javascript_files'],['Python','python_files'],['Markdown','markdown_files'],['JSON','json_files'],['YAML','yaml']].forEach(function(p){
+      if(fs[p[1]]) fsChips.push('<div class="repo-meta-chip"><span class="repo-meta-chip-lbl">'+p[0]+'</span><span class="repo-meta-chip-val">'+esc(String(fs[p[1]]))+'</span></div>');
+    });
+    if(fsChips.length) subcards.push('<div class="repo-subcard2"><div class="repo-subcard2-lbl">'+t('fileStatistics')+'</div><div class="repo-meta-chips">'+fsChips.join('')+'</div></div>');
+  }
+  var hd=t(s.key_components?'keyComponents':'keyConcerns');
   var compCard='<div class="repo-card2">'+
-    '<div class="repo-card2-hd">🔍 '+t('keyComponents')+'</div>'+
+    '<div class="repo-card2-hd">🔍 '+(s.key_components?t('keyComponents'):s.key_concerns?t('keyConcerns'):t('keyComponents'))+'</div>'+
     (subcards.length?'<div class="repo-subcards-stack">'+subcards.join('')+'</div>':
       '<div class="risk-comp-empty">'+t('noData')+'</div>')+
   '</div>';
@@ -1223,6 +1307,10 @@ function renderReport(report){
   if(!report) return;
   var data=getData(report);
   var meta=report.scan_metadata;
+  // Update header version badge from scan_metadata.scanner_version (e.g. "Claude Threat Scan V2.4")
+  var vb=document.getElementById('versionBadge');
+  if(vb){var vm=meta&&meta.scanner_version?String(meta.scanner_version).match(/V?(\d+\.\d+)/i):null;vb.textContent=vm?'V'+vm[1]:'';}
+
   document.getElementById('reportContent').innerHTML=
     renderScanMeta(meta)+
     renderSummary(report)+
@@ -1306,6 +1394,49 @@ document.body.addEventListener('drop',function(e){
 });
 
 updateNav();
+
+// ── OSV CVE Modal ──────────────────────────────────────────────────────────
+function openCveModal(pkg, ver, ids){
+  var ol=document.getElementById('osvModalOverlay');
+  var title=ol.querySelector('.osv-modal-hd-title');
+  var sub=ol.querySelector('.osv-modal-hd-sub');
+  var list=ol.querySelector('.osv-modal-list');
+  title.textContent=(pkg||'')+(ver?'@'+ver:'');
+  sub.textContent=ids.length+' CVE'+(ids.length===1?'':' (전체 목록 — 클릭하면 osv.dev 열림)');
+  list.innerHTML=ids.map(function(id){
+    var href='https://osv.dev/vulnerability/'+encodeURIComponent(id);
+    return '<li class="osv-modal-item">'+
+      '<span class="osv-modal-cve">'+esc(id)+'</span>'+
+      '<a class="osv-modal-link" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">→ osv.dev</a>'+
+    '</li>';
+  }).join('');
+  ol.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeCveModal(){
+  var ol=document.getElementById('osvModalOverlay');
+  if(ol){ol.style.display='none';}
+  document.body.style.overflow='';
+}
+(function(){
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeCveModal();});
+})();
 </script>
+
+<!-- OSV CVE Modal -->
+<div id="osvModalOverlay" class="osv-modal-overlay" style="display:none" onclick="if(event.target===this)closeCveModal()">
+  <div class="osv-modal" role="dialog" aria-modal="true">
+    <div class="osv-modal-hd">
+      <div class="osv-modal-hd-info">
+        <div class="osv-modal-hd-title"></div>
+        <div class="osv-modal-hd-sub"></div>
+      </div>
+      <button class="osv-modal-close" onclick="closeCveModal()" title="닫기">✕</button>
+    </div>
+    <div class="osv-modal-body">
+      <ul class="osv-modal-list"></ul>
+    </div>
+  </div>
+</div>
 </body>
 </html>

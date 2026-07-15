@@ -99,8 +99,9 @@ tools: Read, Write   # 분석 워커는 Read+Write. 셸 허용은 source-handler
 
 `${CLAUDE_PLUGIN_ROOT}`는 Claude Code 플러그인 런타임이 주입한다. 미설정 환경에서는 `skills/<name>/SKILL.md`로 폴백.
 
-**LLM·셸 실행 경계 (v2.3.5 개정):**
+**LLM·셸 실행 경계 (v2.4.1 개정):**
 - `tss-source-handler`(단계 0)·`tss-html-report`(단계 11): Bash·파일 생성 허용.
+- **단계 10.5 조립 (`assemble_bilingual.py`)**: 분할 모드 한정으로 오케스트레이터가 직접 Bash 실행 — 결정론적 Python만, LLM 추론 없음. 단계 0·11과 동일 성격의 결정론·셸 허용 예외.
 - `tss-*` 분석 워커 (단계 1–10): `tools: Read, Write` — Bash 실행 금지, OUTPUT_PATH Write만 허용.
 - Desktop 서브스킬(`skills/*/SKILL.md`): 파일 생성 없음 (Desktop 샌드박스 호환 — 별도 계층).
 

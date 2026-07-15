@@ -53,7 +53,7 @@ description: >
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",
   "scan_metadata": {
     "scan_date": "2026-02-05T12:00:00Z",
-    "scanner_version": "Claude Threat Scan V2.1",
+    "scanner_version": "Claude Threat Scan V2.4",
     "repository": "project-name",
     "target_repository": "project-name",
     "total_files_scanned": 156,
@@ -231,7 +231,7 @@ description: >
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",  // ✓ 필수
   "scan_metadata": {
     "scan_date": "ISO 8601",           // ✓ 필수 (NOT timestamp)
-    "scanner_version": "Claude Threat Scan V2.0",
+    "scanner_version": "Claude Threat Scan V2.4",
     "repository": "name",              // ✓ 필수
     "target_repository": "name",       // ✓ 필수 (NOT target)
     "total_files_scanned": 0,
@@ -303,6 +303,7 @@ description: >
 - [ ] `scan_metadata.code_files` 존재
 - [ ] `scan_metadata.scan_depth` 존재
 - [ ] `english_report.repository_summary` 객체 존재
+- [ ] `repository_summary` 필드명 정본 준수: `description`/`key_components`/`risk_summary`/`file_statistics`/`sensitive_files_detected`. **`overview`/`key_concerns`/`risk_level` 등 비정본 별칭 사용 금지.** 비정본으로 수신 시 병합 전에 정본 필드명으로 정규화한다.
 - [ ] `repository_summary.sensitive_files_detected` 사용 (NOT `dangerous_files_found`)
 - [ ] `repository_summary.file_statistics.python_files` 존재
 - [ ] `repository_summary.file_statistics.javascript_files` 존재
