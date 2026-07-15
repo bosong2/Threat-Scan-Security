@@ -436,7 +436,17 @@ PY
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 
-`tss-html-report` ← `/Users/user/my-project/scanreport-20260623150000.json` 경로 전달
+**(a) compliance_tags 검증 (HTML 생성 직전 — 단계 11 계열 셸 허용):**
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_compliance_tags.py" \
+  "/Users/user/my-project/scanreport-20260623150000.json"
+# (env 미설정 시 repo scripts/validate_compliance_tags.py로 폴백)
+# exit 1(오류) → 오류 카테고리를 보고하고 HTML 생성 없이 중단.
+# exit 2(경고만) → 경고 요약 후 진행. exit 0 → 정상 진행.
+```
+
+**(b) HTML 생성:** `tss-html-report` ← `/Users/user/my-project/scanreport-20260623150000.json` 경로 전달
 (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
 
 ### Phase 5 — 결과 보고
@@ -472,6 +482,13 @@ Claude Desktop에서는 아래 **스캔 순서** 표에 따라 각 `@sub-skill` 
 > Desktop은 샌드박스라 자동 권한 셋업(Code의 Phase 0'')이 필요 없다 — 파일 생성·셸 실행을
 > 하지 않으므로 권한 게이트 자체가 없다.
 
+### Compliance Tagging (Schema V1.4)
+
+단계 1–8이 각 finding에 `compliance_tags`(KISA·AILLM·TA)를 부여하고(CTID-D 규칙,
+`references/docs/compliance-tagmap-distilled.md`), 단계 8.5가 검증·교정한다(CTID-V,
+`references/docs/compliance-tagging-deepdive.md`). 단계 9–11은 태그 읽기전용 —
+번역(단계 10)은 태그를 EN/KO 동일하게 유지하고, HTML(단계 11)은 배지로 렌더한다.
+
 ---
 
 ## 참조 (방법론 상세)
@@ -498,6 +515,7 @@ Claude Desktop에서는 아래 **스캔 순서** 표에 따라 각 `@sub-skill` 
 
 **단계 4.5–4.6은 단계 4 완료 후 순차 실행. 셸/코드 실행 없이 Claude 추론으로만 수행.**
 **단계 8.5는 단계 1–8의 모든 finding 산출 후, 병합(9) 이전에 수행. 셸/코드 실행 없이 Claude 추론으로만.**
+**Compliance Tagging (v2.5.0/Schema V1.4): 단계 1–8이 CTID-D로 `compliance_tags` 부여, 단계 8.5가 CTID-V로 검증·교정(태그 수정 가능한 유일 단계), 단계 9–11은 태그 읽기전용. 단계 11 직전 `validate_compliance_tags.py`로 검증.**
 **단계 10.5(조립)는 분할 모드 한정 결정론·셸 허용 예외 — `assemble_bilingual.py` 실행만. LLM 추론 없음. 단계 0·11과 동일 성격.**
 **단계 11은 단계 10의 bilingual JSON 산출 후 수행. 스크립트 실행이 허용되는 예외 단계(단계 0과 동일 성격)이며, LLM 추론 없이 결정론적 파일 처리만 수행한다. 별도 요구가 없으면 JSON과 KO HTML 리포트를 함께 출력한다.**
 **`references/sub-skills/relationship-graph-analyzer.md`, `references/sub-skills/model-validity-analyzer.md`, `references/sub-skills/securityreports-deepdive.md`, `references/sub-skills/html-report-generator.md` 참조.**
@@ -542,7 +560,7 @@ scanreport-YYYYMMDDhhmmss.json
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",
   "scan_metadata": {
     "scan_date": "ISO 8601 format",
-    "scanner_version": "Claude Threat Scan V2.4",
+    "scanner_version": "Claude Threat Scan V2.5",
     "repository": "repo-name",
     "target_repository": "repo-name",
     "total_files_scanned": 0,

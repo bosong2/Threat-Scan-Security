@@ -53,7 +53,7 @@ description: >
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",
   "scan_metadata": {
     "scan_date": "2026-02-05T12:00:00Z",
-    "scanner_version": "Claude Threat Scan V2.4",
+    "scanner_version": "Claude Threat Scan V2.5",
     "repository": "project-name",
     "target_repository": "project-name",
     "total_files_scanned": 156,
@@ -240,7 +240,7 @@ description: >
   "output_filename": "scanreport-YYYYMMDDhhmmss.json",  // ✓ 필수
   "scan_metadata": {
     "scan_date": "ISO 8601",           // ✓ 필수 (NOT timestamp)
-    "scanner_version": "Claude Threat Scan V2.4",
+    "scanner_version": "Claude Threat Scan V2.5",
     "repository": "name",              // ✓ 필수
     "target_repository": "name",       // ✓ 필수 (NOT target)
     "total_files_scanned": 0,

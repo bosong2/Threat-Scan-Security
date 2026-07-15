@@ -2,6 +2,29 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/) 형식과 [Semantic Versioning](https://semver.org/)을 따릅니다.
 
+## [2.5.0] — 2026-07-15
+
+### Added
+
+- **Compliance Tagging (Schema V1.4)** — finding에 optional `compliance_tags`(KISA 49 + AILLM 9 + TA 10 = governed 68). regex `^#(KISA|AILLM|TA)-[A-Z0-9]+(_[A-Z0-9]+)*$`, 0–4개, primary-first, EN/KO byte-identical. 단계 1–8 CTID-D 방출 + 단계 8.5 CTID-V 검증(V-1~V-7 + cross-finding sweep). v1.4는 v1.3 strict superset(부재=legacy).
+- **`scripts/validate_compliance_tags.py`** — 결정론 검증기(stdlib): regex·개수·유일·EN/KO parity·금지변형·금지배치 검출. exit 0/1/2, `--json`. 픽스처 3종(`tests/fixtures/`).
+- **HTML 태그 배지** — namespace 색(KISA/AILLM/TA/unknown) + tooltip(제어명). 사전 `compliance_controls`(68) 추가. `generate_html_report.py --coverage`(KISA 커버리지 stdout, JSON 미기록).
+- **AI 구성요소 스캔범위 게이트** — Phase 0(d): `.claude/` 등 AI 도구 구성요소 발견 시 1회 질문(포함/제외), `repository_summary.ai_agent_scope` 기록. Code=AskUserQuestion, Desktop=대화 질의.
+- **권한 자동 셋업 (Phase 0'')** — 규칙 부재 시 오케스트레이터가 `.claude/settings.local.json`에 자동 등록(승인 1회 → 무정지 완주). `/threat-scan-setup` 수동 커맨드 신설.
+- 분석 에이전트 9개에 `Glob`/`Grep` 읽기전용 탐색 + 전체 트리 완전 열거(커버리지 누락 방지). 다크 코드뷰(구문 강조·검은 배경).
+- Schema V1.4 문서 2종(`claude-threat-scan-json-schema-v1.4.md`·`SCHEMA_V1.4_ENFORCEMENT.md`) + CTID 2종.
+
+### Changed
+
+- **Monitor 정책 개정** — Agent async 실행(실측) 대응: `Monitor`를 OUTPUT_PATH 파일 출현 대기 용도로만 허용. `TaskStop` 스톨 복구 허용. (BUG-05는 파라미터 오용 금지로 재해석)
+- **bilingual enum 일관성** — enum 13종(severity·status·verdict·priority 등) EN/KO 모두 영어 원문(v1.3 "등급 번역" 폐지). 템플릿 `canonEnum()` 표시 정규화(레거시 한글 하위호환) + `verd-unknown` 폴백. SBOM 서브헤딩 영어 고정. 권장 조치 섹션을 리포지토리 요약 직후로 재배치.
+- **verdict 화이트리스트** — 4종(INSTALL_OK/REVIEW/DISABLE/REMOVE) 외 값(MASK/KEEP 등) 발명 금지, 병합 시 REVIEW 정규화.
+- 번역기 ANTI-HANG·ITEM_RANGE·JSON-SAFETY 계약(단계 10 hang 해소).
+
+### Compatibility
+
+- Schema V1.4는 V1.3의 strict superset. `compliance_tags` 부재 = legacy로 유효. 기존 리포트 렌더 하위호환(canonEnum). v1.2/v1.3 문서는 legacy 참조로 보존.
+
 ## [2.4.1] — 2026-06-24
 
 ### Fixed
