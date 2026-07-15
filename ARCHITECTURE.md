@@ -83,6 +83,35 @@ Threat-scan-security/
 └── docs/                    # 스키마 · 버전별 기획문서
 ```
 
+## 디렉토리 용도 분류 (공용 / Desktop / Code / 로컬)
+
+> 분류 기준: **🟢 공용** = 양 모드가 사용하는 단일 원천. **🔵 Code 전용** = Claude Code 플러그인 런타임만 사용.
+> **🟠 Desktop 전용** = Desktop zip 빌드·배포에만 관여. **⚪ 로컬 전용** = 개발 머신 세션 설정 — **git 비추적**(.gitignore).
+
+| 경로 | 분류 | 용도 | Desktop 반영 경로 | Code 반영 경로 |
+|------|------|------|-------------------|----------------|
+| `skills/*/SKILL.md` | 🟢 공용 | 분석 방법론·스키마 단일 원천 | 빌드가 `references/sub-skills/`로 복사 | `tss-*` 에이전트가 Read로 참조 |
+| `dictionary/` | 🟢 공용 | 번역 사전(JSON)·HTML 리포트 템플릿 | 빌드가 `references/dictionary/`로 복사 | `generate_html_report.py`가 직접 사용 |
+| `scripts/*.py` | 🟢 공용 | 결정론 스크립트 — HTML 생성기·bilingual 조립 | 빌드가 `references/scripts/`로 복사 | 단계 10.5·11에서 직접 실행 |
+| `docs/` (스키마 정본) | 🟢 공용 | Schema V1.3 정의·enforcement — 양 모드 방법론이 참조 | 빌드가 `references/docs/`로 일부 복사 | repo 직접 참조 |
+| `docs/vX.Y.Z/` | 📄 개발 문서 | 버전별 기획(GOAL·phase)·이슈 패치 문서 | 미포함 | 개발 시 참조 |
+| `VERSION` | 🟢 공용 | 버전 동기화 단일 기준 (빌드·plugin.json·help) | 빌드가 읽음 | 범프 시 plugin.json과 동기화 |
+| `agents/tss-*.md` | 🔵 Code 전용 | 파이프라인 워커 정의 (방법론은 SKILL.md 참조) | 미포함 (빌드 비복사) | 플러그인 런타임이 로드 |
+| `commands/threat-scan*.md` | 🔵 Code 전용 | `/threat-scan` 등 슬래시 커맨드 진입점 | 미포함 | 플러그인 런타임이 로드 |
+| `hooks/hooks.json` | 🔵 Code 전용 | SubagentStop 훅(리댁션·완료 로깅) — 런타임 자동 로드 | 미포함 | 플러그인 런타임이 로드 |
+| `scripts/*.sh` | 🔵 Code 전용 | 훅 스크립트(redact_secrets·log_completion)·유틸(agent_efficiency) | **의도적 비복사** (Desktop 샌드박스에 셸 없음) | 훅이 실행 |
+| `.claude-plugin/` | 🔵 Code 전용 | **배포 매니페스트** — plugin.json(버전)·marketplace.json(마켓 정의). `/plugin marketplace add`가 이 리포지토리에서 읽는 설치 진입점 | 미포함 | 설치·업데이트의 기준 |
+| `build_claude_desktop.sh` | 🟠 Desktop 전용 | zip 빌드 도구 — frontmatter 스트립·Code 섹션 제거·references 번들 | 빌드 실행 주체 | 사용 안 함 |
+| `dist_claude_desktop/` · `*.zip` | 🟠 Desktop 전용 | 빌드 산출물 — **git 비추적** (태그 시 CI가 생성) | 배포물 그 자체 | 사용 안 함 |
+| `.github/workflows/` | 🟠 Desktop 전용 | 태그 push 시 Desktop zip 릴리스 CI | 릴리스 자동화 | 사용 안 함 |
+| `CLAUDE.md` | 📄 개발 가이드 | 이 리포지토리를 Claude Code로 **개발**할 때의 규칙 (플러그인 기능 아님 — 추적 유지) | — | — |
+| `README` · `INSTALLATION` · `USER_GUIDE` · `ARCHITECTURE` · `CHANGELOG` | 📄 문서 | 사용자·기여자 문서 | 미포함 | — |
+| `LICENSE` · `NOTICE` | 📄 라이선스 | Apache-2.0 | 빌드가 패키지 루트로 복사 | repo 포함 |
+| `.claude/` | ⚪ 로컬 전용 | 이 머신의 세션 설정(권한 allowlist 등) — **비추적** | — | — |
+| `.gemini/` `.cursor/` `.codex/` 등 | ⚪ 로컬 전용 | 타 AI 도구 로컬 가드레일 — **비추적** | — | — |
+
+> **혼동 주의:** `.claude/`(로컬 세션 설정, 비추적)와 `.claude-plugin/`(배포 매니페스트, 추적 필수)은 이름만 비슷할 뿐 정반대 성격이다. `.claude-plugin/`이 없으면 마켓플레이스 설치가 불가능하다.
+
 ## 설계 원칙
 
 - **단일 원천**: 에이전트는 방법론을 복제하지 않고 `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`를 참조.

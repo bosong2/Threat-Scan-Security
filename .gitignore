@@ -65,3 +65,18 @@ temp/
 # Thumbnails & cache
 Thumbs.db
 *.cache
+
+# AI 도구 로컬 세션 설정·가드레일 (개발 환경 전용 — 동기화 금지)
+# 주의: 플러그인 기능 자산은 여기에 해당하지 않음 —
+#   .claude-plugin/ · CLAUDE.md · agents/ · skills/ · commands/ · hooks/ 는 추적 유지
+.claude/
+CLAUDE.local.md
+.gemini/
+GEMINI.local.md
+.cursor/
+.cursorrules
+.cursorignore
+.codex/
+AGENTS.local.md
+.aider*
+.windsurf/
