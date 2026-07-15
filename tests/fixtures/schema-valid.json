@@ -1,0 +1,35 @@
+{
+  "scan_metadata": {"scanner_version": "Claude Threat Scan V2.5", "repository": "ok"},
+  "english_report": {
+    "repository_summary": {"description": "A web app.", "graph_verdict": {"security_verdict": "REVIEW", "worst_component": "x", "rationale": "because"}},
+    "static_code_findings": [
+      {"id": "STATIC-001", "issue": "SQL Injection", "severity": "High", "status": "Confirmed",
+       "description": "External input concatenated.", "recommendation": "Use params.",
+       "code_fix": {"language": "py", "before": "q=...", "after": "q=?", "note": "param"},
+       "compliance_tags": ["#KISA-1_1"]}
+    ],
+    "sbom_analysis": {
+      "version_risk_findings": [{"id": "VER-001", "package": "lodash", "severity": "Low"}],
+      "supply_chain_findings": [{"id": "SUPPLY-001", "package": "x", "severity": "High"}]
+    },
+    "recommendations": [
+      {"id": "REC-001", "rank": 1, "priority": "High", "action": "Fix it", "rationale": "risk", "finding_ids": ["STATIC-001"]}
+    ]
+  },
+  "korean_report": {
+    "repository_summary": {"description": "웹 애플리케이션입니다.", "graph_verdict": {"security_verdict": "REVIEW", "worst_component": "x", "rationale": "이유 때문에"}},
+    "static_code_findings": [
+      {"id": "STATIC-001", "issue": "SQL 삽입", "severity": "High", "status": "Confirmed",
+       "description": "외부 입력이 연결되었습니다.", "recommendation": "파라미터를 사용하세요.",
+       "code_fix": {"language": "py", "before": "q=...", "after": "q=?", "note": "파라미터화"},
+       "compliance_tags": ["#KISA-1_1"]}
+    ],
+    "sbom_analysis": {
+      "version_risk_findings": [{"id": "VER-001", "package": "lodash", "severity": "Low"}],
+      "supply_chain_findings": [{"id": "SUPPLY-001", "package": "x", "severity": "High"}]
+    },
+    "recommendations": [
+      {"id": "REC-001", "rank": 1, "priority": "High", "action": "수정하세요", "rationale": "위험", "finding_ids": ["STATIC-001"]}
+    ]
+  }
+}

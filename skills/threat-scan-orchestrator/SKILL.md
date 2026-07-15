@@ -449,15 +449,20 @@ PY
 
 ### Phase 4 — HTML 리포트 (단계 11, Phase 3 완료 후)
 
-**(a) compliance_tags 검증 (HTML 생성 직전 — 단계 11 계열 셸 허용):**
+**(a) 스키마·태그 결정론 검증 (HTML 생성 직전 — 단계 11 계열 셸 허용):**
 
 ```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_report_schema.py" \
+  "/Users/user/my-project/scanreport-20260623150000.json"
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/validate_compliance_tags.py" \
   "/Users/user/my-project/scanreport-20260623150000.json"
-# (env 미설정 시 repo scripts/validate_compliance_tags.py로 폴백)
-# exit 1(오류) → 오류 카테고리를 보고하고 HTML 생성 없이 중단.
-# exit 2(경고만) → 경고 요약 후 진행. exit 0 → 정상 진행.
+# (env 미설정 시 repo scripts/*.py로 폴백)
+# 둘 중 하나라도 exit 1(오류) → 지적된 단계 산출물(주로 9/10)을 교정하고 1회 재검증.
+# 재실패 시 위반 목록과 함께 HTML 생성 없이 중단. exit 2(경고만) → 요약 후 진행. exit 0 → 정상 진행.
 ```
+
+`validate_report_schema.py`는 ID prefix·recommendations 필드·code_fix 객체·sbom 정본 배열명·
+graph_verdict 정본 필드·verdict 화이트리스트·enum 13종 EN/KO 동일·**KR 서술 완역**을 검사한다(v2.5.1 / D3).
 
 **(b) HTML 생성:** `tss-html-report` ← `/Users/user/my-project/scanreport-20260623150000.json` 경로 전달
 (OUT_DIR 실제값 + `/scanreport-` + TIMESTAMP 실제값 + `.json`)
@@ -527,6 +532,21 @@ enum 번역 오류). 이를 막기 위해:
 - enum 13종·`compliance_tags`·ID·파일 경로·코드·CVE는 **원형 유지**(번역 금지).
 - **카테고리 단위 순차 번역:** `english_report`의 최상위 카테고리를 하나씩 — 한 카테고리를 완역해
   `korean_report`에 기록한 뒤 다음 카테고리로 진행한다. 전체를 한 번에 출력하려다 서술을 생략하지 않는다.
+
+### 단계 11 직전 — 결정론 스키마·태그 검증 (v2.5.1 / D3, 필수)
+
+HTML 생성 전에 두 검증 스크립트를 실행한다(단계 11은 스크립트 실행 허용 예외 단계):
+
+```bash
+python3 references/scripts/validate_report_schema.py <report.json>
+python3 references/scripts/validate_compliance_tags.py <report.json>
+```
+
+`validate_report_schema.py`는 ID prefix·recommendations 필드(action/rationale/finding_ids)·
+`code_fix` 객체 구조·sbom 정본 배열명·`graph_verdict` 정본 필드·verdict 화이트리스트·
+enum 13종 EN/KO 동일·**korean_report 서술 완역**을 검사한다. 오류(exit 1)가 나오면 지적된
+단계(주로 9 병합·10 번역)의 산출물을 교정하고 **1회 재검증**한 뒤 진행한다. 재실패 시 위반 목록과
+함께 중단한다. 이 검증은 결정론 스크립트로 단계 0·11과 동일한 셸 허용 예외다.
 
 ### Compliance Tagging (Schema V1.4)
 

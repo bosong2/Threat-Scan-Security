@@ -1,0 +1,21 @@
+{
+  "scan_metadata": {"scanner_version": "Claude Threat Scan V2.5"},
+  "english_report": {
+    "repository_summary": {"name": "x", "graph_verdict": {"verdict": "DISABLE", "propagation_summary": "s"}},
+    "static_code_findings": [
+      {"id": "SCED-001", "severity": "High", "code_fix": "just a string"}
+    ],
+    "sensitive_patterns": [{"id": "SPT-001", "severity": "Low", "verdict": "MASK"}],
+    "sbom_analysis": {"verdict": "APPROVE", "vulnerabilities": [{"id": "V-1"}]},
+    "recommendations": [{"id": "REC-001", "title": "t", "description": "d", "references": ["SCED-001"]}]
+  },
+  "korean_report": {
+    "repository_summary": {"name": "x", "graph_verdict": {"verdict": "DISABLE", "propagation_summary": "s"}},
+    "static_code_findings": [
+      {"id": "SCED-001", "severity": "높음", "code_fix": "just a string"}
+    ],
+    "sensitive_patterns": [{"id": "SPT-001", "severity": "Low", "verdict": "MASK"}],
+    "sbom_analysis": {"verdict": "승인", "vulnerabilities": [{"id": "V-1"}]},
+    "recommendations": [{"id": "REC-001", "title": "t", "description": "d", "references": ["SCED-001"]}]
+  }
+}
