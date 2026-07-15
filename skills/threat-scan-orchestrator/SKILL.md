@@ -192,6 +192,19 @@ echo "RESOLVED_TARGET_ROOT=$ROOT"
 
 `RESOLVED_TARGET_ROOT`이 원래 경로와 다르면 그 값을 이후 모든 Phase의 `TARGET_PATH`로 사용한다.
 
+**(c-2) 결정론 파일 열거 (v2.5.1 / D1).** `RESOLVED_TARGET_ROOT` 확정 직후 아래를 실행한다.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/enumerate_tree.py" "/actual/RESOLVED_TARGET_ROOT" \
+  --out "/var/folders/.../tss.a1b2c3d4/file-manifest.json"
+# (env 미설정 시 repo의 scripts/enumerate_tree.py)
+```
+
+산출된 `file-manifest.json`은 커버리지 정본이다:
+- 단계 1(repo-indexer) 프롬프트에 이 경로를 전달 — `file_statistics`를 **그대로** `repository_summary.file_statistics`에 사용(LLM 산수 금지). `sensitive_candidates`·`manifest_files`를 검토 출발점으로.
+- 단계 2–8 프롬프트에 `file-manifest.json` 경로를 함께 전달 — Glob 탐색과 병행하되, `_meta.files_total`은 manifest의 `total_files`를 정본으로 기록하고 "manifest의 파일을 빠짐없이" 커버한다.
+- 아래 (d) 게이트는 manifest의 `ai_agent_paths`를 탐지 결과로 재사용할 수 있다(별도 Bash 스니펫은 폴백).
+
 **(d) AI 에이전트 구성요소 스캔 범위 확인 (신규 — v1.4.3, 유일한 사용자 질문 지점).**
 `RESOLVED_TARGET_ROOT` 하위에 `.claude/`, `.cursor/`, `.github/copilot-instructions.md`,
 `AGENTS.md`, `SKILL.md`, `.mcp.json`/`mcp.json`, `agents/**`, `prompts/**` 같은 **AI 에이전트/도구
@@ -464,6 +477,20 @@ rm -rf "/var/folders/.../tss.a1b2c3d4"   # 실제 SCAN_TMP 값 대입
 
 Claude Desktop에서는 아래 **스캔 순서** 표에 따라 각 `@sub-skill` 을 순서대로 호출한다.
 모든 finding 산출 후 단계 9(병합) → 10(번역) → 11(HTML) 순으로 완주한다.
+
+### 단계 0 — 결정론 파일 열거 (v2.5.1 / D1, 필수 선행)
+
+소스 준비(압축 해제/복사) 직후, 인덱싱 전에 파일 열거 스크립트를 실행한다(단계 0은 스크립트
+실행이 허용되는 예외 단계다):
+
+```bash
+python3 references/scripts/enumerate_tree.py <대상경로> --out file-manifest.json
+```
+
+`file-manifest.json`을 이후 단계의 **커버리지 정본**으로 사용한다:
+- 단계 1(`@repo-indexer`): manifest의 `file_statistics`를 **수정 없이 그대로** `repository_summary.file_statistics`에 사용한다(직접 세지 않는다 — 자기모순 방지). `sensitive_candidates`·`manifest_files`를 검토 출발점으로 삼는다.
+- 단계 2–8: manifest의 `files`/`code_files` 목록에 있는 파일을 **빠짐없이, 그리고 목록에 있는 것만** 분석한다. 경로를 추측하지 않는다.
+- 아래 AI 구성요소 게이트는 manifest의 `ai_agent_paths`를 탐지 결과로 사용한다.
 
 ### AI 에이전트 구성요소 스캔 범위 확인 (단계 1 인덱싱 직후, 1회)
 
